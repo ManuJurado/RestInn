@@ -1,13 +1,13 @@
-package GestionHotelera;
+package RestInn;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class GestionHotelAppApplication {
+public class RestInnApp {
 
 	public static void main(String[] args) {
-		SpringApplication.run(GestionHotelAppApplication.class, args);
+		SpringApplication.run(RestInnApp.class, args);
 	}
 
 }
