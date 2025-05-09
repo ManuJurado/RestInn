@@ -17,5 +17,4 @@ public class Empleado {
     private Long id;
     private String nombre, apellido, dni;
     private Double sueldoHora;
-    private Integer horasExtra;
 }
