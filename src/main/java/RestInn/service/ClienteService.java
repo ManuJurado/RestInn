@@ -1,7 +1,7 @@
 package RestInn.service;
 
-import RestInn.entity.Cliente;  // Asegúrate de que esto está bien importado
-import RestInn.repository.ClienteRepository;  // Asegúrate de que esto está bien importado
+import RestInn.entity.usuarios.Cliente;  // Asegúrate de que esto está bien importado
+import RestInn.repository.usuariosRepository.ClienteRepository;  // Asegúrate de que esto está bien importado
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

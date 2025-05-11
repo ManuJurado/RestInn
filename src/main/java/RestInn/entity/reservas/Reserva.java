@@ -1,4 +1,4 @@
-package RestInn.entity;
+package RestInn.entity.reservas;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -11,12 +11,12 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Facturacion {
+public class Reserva {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Double monto;
-    private String metodoPago;
+    private String fechaIngreso;
+    private String fechaSalida;
 }
