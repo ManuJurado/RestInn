@@ -33,4 +33,4 @@ build/
 .vscode/
 
 # Ocultar configuración sensible
-application.properties
+src/main/resources/application.properties
