@@ -1,4 +1,4 @@
-package RestInn.entity;
+package RestInn.entity.facturaciones;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -11,12 +11,12 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Empleado {
+public class Facturacion {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String nombre;
-    private String puesto;
+    private Double monto;
+    private String metodoPago;
 }
