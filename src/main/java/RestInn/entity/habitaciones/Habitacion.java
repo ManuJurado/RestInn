@@ -1,5 +1,7 @@
 package RestInn.entity.habitaciones;
 
+import RestInn.entity.habitaciones.enums.H_Estado;
+import RestInn.entity.habitaciones.enums.H_Tipo;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.GeneratedValue;
@@ -13,17 +15,15 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public abstract class Habitacion {
+public class Habitacion {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String tipo;
-    private Integer numero;
-    private Integer capacidad;
-    private List<String> camas;
-    private Boolean disponible;
-    private EstadoHabitacion estado;  //(alquilada, limpieza, reparación, desinfección, etc. Detallar el motivo)
-    private String detalleEstado;
+    private Integer numero, capacidad;
+    private Boolean activo;     // Borrado Lógico.
+    private Boolean disponible; // Listo para usar.
+    private H_Estado estado;
+    private H_Tipo tipo;
     private Double precioNoche;
 }
