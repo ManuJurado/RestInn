@@ -2,10 +2,9 @@ package RestInn.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import lombok.*;
 
 @Entity
 @Getter
@@ -13,9 +12,11 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Empleado {
+
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String nombre, apellido, dni;
-    private Double sueldoHora;
-    private Integer horasExtra;
+
+    private String nombre;
+    private String puesto;
 }
