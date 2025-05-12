@@ -1,6 +1,7 @@
 package RestInn.controller;
 
-import RestInn.entities.Reserva;
+import RestInn.dto.reservasDTO.ReservaRequestDTO;
+import RestInn.dto.reservasDTO.ReservaResponseDTO;
 import RestInn.service.ReservaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -18,27 +19,33 @@ public class ReservaController {
         this.reservaService = reservaService;
     }
 
+    // Crear una nueva reserva desde un DTO
     @PostMapping
-    public Reserva createReserva(@RequestBody Reserva reserva) {
-        return reservaService.crearReserva(reserva);
+    public ReservaResponseDTO createReserva(@RequestBody ReservaRequestDTO dto) {
+        return reservaService.crearReservaDesdeDto(dto);
     }
 
+    // Actualizar una reserva existente
     @PutMapping("/{id}")
-    public Reserva updateReserva(@PathVariable Long id, @RequestBody Reserva reserva) {
-        return reservaService.actualizarReserva(id, reserva)
-                .orElseThrow(() -> new RuntimeException("No se pudo actualizar la reserva")); // Esto no debería ocurrir por validación previa
+    public ReservaResponseDTO updateReserva(@PathVariable Long id, @RequestBody ReservaRequestDTO dto) {
+        return reservaService.actualizarReservaDesdeDto(id, dto);
     }
 
+    // Obtener todas las reservas (ahora devuelve una lista de ReservaResponseDTO)
     @GetMapping
-    public List<Reserva> getAllReservas() {
-        return reservaService.obtenerReservas();
+    public List<ReservaResponseDTO> getAllReservas() {
+        return reservaService.obtenerReservas().stream()
+                .map(reserva -> new ReservaResponseDTO(reserva.getId(), reserva.getFechaIngreso(), reserva.getFechaSalida()))
+                .toList();
     }
 
+    // Obtener una reserva por ID (ahora devuelve ReservaResponseDTO)
     @GetMapping("/{id}")
-    public Reserva getReservaById(@PathVariable Long id) {
+    public ReservaResponseDTO getReservaById(@PathVariable Long id) {
         return reservaService.obtenerReservaPorId(id);
     }
 
+    // Eliminar una reserva
     @DeleteMapping("/{id}")
     public void deleteReserva(@PathVariable Long id) {
         reservaService.eliminarReserva(id);
