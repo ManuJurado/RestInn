@@ -1,5 +1,6 @@
 package RestInn.dto.reservasDTO;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;

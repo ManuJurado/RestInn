@@ -4,6 +4,8 @@ import RestInn.dto.reservasDTO.ReservaRequestDTO;
 import RestInn.dto.reservasDTO.ReservaResponseDTO;
 import RestInn.entities.Reserva;
 import RestInn.repositories.ReservaRepository;
+import jakarta.annotation.Nonnull;
+import org.antlr.v4.runtime.misc.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -32,8 +34,6 @@ public class ReservaService {
 
     // Crear una nueva reserva desde un DTO
     public ReservaResponseDTO crearReservaDesdeDto(ReservaRequestDTO dto) {
-        validarFechas(dto);
-
         Reserva reserva = new Reserva();
         reserva.setFechaIngreso(dto.getFechaIngreso());
         reserva.setFechaSalida(dto.getFechaSalida());
@@ -57,8 +57,6 @@ public class ReservaService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Reserva no encontrada");
         }
 
-        validarFechas(dto);
-
         Reserva reserva = reservaOptional.get();
         reserva.setFechaIngreso(dto.getFechaIngreso());
         reserva.setFechaSalida(dto.getFechaSalida());
@@ -72,15 +70,6 @@ public class ReservaService {
         reservaRepository.deleteById(id);
     }
 
-    // Metodo de validación de fechas
-    private void validarFechas(ReservaRequestDTO dto) {
-        if (dto.getFechaIngreso() == null || dto.getFechaSalida() == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Fechas requeridas");
-        }
-        if (dto.getFechaIngreso().isAfter(dto.getFechaSalida())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ingreso después de salida");
-        }
-    }
 
     // Metodo de validación de fechas (alternativa para la entidad)
     private void validarFechas(Reserva reserva) {
