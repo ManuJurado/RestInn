@@ -8,7 +8,6 @@ import lombok.*;
 @Setter
 @AllArgsConstructor
 public class HabitacionDTO {
-    private Long id;
     private Boolean activo;     // Borrado Lógico.
     private Boolean disponible; // Listo para usar.
     private H_Estado estado;
