@@ -5,13 +5,15 @@ import RestInn.entities.enums.H_Estado;
 import RestInn.entities.enums.H_Tipo;
 import RestInn.repositories.HabitacionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+@Service
 public class HabitacionService {
     private final HabitacionRepository habitacionRepository;
 
     @Autowired
-    public HabitacionService(HabitacionRepository clienteRepository) {
-        this.habitacionRepository = clienteRepository;
+    public HabitacionService(HabitacionRepository habitacionRepository) {
+        this.habitacionRepository = habitacionRepository;
     }
 
     public Habitacion crearHabitacion() {
