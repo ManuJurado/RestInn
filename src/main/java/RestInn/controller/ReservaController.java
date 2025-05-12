@@ -22,7 +22,7 @@ public class ReservaController {
 
     // Crear una nueva reserva desde un DTO
     @PostMapping
-    public ReservaResponseDTO createReserva(@Valid @RequestBody ReservaRequestDTO dto) {
+    public ReservaResponseDTO createReserva( @RequestBody @Valid ReservaRequestDTO dto) {
         return reservaService.crearReservaDesdeDto(dto);
     }
 
