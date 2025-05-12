@@ -1,6 +1,7 @@
 package RestInn.entities;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.OneToMany;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,7 +14,6 @@ public class Cliente extends Usuario {
 
     private String direccion;
     private String telefono;
-    private List<Reserva> historialReservas;
     private int puntosFidelidad;
     private String tipoCliente;
     private Date fechaNacimiento;

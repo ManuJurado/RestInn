@@ -5,6 +5,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import lombok.*;
+import org.antlr.v4.runtime.misc.NotNull;
+
+import java.time.LocalDate;
 
 @Entity
 @Getter
@@ -17,6 +20,6 @@ public class Reserva {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String fechaIngreso;
-    private String fechaSalida;
+    private LocalDate fechaIngreso;
+    private LocalDate fechaSalida;
 }

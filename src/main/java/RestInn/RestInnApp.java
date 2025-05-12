@@ -10,8 +10,8 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @SpringBootApplication
-@EntityScan(basePackages = "RestInn.entity")
-@EnableJpaRepositories(basePackages = "RestInn.repository")
+@EntityScan(basePackages = "RestInn.entities")
+@EnableJpaRepositories(basePackages = "RestInn.repositories")
 public class RestInnApp implements CommandLineRunner {
 
 	private final ClienteService clienteService;
@@ -30,7 +30,5 @@ public class RestInnApp implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-		habitacionService.crearHabitacion();
-		System.out.println("Habitacion creada con éxito!");
 	}
 }
