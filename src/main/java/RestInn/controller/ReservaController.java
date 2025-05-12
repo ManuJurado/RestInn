@@ -3,6 +3,7 @@ package RestInn.controller;
 import RestInn.dto.reservasDTO.ReservaRequestDTO;
 import RestInn.dto.reservasDTO.ReservaResponseDTO;
 import RestInn.service.ReservaService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,13 +22,13 @@ public class ReservaController {
 
     // Crear una nueva reserva desde un DTO
     @PostMapping
-    public ReservaResponseDTO createReserva(@RequestBody ReservaRequestDTO dto) {
+    public ReservaResponseDTO createReserva(@Valid @RequestBody ReservaRequestDTO dto) {
         return reservaService.crearReservaDesdeDto(dto);
     }
 
     // Actualizar una reserva existente
     @PutMapping("/{id}")
-    public ReservaResponseDTO updateReserva(@PathVariable Long id, @RequestBody ReservaRequestDTO dto) {
+    public ReservaResponseDTO updateReserva(@PathVariable Long id, @Valid @RequestBody ReservaRequestDTO dto) {
         return reservaService.actualizarReservaDesdeDto(id, dto);
     }
 
