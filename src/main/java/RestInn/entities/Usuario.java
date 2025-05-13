@@ -30,7 +30,7 @@ public class Usuario implements Serializable {
     private TipoUsuario tipoUsuario;
 
     @Enumerated(EnumType.STRING)
-    private Optional<RolEmpleado> rolEmpleado;
+    private RolEmpleado rolEmpleado;
 
     // Constructor con validación para rolEmpleado solo si el tipo es EMPLEADO
     public Usuario(String nombre, String apellido, String dni, String email, String password,Direccion direccion, TipoUsuario tipoUsuario, RolEmpleado rolEmpleado) {
@@ -42,9 +42,9 @@ public class Usuario implements Serializable {
         this.direccion = direccion;
         this.tipoUsuario = tipoUsuario;
         if (tipoUsuario == TipoUsuario.EMPLEADO) {
-            this.rolEmpleado = Optional.of(rolEmpleado);
+            this.rolEmpleado = rolEmpleado;
         } else {
-            this.rolEmpleado = Optional.empty();
+            this.rolEmpleado = null;
         }
     }
 }
