@@ -11,6 +11,6 @@ public class FacturacionDTO {
     private Long id;
     private Double montoTotal;
     private String metodoPago;
-    private Long clienteId;  // Relación con Cliente
+    private Long clienteId;
     private Long reservaId;  // Relación con Reserva
 }

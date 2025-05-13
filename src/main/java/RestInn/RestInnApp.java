@@ -1,6 +1,5 @@
 package RestInn;
 
-import RestInn.service.ClienteService;
 import RestInn.service.HabitacionService;
 import RestInn.service.ReservaService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,18 +14,15 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @EnableJpaRepositories(basePackages = "RestInn.repositories")
 public class RestInnApp implements CommandLineRunner {
 
-	private final ClienteService clienteService;
 	private final ReservaService reservaService;
 	private final HabitacionService habitacionService;
 
 	@Autowired
-	public RestInnApp(ClienteService clienteService, HabitacionService habitacionService, ReservaService reservaService) {
-		this.clienteService = clienteService;
+	public RestInnApp(HabitacionService habitacionService, ReservaService reservaService) {
 		this.habitacionService = habitacionService;
 		this.reservaService = reservaService;
 
 	}
-
 
 	public static void main(String[] args) {
 		SpringApplication.run(RestInnApp.class, args);

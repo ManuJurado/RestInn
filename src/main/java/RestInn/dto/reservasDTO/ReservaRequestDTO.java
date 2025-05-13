@@ -8,9 +8,10 @@ import java.time.LocalDate;
 import RestInn.validation.FechasValidas;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 @FechasValidas
 public class ReservaRequestDTO {
-
     @NotNull(message = "fecha ingreso obligatoria")
     private LocalDate fechaIngreso;
     @NotNull(message = "fecha egreso obligatoria")

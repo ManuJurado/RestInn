@@ -8,12 +8,12 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
-
     // Maneja excepciones generales (error interno)
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -21,12 +21,6 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(new ErrorDetails("Error interno del servidor", ex.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    // Maneja excepciones cuando un cliente no se encuentra
-    @ExceptionHandler(ClienteNotFoundException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ResponseEntity<Object> handleClienteNotFoundException(ClienteNotFoundException ex) {
-        return new ResponseEntity<>(new ErrorDetails("Cliente no encontrado", ex.getMessage()), HttpStatus.NOT_FOUND);
-    }
 
     // Maneja excepciones cuando los datos de la solicitud son inválidos
     @ExceptionHandler(InvalidDataException.class)
@@ -45,11 +39,18 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<Object> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        Map<String, Object> response = new HashMap<>();
         Map<String, String> errors = new HashMap<>();
+
         for (FieldError error : ex.getBindingResult().getFieldErrors()) {
             errors.put(error.getField(), error.getDefaultMessage());
         }
-        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+
+        response.put("mensaje", "Error de validación: los campos enviados no son válidos.");
+        response.put("errores", errors);
+        response.put("fecha", LocalDateTime.now());
+
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
     // Maneja excepciones cuando el cliente no tiene permisos suficientes
