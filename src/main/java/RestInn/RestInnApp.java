@@ -27,7 +27,6 @@ public class RestInnApp implements CommandLineRunner {
 
 	}
 
-
 	public static void main(String[] args) {
 		SpringApplication.run(RestInnApp.class, args);
 	}

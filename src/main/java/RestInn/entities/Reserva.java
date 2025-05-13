@@ -16,7 +16,13 @@ public class Reserva {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(
+            nullable = false
+    )
     private LocalDate fechaIngreso;
 
+    @Column(
+            nullable = false
+    )
     private LocalDate fechaSalida;
 }
