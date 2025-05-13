@@ -21,12 +21,6 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(new ErrorDetails("Error interno del servidor", ex.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    // Maneja excepciones cuando un cliente no se encuentra
-    @ExceptionHandler(ClienteNotFoundException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ResponseEntity<Object> handleClienteNotFoundException(ClienteNotFoundException ex) {
-        return new ResponseEntity<>(new ErrorDetails("Cliente no encontrado", ex.getMessage()), HttpStatus.NOT_FOUND);
-    }
 
     // Maneja excepciones cuando los datos de la solicitud son inválidos
     @ExceptionHandler(InvalidDataException.class)
