@@ -23,6 +23,8 @@ public class Usuario implements Serializable {
     private String dni;
     private String email;
     private String password;
+    @Embedded
+    private Direccion direccion;
 
     @Enumerated(EnumType.STRING)
     private TipoUsuario tipoUsuario;
@@ -31,12 +33,13 @@ public class Usuario implements Serializable {
     private Optional<RolEmpleado> rolEmpleado;
 
     // Constructor con validación para rolEmpleado solo si el tipo es EMPLEADO
-    public Usuario(String nombre, String apellido, String dni, String email, String password, TipoUsuario tipoUsuario, RolEmpleado rolEmpleado) {
+    public Usuario(String nombre, String apellido, String dni, String email, String password,Direccion direccion, TipoUsuario tipoUsuario, RolEmpleado rolEmpleado) {
         this.nombre = nombre;
         this.apellido = apellido;
         this.dni = dni;
         this.email = email;
         this.password = password;
+        this.direccion = direccion;
         this.tipoUsuario = tipoUsuario;
         if (tipoUsuario == TipoUsuario.EMPLEADO) {
             this.rolEmpleado = Optional.of(rolEmpleado);
