@@ -70,7 +70,6 @@ public class ReservaService {
         reservaRepository.deleteById(id);
     }
 
-
     // Metodo de validación de fechas (alternativa para la entidad)
     private void validarFechas(Reserva reserva) {
         if (reserva.getFechaIngreso() == null || reserva.getFechaSalida() == null) {
