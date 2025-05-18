@@ -1,4 +1,4 @@
-package RestInn.dto;
+package RestInn.dto.facturacionDTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,7 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class FacturacionDTO {
+public class FacturacionRequestDTO {
     private Long id;
     private Double montoTotal;
     private String metodoPago;
