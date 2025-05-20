@@ -1,4 +1,4 @@
-package RestInn.entities.usuarios;
+package RestInn.entities;
 
 import jakarta.persistence.*;
 import lombok.*;

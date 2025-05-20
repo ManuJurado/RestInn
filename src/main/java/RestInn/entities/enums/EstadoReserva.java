@@ -1,7 +1,7 @@
 package RestInn.entities.enums;
 
-public enum EstadoReservas {
-    INICIADA,
+public enum EstadoReserva {
+    PENDIENTE,
     EN_CURSO,
     FINALIZADA,
     CANCELADA

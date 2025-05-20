@@ -2,15 +2,16 @@ package RestInn.entities.usuarios;
 
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.io.Serializable;
 
-@Entity
+@MappedSuperclass
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@SuperBuilder
 public abstract class Usuario implements Serializable {
 
     @Id
@@ -24,11 +25,4 @@ public abstract class Usuario implements Serializable {
     private String email;
     private String password;
 
-    public Usuario(String nombre, String apellido, String dni, String email, String password) {
-        this.nombre = nombre;
-        this.apellido = apellido;
-        this.dni = dni;
-        this.email = email;
-        this.password = password;
-    }
 }

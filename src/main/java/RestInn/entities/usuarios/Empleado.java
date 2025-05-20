@@ -14,8 +14,4 @@ public class Empleado extends Usuario{
     @Enumerated(EnumType.STRING)
     private RolEmpleado rolEmpleado;
 
-    public Empleado(String nombre, String apellido, String dni, String email, String password, RolEmpleado rolEmpleado) {
-        super(nombre, apellido, dni, email, password);
-        this.rolEmpleado = rolEmpleado;
-    }
 }
