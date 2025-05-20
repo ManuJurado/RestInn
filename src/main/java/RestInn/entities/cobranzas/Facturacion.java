@@ -1,4 +1,4 @@
-package RestInn.entities;
+package RestInn.entities.cobranzas;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;

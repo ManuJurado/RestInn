@@ -1,6 +1,6 @@
 package RestInn.repositories;
 
-import RestInn.entities.Usuario;
+import RestInn.entities.usuarios.Usuario;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

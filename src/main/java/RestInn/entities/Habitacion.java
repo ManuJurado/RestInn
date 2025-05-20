@@ -1,28 +1,63 @@
 package RestInn.entities;
 
+import RestInn.entities.cobranzas.Facturacion;
 import RestInn.entities.enums.H_Estado;
 import RestInn.entities.enums.H_Tipo;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
-import org.antlr.v4.runtime.misc.NotNull;
+
+import java.util.List;
 
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Habitacion {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+        @Column(columnDefinition = "boolean default true",
+                nullable = false)
     private Boolean activo;     // Borrado Lógico.
+
+        @Column(columnDefinition = "boolean default true",
+                nullable = false)
     private Boolean disponible; // Listo para usar.
+
+        @Column(name = "estado",
+                nullable = false)
     private H_Estado estado;
+
+        @Column(name = "tipo",
+                nullable = false)
     private H_Tipo tipo;
-    private Integer numero, capacidad, cantCamas;
+
+        @Column(nullable = false)
+    private Integer numero;
+
+        @Column(nullable = false)
+    private Integer capacidad;
+
+        @Column(name = "cantidad_camas",
+                nullable = false)
+    private Integer cantCamas;
+
+        @Column(nullable = false)
+        @NotNull(message = "El precio por noche no puede ser nulo.")
+        @DecimalMin(value = "0.01", message = "El precio por noche debe ser mayor que 0.")
     private Double precioNoche;
+
     private String comentario;
+    private Imagen imagen;
+
+    @OneToMany(mappedBy = "habitacion")
+    private List<Reserva> reservas;
+
+    @OneToMany(mappedBy = "habitacion")
+    private List<Facturacion> facturaciones;
 }
