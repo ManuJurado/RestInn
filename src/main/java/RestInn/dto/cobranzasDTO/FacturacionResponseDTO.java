@@ -1,4 +1,4 @@
-package RestInn.dto.facturacionDTO;
+package RestInn.dto.cobranzasDTO;
 
 public class FacturacionResponseDTO {
 }
