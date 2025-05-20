@@ -1,11 +1,15 @@
 package RestInn.service;
 
+import RestInn.dto.habitacionesDTO.HabitacionRequestDTO;
+import RestInn.dto.habitacionesDTO.HabitacionResponseDTO;
 import RestInn.entities.Habitacion;
 import RestInn.entities.enums.H_Estado;
 import RestInn.entities.enums.H_Tipo;
 import RestInn.repositories.HabitacionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class HabitacionService {
@@ -16,16 +20,26 @@ public class HabitacionService {
         this.habitacionRepository = habitacionRepository;
     }
 
-    public Habitacion crearHabitacion() {
-        Habitacion habitacion = new Habitacion();
-        habitacion.setCantCamas(2);
-        habitacion.setDisponible(true);
-        habitacion.setCapacidad(3);
-        habitacion.setNumero(19);
-        habitacion.setDisponible(true);
-        habitacion.setTipo(H_Tipo.DOBLE);
-        habitacion.setEstado(H_Estado.DISPONIBLE);
-        habitacion.setPrecioNoche(26000.0);
-        return habitacionRepository.save(habitacion);
+    public HabitacionResponseDTO crearHabitacion(HabitacionRequestDTO habReqDTO) {
+
+        return null;
+    }
+
+    public HabitacionResponseDTO modificarHabitacion(Long id, HabitacionRequestDTO habReqDTO){
+
+        return null;
+    }
+
+    public void borrarHabitacion(Long id){
+
+    }
+
+    public void cambiarEstadoHabitacion(Long id,  H_Estado nuevoEstado){
+
+    }
+
+    public List<HabitacionResponseDTO> obtenerHabitacionesDisponibles(){
+
+        return List.of();
     }
 }
