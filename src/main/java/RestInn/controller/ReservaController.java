@@ -20,33 +20,26 @@ public class ReservaController {
         this.reservaService = reservaService;
     }
 
-    // Crear una nueva reserva desde un DTO
     @PostMapping
-    public ReservaResponseDTO createReserva( @RequestBody @Valid ReservaRequestDTO dto) {
+    public ReservaResponseDTO createReserva(@RequestBody @Valid ReservaRequestDTO dto) {
         return reservaService.crearReservaDesdeDto(dto);
     }
 
-    // Actualizar una reserva existente
     @PutMapping("/{id}")
     public ReservaResponseDTO updateReserva(@PathVariable Long id, @Valid @RequestBody ReservaRequestDTO dto) {
         return reservaService.actualizarReservaDesdeDto(id, dto);
     }
 
-    // Obtener todas las reservas (ahora devuelve una lista de ReservaResponseDTO)
     @GetMapping
     public List<ReservaResponseDTO> getAllReservas() {
-        return reservaService.obtenerReservas().stream()
-                .map(reserva -> new ReservaResponseDTO(reserva.getId(), reserva.getFechaIngreso(), reserva.getFechaSalida()))
-                .toList();
+        return reservaService.obtenerReservas();  // Ya viene completo desde el servicio
     }
 
-    // Obtener una reserva por ID (ahora devuelve ReservaResponseDTO)
     @GetMapping("/{id}")
     public ReservaResponseDTO getReservaById(@PathVariable Long id) {
         return reservaService.obtenerReservaPorId(id);
     }
 
-    // Eliminar una reserva
     @DeleteMapping("/{id}")
     public void deleteReserva(@PathVariable Long id) {
         reservaService.eliminarReserva(id);

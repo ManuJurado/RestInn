@@ -1,82 +1,133 @@
 package RestInn.service;
 
+import RestInn.dto.reservasDTO.HuespedRequestDTO;
 import RestInn.dto.reservasDTO.ReservaRequestDTO;
 import RestInn.dto.reservasDTO.ReservaResponseDTO;
+import RestInn.entities.enums.EstadoReserva;
+import RestInn.entities.Habitacion;
+import RestInn.entities.Huesped;
 import RestInn.entities.Reserva;
+import RestInn.entities.usuarios.Usuario;
+import RestInn.repositories.HabitacionRepository;
 import RestInn.repositories.ReservaRepository;
-import jakarta.annotation.Nonnull;
-import org.antlr.v4.runtime.misc.NotNull;
+import RestInn.repositories.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ReservaService {
 
     private final ReservaRepository reservaRepository;
+    private final UsuarioRepository usuarioRepository;
+    private final HabitacionRepository habitacionRepository;
 
     @Autowired
-    public ReservaService(ReservaRepository reservaRepository) {
+    public ReservaService(ReservaRepository reservaRepository,
+                          UsuarioRepository usuarioRepository,
+                          HabitacionRepository habitacionRepository) {
         this.reservaRepository = reservaRepository;
+        this.usuarioRepository = usuarioRepository;
+        this.habitacionRepository = habitacionRepository;
     }
 
-    // Obtener todas las reservas
+    // Obtener todas las reservas (con map a DTO completo)
     public List<ReservaResponseDTO> obtenerReservas() {
         List<Reserva> reservas = reservaRepository.findAll();
         return reservas.stream()
-                .map(reserva -> new ReservaResponseDTO(reserva.getId(), reserva.getFechaIngreso(), reserva.getFechaSalida()))
+                .map(this::mapReservaAResponseDTO)
                 .toList();
     }
 
-    // Crear una nueva reserva desde un DTO
+    // Crear reserva desde DTO, mapeando huespedes también
     public ReservaResponseDTO crearReservaDesdeDto(ReservaRequestDTO dto) {
+        // Validación de fechas la hace el validador @ReservaValida
+        Usuario usuario = usuarioRepository.findById(dto.getUsuarioId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
+
+        Habitacion habitacion = habitacionRepository.findById(dto.getHabitacionId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Habitación no encontrada"));
+
         Reserva reserva = new Reserva();
+        reserva.setUsuario(usuario);
+        reserva.setHabitacion(habitacion);
         reserva.setFechaIngreso(dto.getFechaIngreso());
         reserva.setFechaSalida(dto.getFechaSalida());
+        reserva.setFechaReserva(LocalDate.now());
+        reserva.setEstadoReserva(EstadoReserva.PENDIENTE); // Ajusta según tu lógica
 
-        Reserva saved = reservaRepository.save(reserva);
-        return new ReservaResponseDTO(saved.getId(), saved.getFechaIngreso(), saved.getFechaSalida());
+        // Mapear huespedes desde DTO a entidad
+        if (dto.getHuespedes() != null && !dto.getHuespedes().isEmpty()) {
+            List<Huesped> huespedes = dto.getHuespedes().stream()
+                    .map(this::mapHuespedRequestDtoAEntidad)
+                    .collect(Collectors.toList());
+            reserva.setHuespedes(huespedes);
+        }
+
+        Reserva guardada = reservaRepository.save(reserva);
+
+        return mapReservaAResponseDTO(guardada);
     }
 
-    // Obtener una reserva por ID
+    // Obtener reserva por ID
     public ReservaResponseDTO obtenerReservaPorId(Long id) {
         Reserva reserva = reservaRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Reserva con ID " + id + " no encontrada."));
 
-        return new ReservaResponseDTO(reserva.getId(), reserva.getFechaIngreso(), reserva.getFechaSalida());
+        return mapReservaAResponseDTO(reserva);
     }
 
-    // Actualizar una reserva desde un DTO
+    // Actualizar reserva desde DTO (sin tocar usuario, habitación ni huespedes por simplicidad)
     public ReservaResponseDTO actualizarReservaDesdeDto(Long id, ReservaRequestDTO dto) {
-        Optional<Reserva> reservaOptional = reservaRepository.findById(id);
-        if (reservaOptional.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Reserva no encontrada");
-        }
+        Reserva reserva = reservaRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Reserva no encontrada"));
 
-        Reserva reserva = reservaOptional.get();
         reserva.setFechaIngreso(dto.getFechaIngreso());
         reserva.setFechaSalida(dto.getFechaSalida());
+        // Si querés actualizar huespedes, tendrías que hacerlo acá también.
 
-        Reserva updated = reservaRepository.save(reserva);
-        return new ReservaResponseDTO(updated.getId(), updated.getFechaIngreso(), updated.getFechaSalida());
+        Reserva actualizada = reservaRepository.save(reserva);
+
+        return mapReservaAResponseDTO(actualizada);
     }
 
-    // Eliminar una reserva por ID
+    // Eliminar reserva por ID
     public void eliminarReserva(Long id) {
         reservaRepository.deleteById(id);
     }
 
-    // Metodo de validación de fechas (alternativa para la entidad)
-    private void validarFechas(Reserva reserva) {
-        if (reserva.getFechaIngreso() == null || reserva.getFechaSalida() == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Las fechas de ingreso y salida son obligatorias.");
-        }
-        if (reserva.getFechaIngreso().isAfter(reserva.getFechaSalida())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La fecha de ingreso no puede ser posterior a la fecha de salida.");
-        }
+    // --- Mapeos privados ---
+
+    private ReservaResponseDTO mapReservaAResponseDTO(Reserva reserva) {
+        List<Long> huespedesIds = reserva.getHuespedes() != null
+                ? reserva.getHuespedes().stream().map(h -> h.getId()).toList()
+                : List.of();
+
+        return new ReservaResponseDTO(
+                reserva.getId(),
+                reserva.getFechaIngreso(),
+                reserva.getFechaSalida(),
+                reserva.getFechaReserva(),
+                reserva.getUsuario().getId(),
+                reserva.getHabitacion().getId(),
+                huespedesIds,
+                reserva.getEstadoReserva().name() // o .toString() según quieras
+        );
+    }
+
+    private Huesped mapHuespedRequestDtoAEntidad(HuespedRequestDTO dto) {
+        Huesped huesped = new Huesped();
+        // Mapea los campos necesarios, ej:
+        huesped.setNombre(dto.getNombre());
+        huesped.setApellido(dto.getApellido());
+        huesped.setDni(dto.getDni());
+        // etc, según tu entidad y DTO de huesped
+        return huesped;
     }
 }
