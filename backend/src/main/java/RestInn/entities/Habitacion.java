@@ -53,6 +53,9 @@ public class Habitacion {
     private Double precioNoche;
 
     private String comentario;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "imagen_id")
     private Imagen imagen;
 
     @OneToMany(mappedBy = "habitacion")

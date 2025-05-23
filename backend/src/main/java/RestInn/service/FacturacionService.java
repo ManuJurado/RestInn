@@ -8,7 +8,7 @@ import java.util.List;
 
 public class FacturacionService {
     private FacturacionRepository facturacionRepository;
-    private ReservaRepository reservaRepository;
+    private ReservaService reservaService;
 
     public Facturacion generarFactura(Long reservaId) {
 
