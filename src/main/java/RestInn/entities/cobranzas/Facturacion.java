@@ -1,9 +1,7 @@
 package RestInn.entities.cobranzas;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
+import RestInn.entities.Habitacion;
+import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
@@ -18,4 +16,8 @@ public class Facturacion {
 
     private Double monto;
     private String metodoPago;
+
+    @ManyToOne
+    @JoinColumn(name = "habitacion_id")
+    private Habitacion habitacion;
 }

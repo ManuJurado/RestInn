@@ -6,7 +6,8 @@ import lombok.experimental.SuperBuilder;
 
 import java.io.Serializable;
 
-@MappedSuperclass
+@Entity  // Cambiar de @MappedSuperclass a @Entity
+@Inheritance(strategy = InheritanceType.JOINED) // o SINGLE_TABLE según tu diseño
 @Getter
 @Setter
 @NoArgsConstructor
@@ -18,7 +19,7 @@ public abstract class Usuario implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Boolean activo; //Borrado lógico.
+    private Boolean activo;
     private String nombre;
     private String apellido;
     private String dni;
