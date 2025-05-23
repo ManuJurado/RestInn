@@ -39,7 +39,7 @@ public class Reserva {
     @Column(nullable = false)
     private EstadoReserva estadoReserva;
 
-    @Column(nullable = false)
+    @Column(name = "fecha_reserva", nullable = true)
     private LocalDate fechaReserva;
 
     @Column(nullable = false, name = "fecha_ingreso")
