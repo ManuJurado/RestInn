@@ -59,8 +59,5 @@ public class Habitacion {
     private Imagen imagen;
 
     @OneToMany(mappedBy = "habitacion")
-    private List<Reserva> reservas;
-
-    @OneToMany(mappedBy = "habitacion")
     private List<Facturacion> facturaciones;
 }
