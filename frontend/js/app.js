@@ -1,5 +1,5 @@
 // frontend/js/app.js
-fetch('http://localhost:8080/api/habitaciones')
+fetch('http://localhost:8080/habitaciones')
   .then(response => response.json())
   .then(data => {
     const lista = document.getElementById('habitaciones-list');

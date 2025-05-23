@@ -42,4 +42,25 @@ public class HabitacionService {
 
         return List.of();
     }
+
+    public List<HabitacionResponseDTO> listarTodas() {
+        return habitacionRepository.findAll()
+                .stream()
+                .map(this::convertirAResponseDTO)
+                .toList();
+    }
+
+    private HabitacionResponseDTO convertirAResponseDTO(Habitacion habitacion) {
+        return HabitacionResponseDTO.builder()
+                .id(habitacion.getId())
+                .numero(habitacion.getNumero())
+                .capacidad(habitacion.getCapacidad())
+                .estado(habitacion.getEstado())
+                .tipo(habitacion.getTipo())
+                .precioNoche(habitacion.getPrecioNoche())
+                .comentario(habitacion.getComentario())
+                .build();
+    }
+
+
 }
