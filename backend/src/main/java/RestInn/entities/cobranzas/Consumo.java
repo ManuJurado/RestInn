@@ -4,13 +4,12 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
-public class Consumo {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+import java.math.BigDecimal;
 
-    private Double precioUnitario;
+public class Consumo {
+    private Long id;
+    private String descripcion;
     private Integer cantidad;
-    private String detalle;
-    private Double montoTotal;
+    private BigDecimal precioUnitario;
+    private BigDecimal subtotal;
 }

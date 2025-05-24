@@ -7,7 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class FacturacionRequestDTO {
+public class FacturaRequestDTO {
     private Long id;
     private Double montoTotal;
     private String metodoPago;
