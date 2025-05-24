@@ -1,6 +1,6 @@
 package RestInn.entities;
 
-import RestInn.entities.cobranzas.Facturacion;
+import RestInn.entities.cobranzas.Factura;
 import RestInn.entities.enums.H_Estado;
 import RestInn.entities.enums.H_Tipo;
 import jakarta.persistence.*;
@@ -8,6 +8,7 @@ import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Entity
@@ -50,7 +51,7 @@ public class Habitacion {
         @Column(nullable = false)
         @NotNull(message = "El precio por noche no puede ser nulo.")
         @DecimalMin(value = "0.01", message = "El precio por noche debe ser mayor que 0.")
-    private Double precioNoche;
+    private BigDecimal precioNoche;
 
     private String comentario;
 
@@ -59,5 +60,5 @@ public class Habitacion {
     private Imagen imagen;
 
     @OneToMany(mappedBy = "habitacion")
-    private List<Facturacion> facturaciones;
+    private List<Factura> facturaciones;
 }
