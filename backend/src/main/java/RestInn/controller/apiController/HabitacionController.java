@@ -1,7 +1,6 @@
-package RestInn.controller;
+package RestInn.controller.apiController;
 
 import RestInn.dto.habitacionesDTO.HabitacionResponseDTO;
-import RestInn.entities.Habitacion;
 import RestInn.service.HabitacionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;

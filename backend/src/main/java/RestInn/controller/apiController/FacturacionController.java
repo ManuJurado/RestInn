@@ -1,4 +1,4 @@
-package RestInn.controller;
+package RestInn.controller.apiController;
 
 import org.springframework.web.bind.annotation.RestController;
 

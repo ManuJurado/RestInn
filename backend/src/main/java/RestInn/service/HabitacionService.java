@@ -4,7 +4,6 @@ import RestInn.dto.habitacionesDTO.HabitacionRequestDTO;
 import RestInn.dto.habitacionesDTO.HabitacionResponseDTO;
 import RestInn.entities.Habitacion;
 import RestInn.entities.enums.H_Estado;
-import RestInn.entities.enums.H_Tipo;
 import RestInn.repositories.HabitacionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
