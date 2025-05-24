@@ -22,8 +22,13 @@ public abstract class Usuario implements Serializable {
     private Boolean activo;
     private String nombre;
     private String apellido;
+    private String nombreLogin;
     private String dni;
+    private String phoneNumber;
     private String email;
     private String password;
+    private String CUIT;
+
+
 
 }
