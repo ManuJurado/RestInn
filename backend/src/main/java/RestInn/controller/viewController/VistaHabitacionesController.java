@@ -8,6 +8,6 @@ public class VistaHabitacionesController {
 
     @GetMapping("/verTodasHabitaciones")
     public String verTodasHabitaciones() {
-        return "habitaciones.html";  // devuelve el archivo estático de resources/static
+        return "habitaciones";  // devuelve el archivo estático de resources/static
     }
 }

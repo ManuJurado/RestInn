@@ -1,29 +1,13 @@
-// src/main/resources/static/js/habitaciones.js
 document.addEventListener('DOMContentLoaded', () => {
-  fetch('/habitaciones')  // ruta relativa al backend en el mismo dominio
+  fetch('/habitaciones')
     .then(response => {
       if (!response.ok) throw new Error('Error al obtener habitaciones');
       return response.json();
     })
     .then(data => {
-      const tabla = document.getElementById('tabla-habitaciones');
+      const tbody = document.querySelector('#tabla-habitaciones tbody');
+      tbody.innerHTML = ''; // limpiar por si acaso
 
-      // Crear encabezados
-      const thead = document.createElement('thead');
-      thead.innerHTML = `
-        <tr>
-          <th>Número</th>
-          <th>Tipo</th>
-          <th>Estado</th>
-          <th>Capacidad</th>
-          <th>Precio por Noche</th>
-          <th>Comentario</th>
-        </tr>
-      `;
-      tabla.appendChild(thead);
-
-      // Crear cuerpo
-      const tbody = document.createElement('tbody');
       data.forEach(h => {
         const fila = document.createElement('tr');
         fila.innerHTML = `
@@ -36,7 +20,6 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
         tbody.appendChild(fila);
       });
-      tabla.appendChild(tbody);
     })
     .catch(error => {
       console.error('Error al cargar habitaciones:', error);
