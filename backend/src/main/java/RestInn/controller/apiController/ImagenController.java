@@ -1,4 +1,4 @@
-package RestInn.controller;
+package RestInn.controller.apiController;
 
 import RestInn.entities.Imagen;
 import RestInn.service.ImagenService;

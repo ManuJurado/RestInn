@@ -34,6 +34,6 @@ public class RestInnApp implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-		// Sin lógica para crear o modificar datos
+
 	}
 }

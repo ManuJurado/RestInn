@@ -30,12 +30,12 @@ public class Habitacion {
                 nullable = false)
     private Boolean disponible; // Listo para usar.
 
-        @Column(name = "estado",
-                nullable = false)
+    @Enumerated(EnumType.STRING)
+    @Column(name = "estado", nullable = false)
     private H_Estado estado;
 
-        @Column(name = "tipo",
-                nullable = false)
+    @Enumerated(EnumType.STRING)
+    @Column(name = "tipo", nullable = false)
     private H_Tipo tipo;
 
         @Column(nullable = false)

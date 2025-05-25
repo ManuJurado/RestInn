@@ -1,4 +1,4 @@
-package RestInn.controller;
+package RestInn.controller.apiController;
 
 import RestInn.dto.reservasDTO.ReservaRequestDTO;
 import RestInn.dto.reservasDTO.ReservaResponseDTO;
@@ -11,6 +11,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/reservas")
+@CrossOrigin(origins = "*") // permite peticiones desde el frontend local
 public class ReservaController {
 
     private final ReservaService reservaService;

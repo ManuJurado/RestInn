@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Lista de Habitaciones</title>
+    <style>
+        table {
+          border-collapse: collapse;
+          width: 100%;
+        }
+        th, td {
+          padding: 8px;
+          border: 1px solid #ccc;
+        }
+        th {
+          background-color: #f4f4f4;
+        }
+    </style>
+</head>
+<body>
+<h1>Habitaciones Disponibles</h1>
+<table id="habitaciones-table">
+    <thead>
+    <tr>
+        <th>Número</th>
+        <th>Tipo</th>
+        <th>Precio por Noche</th>
+        <th>Capacidad</th>
+        <th>Estado</th>
+        <th>Comentario</th>
+    </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+<script>
+    fetch('http://localhost:8080/habitaciones')
+      .then(res => res.json())
+      .then(habitaciones => {
+        const tbody = document.querySelector('#habitaciones-table tbody');
+        habitaciones.forEach(h => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${h.numero}</td>
+            <td>${h.tipo}</td>
+            <td>$${h.precioNoche.toFixed(2)}</td>
+            <td>${h.capacidad}</td>
+            <td>${h.estado}</td>
+            <td>${h.comentario || '-'}</td>
+          `;
+          tbody.appendChild(row);
+        });
+      })
+      .catch(error => {
+        console.error('Error al cargar habitaciones:', error);
+        const tbody = document.querySelector('#habitaciones-table tbody');
+        const row = document.createElement('tr');
+        row.innerHTML = `<td colspan="6">Error al cargar habitaciones</td>`;
+        tbody.appendChild(row);
+      });
+</script>
+</body>
+</html>
