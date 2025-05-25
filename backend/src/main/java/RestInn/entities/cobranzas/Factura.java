@@ -1,5 +1,6 @@
 package RestInn.entities.cobranzas;
 
+import RestInn.entities.Habitacion;
 import RestInn.entities.Reserva;
 import RestInn.entities.enums.EstadoFactura;
 import RestInn.entities.enums.MetodoPago;
@@ -16,9 +17,15 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Factura {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private LocalDate fechaEmision;
+
+    @OneToMany(cascade = CascadeType.ALL)  // asumo la relación con consumos, ajustá según necesidad
     private List<Consumo> consumos;
+
     private BigDecimal subtotal;  // reserva + consumos
     private MetodoPago metodoPago;
     private Double cuotas;
@@ -29,4 +36,7 @@ public class Factura {
     private Double haber;   // pagado
     private Double debe;    // deuda
 
+    @ManyToOne
+    @JoinColumn(name = "habitacion_id")
+    private Habitacion habitacion;  // <-- ESTE CAMPO FALTABA
 }

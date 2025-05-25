@@ -1,30 +1,31 @@
 package RestInn.service;
 
-import RestInn.entities.cobranzas.Facturacion;
-import RestInn.repositories.FacturacionRepository;
+import RestInn.entities.cobranzas.Factura;
+import RestInn.repositories.FacturaRepository;
+
 
 import java.util.List;
 
 public class FacturacionService {
-    private FacturacionRepository facturacionRepository;
+    private FacturaRepository facturacionRepository;
     private ReservaService reservaService;
 
-    public Facturacion generarFactura(Long reservaId) {
+    public Factura generarFactura(Long reservaId) {
 
         return null;
     }
 
-    public Facturacion obtenerFacturaPorId(Long id) {
+    public Factura obtenerFacturaPorId(Long id) {
 
         return null;
     }
 
-    public List<Facturacion> obtenerFacturas()  {
+    public List<Factura> obtenerFacturas()  {
 
         return null;
     }
 
-    public List<Facturacion> obtenerFacturasPorCliente(Long clienteId) {
+    public List<Factura> obtenerFacturasPorCliente(Long clienteId) {
 
         return null;
     }

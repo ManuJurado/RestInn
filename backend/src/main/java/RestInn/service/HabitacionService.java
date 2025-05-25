@@ -20,8 +20,28 @@ public class HabitacionService {
     }
 
     public HabitacionResponseDTO crearHabitacion(HabitacionRequestDTO habReqDTO) {
+        Habitacion habitacion = convertirAEntidad(habReqDTO);
 
-        return null;
+        // Por default, si no envían activo/disponible, ponemos true
+        if (habitacion.getActivo() == null) habitacion.setActivo(true);
+        if (habitacion.getDisponible() == null) habitacion.setDisponible(true);
+
+        Habitacion habitacionGuardada = habitacionRepository.save(habitacion);
+        return convertirAResponseDTO(habitacionGuardada);
+    }
+
+    private Habitacion convertirAEntidad(HabitacionRequestDTO dto) {
+        return Habitacion.builder()
+                .estado(dto.getEstado())
+                .tipo(dto.getTipo())
+                .numero(dto.getNumero())
+                .capacidad(dto.getCapacidad())
+                .cantCamas(dto.getCantCamas())
+                .precioNoche(dto.getPrecioNoche())
+                .comentario(dto.getComentario())
+                .activo(dto.getActivo())
+                .disponible(dto.getDisponible())
+                .build();
     }
 
     public HabitacionResponseDTO modificarHabitacion(Long id, HabitacionRequestDTO habReqDTO){
