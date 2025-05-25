@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Reservas</title>
+  <style>
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+    }
+    th {
+      background-color: #f0f0f0;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Listado de Reservas</h1>
+
+<table id="reservas-table">
+  <thead>
+  <tr>
+    <th>ID Reserva</th>
+    <th>Fecha Reserva</th>
+    <th>Fecha Ingreso</th>
+    <th>Fecha Salida</th>
+    <th>ID Habitación</th>
+    <th>ID Usuario</th>
+    <th>Estado Reserva</th>
+  </tr>
+  </thead>
+  <tbody>
+  </tbody>
+</table>
+
+<script>
+  fetch('http://localhost:8080/reservas')
+    .then(response => response.json())
+    .then(reservas => {
+      const tbody = document.querySelector('#reservas-table tbody');
+      reservas.forEach(r => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${r.id}</td>
+          <td>${r.fechaReserva || '-'}</td>
+          <td>${r.fechaIngreso || '-'}</td>
+          <td>${r.fechaSalida || '-'}</td>
+          <td>${r.habitacionId}</td>
+          <td>${r.usuarioId}</td>
+          <td>${r.estado}</td>
+        `;
+        tbody.appendChild(row);
+      });
+    })
+    .catch(error => {
+      console.error('Error al cargar reservas:', error);
+      const tbody = document.querySelector('#reservas-table tbody');
+      const row = document.createElement('tr');
+      row.innerHTML = `<td colspan="7">Error al cargar las reservas</td>`;
+      tbody.appendChild(row);
+    });
+</script>
+
+</body>
+</html>

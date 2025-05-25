@@ -1,8 +1,9 @@
-package RestInn.controller;
+package RestInn.controller.apiController;
 
+import RestInn.dto.habitacionesDTO.HabitacionRequestDTO;
 import RestInn.dto.habitacionesDTO.HabitacionResponseDTO;
-import RestInn.entities.Habitacion;
 import RestInn.service.HabitacionService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,4 +21,15 @@ public class HabitacionController {
     public List<HabitacionResponseDTO> listarHabitaciones() {
         return habitacionService.listarTodas();
     }
+
+    @PostMapping
+    public HabitacionResponseDTO crearHabitacion(@RequestBody @Valid HabitacionRequestDTO dto) {
+        return habitacionService.crearHabitacion(dto);
+    }
+
+    @PostMapping("/test")
+    public String testPost() {
+        return "POST funciona";
+    }
+
 }
