@@ -58,7 +58,4 @@ public class Habitacion {
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "imagen_id")
     private Imagen imagen;
-
-    @OneToMany(mappedBy = "habitacion")
-    private List<Factura> facturaciones;
 }
