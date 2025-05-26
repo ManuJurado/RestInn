@@ -2,10 +2,16 @@ package RestInn.controller.apiController;
 
 import RestInn.dto.reservasDTO.ReservaRequestDTO;
 import RestInn.dto.reservasDTO.ReservaResponseDTO;
+import RestInn.entities.usuarios.Usuario;
 import RestInn.service.ReservaService;
+import RestInn.service.UsuarioService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -15,10 +21,20 @@ import java.util.List;
 public class ReservaController {
 
     private final ReservaService reservaService;
+    private final UsuarioService usuarioService;
 
     @Autowired
-    public ReservaController(ReservaService reservaService) {
+    public ReservaController(ReservaService reservaService, UsuarioService usuarioService) {
         this.reservaService = reservaService;
+        this.usuarioService = usuarioService;
+    }
+
+    @GetMapping("/mias")
+    @PreAuthorize("isAuthenticated()")
+    public List<ReservaResponseDTO> reservasDelUsuario(Authentication auth) {
+        Usuario usuario = usuarioService.buscarEntidadPorNombreLogin(auth.getName())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
+        return reservaService.obtenerReservasPorUsuarioId(usuario.getId());
     }
 
     @PostMapping
