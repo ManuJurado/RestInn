@@ -26,10 +26,6 @@ public class Habitacion {
                 nullable = false)
     private Boolean activo;     // Borrado Lógico.
 
-        @Column(columnDefinition = "boolean default true",
-                nullable = false)
-    private Boolean disponible; // Listo para usar.
-
     @Enumerated(EnumType.STRING)
     @Column(name = "estado", nullable = false)
     private H_Estado estado;
@@ -40,6 +36,9 @@ public class Habitacion {
 
         @Column(nullable = false)
     private Integer numero;
+
+    @Column(nullable = false)
+    private Integer piso;
 
         @Column(nullable = false)
     private Integer capacidad;
@@ -55,7 +54,6 @@ public class Habitacion {
 
     private String comentario;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "imagen_id")
+        @Embedded
     private Imagen imagen;
 }
