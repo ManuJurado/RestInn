@@ -9,7 +9,6 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 @Entity
 @Getter
@@ -59,6 +58,4 @@ public class Habitacion {
     @JoinColumn(name = "imagen_id")
     private Imagen imagen;
 
-    @OneToMany(mappedBy = "habitacion")
-    private List<Factura> facturaciones;
 }
