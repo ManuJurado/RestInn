@@ -5,10 +5,13 @@ import RestInn.dto.usuariosDTO.UsuarioResponseDTO;
 import RestInn.entities.usuarios.*;
 import RestInn.repositories.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -78,6 +81,14 @@ public class UsuarioService {
         Usuario usuario = usuarioRepository.findByNombreLogin(nombreLogin)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
         return mapToResponse(usuario);
+    }
+
+    public Optional<Usuario> buscarEntidadPorId(Long id) {
+        return usuarioRepository.findById(id);
+    }
+
+    public Optional<Usuario> buscarEntidadPorNombreLogin(String nombreLogin) {
+        return usuarioRepository.findByNombreLogin(nombreLogin);
     }
 
     // UTILIDAD: mapear DTO → entidad
