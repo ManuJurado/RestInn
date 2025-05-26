@@ -1,0 +1,16 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    height: 100vh;
+    color: white;
+    background:
+        linear-gradient(rgba(44, 62, 80, 0.7), rgba(76, 161, 175, 0.7)),
+        url('../images/logo.png') no-repeat center center fixed;
+    background-size: cover;
+}
+
+h1 {
+    font-size: 2.5em;
+    margin: 0;
+}

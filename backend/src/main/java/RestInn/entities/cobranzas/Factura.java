@@ -1,5 +1,6 @@
 package RestInn.entities.cobranzas;
 
+import RestInn.entities.Habitacion;
 import RestInn.entities.Reserva;
 import RestInn.entities.enums.EstadoFactura;
 import RestInn.entities.enums.MetodoPago;
@@ -24,12 +25,12 @@ public class Factura {
     @Column(name = "factura_id")
     private Long id;
 
-    @OneToOne
-    @JoinColumn(name = "cliente_id")
+    @ManyToOne
+    @JoinColumn(name = "cliente_id", nullable = false)
     private Cliente cliente;
 
     @OneToOne
-    @JoinColumn(name = "reserva_id")
+    @JoinColumn(name = "reserva_id", nullable = false)
     private Reserva reserva;
 
     @Column(name = "fecha_emision", nullable = false)
@@ -69,4 +70,3 @@ public class Factura {
     @DecimalMin("0.00")
     private BigDecimal debe;    // deuda
 }
-
