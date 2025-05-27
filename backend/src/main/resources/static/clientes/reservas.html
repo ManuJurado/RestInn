@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Mis Reservas</title>
     <!-- Rutas absolutas para CSS en static/css -->
     <link rel="stylesheet" href="/css/base.css" />
@@ -15,9 +15,28 @@
 </head>
 <body>
 <h1 class="labels">Mis reservas</h1>
-<!-- Contenedor donde se monta la tabla -->
-<div class="contenedorReservas" id="contenedorReservas"></div>
-<!-- Script modularizado -->
+
+<div class="wrapper" style="display: flex; gap: 20px;">
+    <!-- Panel lateral de filtros -->
+    <aside style="min-width: 200px;">
+        <div class="filtro-fecha">
+            <label for="fechaInicio" class="labels">Desde</label>
+            <input id="fechaInicio" type="date" class="inputs" />
+        </div>
+        <div class="filtro-fecha">
+            <label for="fechaFin" class="labels">Hasta</label>
+            <input id="fechaFin" type="date" class="inputs" />
+        </div>
+        <button id="btnFiltrar" class="btn-filtrar">Aplicar filtro</button>
+        <button id="btnLimpiar" class="btn-limpiar">Limpiar filtro</button>
+    </aside>
+
+    <!-- Contenedor principal de la tabla -->
+    <main style="flex: 1; overflow-x: auto;">
+        <div id="contenedorReservas" class="contenedorReservas"></div>
+    </main>
+</div>
+
 <script src="/js/reservas.js"></script>
 </body>
 </html>
