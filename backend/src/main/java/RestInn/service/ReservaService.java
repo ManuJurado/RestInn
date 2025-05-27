@@ -8,9 +8,7 @@ import RestInn.entities.Habitacion;
 import RestInn.entities.Huesped;
 import RestInn.entities.Reserva;
 import RestInn.entities.usuarios.Usuario;
-import RestInn.repositories.HabitacionRepository;
 import RestInn.repositories.ReservaRepository;
-import RestInn.repositories.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -18,7 +16,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -101,7 +98,13 @@ public class ReservaService {
         reservaRepository.deleteById(id);
     }
 
-    // --- Mapeos privados ---
+    public List<ReservaResponseDTO> buscarReservasEntreFechas(Usuario usuario, LocalDate desde, LocalDate hasta) {
+        List<Reserva> reservas = reservaRepository.findByUsuarioAndFechaIngresoLessThanEqualAndFechaSalidaGreaterThanEqual(usuario, desde, hasta);
+
+        return reservas.stream()
+                .map(this::mapReservaAResponseDTO)
+                .toList();
+    }
 
     public List<ReservaResponseDTO> obtenerReservasPorUsuarioId(Long usuarioId) {
         List<Reserva> reservas = reservaRepository.findByUsuarioId(usuarioId);
