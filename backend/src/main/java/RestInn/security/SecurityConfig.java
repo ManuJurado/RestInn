@@ -34,18 +34,15 @@ public class SecurityConfig {
         http
                 // Deshabilitar CSRF para API REST
                 .csrf(AbstractHttpConfigurer::disable)
-
                 // Configurar CORS con bean
                 .cors(Customizer.withDefaults())
-
                 // Registrar el provider personalizado
                 .authenticationProvider(authenticationProvider())
-
                 // Reglas de autorización
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/api/login",
-                                "/logout",
+                                "/logout","/reservas",
                                 "/registro", "/recuperar-password",
                                 "/", "/index.html", "/login.html",
                                 "/css/**", "/js/**", "/images/**",
@@ -57,7 +54,6 @@ public class SecurityConfig {
                         .requestMatchers("/empleados/**").hasAuthority("ROLE_EMPLEADO")
                         .anyRequest().authenticated()
                 )
-
                 // Configurar logout
                 .logout(logout -> logout
                         .logoutUrl("/logout")
@@ -66,12 +62,10 @@ public class SecurityConfig {
                         .deleteCookies("JSESSIONID")
                         .permitAll()
                 )
-
                 // Política de sesión
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
                 );
-
         return http.build();
     }
 

@@ -1,5 +1,6 @@
 package RestInn.dto.reservasDTO;
 
+import RestInn.entities.Huesped;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -22,4 +23,8 @@ public class ReservaResponseDTO {
     private List<Long> huespedesIds;
 
     private String estado; // Podés usar EstadoReserva directamente si querés devolver el enum
+
+    private Integer habitacionNumero;
+    private List<Huesped> huespedes;
+
 }
