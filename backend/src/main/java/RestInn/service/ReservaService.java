@@ -18,22 +18,22 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 public class ReservaService {
-
     private final ReservaRepository reservaRepository;
-    private final UsuarioRepository usuarioRepository;
-    private final HabitacionRepository habitacionRepository;
+    private final UsuarioService usuarioService;
+    private final HabitacionService habitacionService;
 
     @Autowired
     public ReservaService(ReservaRepository reservaRepository,
-                          UsuarioRepository usuarioRepository,
-                          HabitacionRepository habitacionRepository) {
+                          UsuarioService usuarioService,
+                          HabitacionService habitacionService) {
         this.reservaRepository = reservaRepository;
-        this.usuarioRepository = usuarioRepository;
-        this.habitacionRepository = habitacionRepository;
+        this.usuarioService = usuarioService;
+        this.habitacionService = habitacionService;
     }
 
     // Obtener todas las reservas (con map a DTO completo)
@@ -47,10 +47,10 @@ public class ReservaService {
     // Crear reserva desde DTO, mapeando huespedes también
     public ReservaResponseDTO crearReservaDesdeDto(ReservaRequestDTO dto) {
         // Validación de fechas la hace el validador @ReservaValida
-        Usuario usuario = usuarioRepository.findById(dto.getUsuarioId())
+        Usuario usuario = usuarioService.buscarEntidadPorId(dto.getUsuarioId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
 
-        Habitacion habitacion = habitacionRepository.findById(dto.getHabitacionId())
+        Habitacion habitacion = habitacionService.buscarEntidadPorId(dto.getHabitacionId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Habitación no encontrada"));
 
         Reserva reserva = new Reserva();
@@ -118,6 +118,13 @@ public class ReservaService {
                 huespedesIds,
                 reserva.getEstadoReserva().name() // o .toString() según quieras
         );
+    }
+
+    public List<ReservaResponseDTO> obtenerReservasPorUsuarioId(Long usuarioId) {
+        List<Reserva> reservas = reservaRepository.findByUsuarioId(usuarioId);
+        return reservas.stream()
+                .map(this::mapReservaAResponseDTO)
+                .toList();
     }
 
     private Huesped mapHuespedRequestDtoAEntidad(HuespedRequestDTO dto) {

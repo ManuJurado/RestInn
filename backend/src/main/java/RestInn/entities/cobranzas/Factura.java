@@ -1,5 +1,6 @@
 package RestInn.entities.cobranzas;
 
+import RestInn.entities.Habitacion;
 import RestInn.entities.Reserva;
 import RestInn.entities.enums.EstadoFactura;
 import RestInn.entities.enums.MetodoPago;
@@ -69,4 +70,3 @@ public class Factura {
     @DecimalMin("0.00")
     private BigDecimal debe;    // deuda
 }
-

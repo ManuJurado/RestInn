@@ -1,5 +1,6 @@
 package RestInn.entities;
 
+import RestInn.entities.cobranzas.Factura;
 import RestInn.entities.enums.EstadoReserva;
 import RestInn.entities.usuarios.Usuario;
 import jakarta.persistence.*;
@@ -47,4 +48,8 @@ public class Reserva {
 
     @Column(nullable = false, name = "fecha_salida")
     private LocalDate fechaSalida;
+
+    @OneToOne(mappedBy = "reserva", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    private Factura factura;
+    
 }

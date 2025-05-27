@@ -1,6 +1,7 @@
 package RestInn.entities.enums;
 
 public enum H_Tipo {
+    SIMPLE,
     INDIVIDUAL,
     DOBLE,
     TRIPLE,

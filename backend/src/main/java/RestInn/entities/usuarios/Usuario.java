@@ -6,13 +6,14 @@ import lombok.experimental.SuperBuilder;
 
 import java.io.Serializable;
 
-@Entity  // Cambiar de @MappedSuperclass a @Entity
-@Inheritance(strategy = InheritanceType.JOINED) // o SINGLE_TABLE según tu diseño
+@SuperBuilder
+@NoArgsConstructor(force = true)
+@AllArgsConstructor
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@SuperBuilder
+@Entity
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "DTYPE")
 public abstract class Usuario implements Serializable {
 
     @Id
@@ -28,7 +29,5 @@ public abstract class Usuario implements Serializable {
     private String email;
     private String password;
     private String CUIT;
-
-
 
 }
