@@ -1,4 +1,4 @@
-.button {
+.button-left {
     display: inline-block;
     padding: 100px 60px; /* mantenemos el padding igual */
     font-size: 1.1em;
@@ -36,20 +36,60 @@
     text-align: center;        /* por si hay varias líneas */
     padding-bottom: 50px;      /* un poco más de espacio abajo si querés */
 }
+.button-left:hover {
+    filter: brightness(1.3);
+}
 
 
-.button:hover {
+.button-right {
+    display: inline-block;
+    padding: 100px 60px; /* mantenemos el padding igual */
+    font-size: 1.1em;
+    cursor: pointer;
+    border: none;
+    color: white;
+    border-radius: 18px;
+
+    background-image: url('../images/boton2right.png');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 100% 100%;
+
+    background-color: transparent;
+
+        text-shadow: 1px 1px 3px rgba(0,0,0,0.7);
+
+        transition: filter 0.2s ease;
+
+    /*fuente de letras de botones */
+    font-family: 'Pirata One', cursive;
+      font-size: 1.8em;
+      color: #000;
+      text-shadow:
+        2px 2px 4px rgba(150, 75, 0, 0.7),
+        -1px -1px 0 #fff;
+
+
+    /* para bajar el texto: */
+    line-height: 1;            /* reset para controlar mejor altura */
+    height: 80%;              /* que el botón tome todo el alto del fondo */
+    display: flex;             /* flex para controlar alineación */
+    align-items: flex-end;     /* texto abajo */
+    justify-content: center;   /* texto centrado horizontal */
+    text-align: center;        /* por si hay varias líneas */
+    padding-bottom: 50px;      /* un poco más de espacio abajo si querés */
+}
+.button-right:hover {
     filter: brightness(1.3);
 }
 
 .button-container-right {
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
+  align-items: flex-end; /*derecha*/
   width: 100vw;
   padding: 20px 5px 20px 20px;
   box-sizing: border-box;
-  position: fixed;
   top: 20px;
   right: 0;
   z-index: 1000;
@@ -62,7 +102,6 @@
   width: 100vw;
   padding: 20px 20px 20px 0px; /* menos padding a la izquierda */
   box-sizing: border-box;
-  position: fixed;
   top: 20px;
   left: 0;
   z-index: 1000;

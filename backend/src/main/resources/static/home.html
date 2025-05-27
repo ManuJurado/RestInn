@@ -6,15 +6,22 @@
     <link rel="stylesheet" href="css/base.css" />
     <link rel="stylesheet" href="css/layout.css" />
     <link rel="stylesheet" href="css/buttons.css" />
+    <link rel="stylesheet" href="css/labels.css" />
+    <link rel="stylesheet" href="css/inputs.css" />
+    <link rel="stylesheet" href="css/wrapper.css" />
 </head>
 <body>
-<div class="container">
-    <h1>Bienvenido, <span id="username">...</span></h1>
 
-    <button id="btnReservas">Ver mis reservas</button>
-    <button id="btnHabitaciones">Ver habitaciones disponibles</button>
-    <button id="btnDatos">Ver mis datos</button>
-    <button id="btnCerrar">Cerrar sesión</button>
+<div class="wrapper">
+    <div class="button-column left">
+        <button class="button-left" id="btnReservas">Ver mis reservas</button>
+        <button class="button-left" id="btnHabitaciones">Ver habitaciones disponibles</button>
+        <!-- más botones si querés -->
+    </div>
+    <div class="button-column right">
+        <button class="button-right" id="btnDatos">Ver mis datos</button>
+        <button class="button-right" id="btnCerrar">Cerrar sesión</button>
+    </div>
 </div>
 
 <script src="/js/home.js"></script>

@@ -2,8 +2,10 @@ package RestInn.service;
 
 import RestInn.dto.habitacionesDTO.HabitacionRequestDTO;
 import RestInn.dto.habitacionesDTO.HabitacionResponseDTO;
+import RestInn.dto.usuariosDTO.UsuarioResponseDTO;
 import RestInn.entities.Habitacion;
 import RestInn.entities.enums.H_Estado;
+import RestInn.entities.usuarios.Usuario;
 import RestInn.repositories.HabitacionRepository;
 import RestInn.repositories.specifications.HabitacionSprecification;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +13,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class HabitacionService {
@@ -52,7 +55,16 @@ public class HabitacionService {
     }
 
     public void borrarHabitacion(Long id){
+    }
 
+    public HabitacionResponseDTO buscarPorId(Long id) {
+        Habitacion habitacion = habitacionRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        return convertirAResponseDTO(habitacion);
+    }
+
+    public Optional<Habitacion> buscarEntidadPorId(Long id) {
+        return habitacionRepository.findById(id);
     }
 
     public void cambiarEstadoHabitacion(Long id,  H_Estado nuevoEstado){
