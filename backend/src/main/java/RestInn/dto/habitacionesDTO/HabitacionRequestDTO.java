@@ -24,6 +24,9 @@ public class HabitacionRequestDTO {
     @NotNull(message = "El número es obligatorio")
     private Integer numero;
 
+    @NotNull(message = "El piso es obligatorio")
+    private Integer piso;
+
     @NotNull(message = "La capacidad es obligatoria")
     private Integer capacidad;
 
@@ -37,5 +40,4 @@ public class HabitacionRequestDTO {
     private String comentario;
 
     private Boolean activo;      // opcional, puede venir o no
-    private Boolean disponible;  // opcional
 }

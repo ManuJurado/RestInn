@@ -8,6 +8,7 @@ import lombok.*;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Embeddable
 public class Imagen {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

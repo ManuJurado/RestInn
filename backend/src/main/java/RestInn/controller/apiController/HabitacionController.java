@@ -2,6 +2,8 @@ package RestInn.controller.apiController;
 
 import RestInn.dto.habitacionesDTO.HabitacionRequestDTO;
 import RestInn.dto.habitacionesDTO.HabitacionResponseDTO;
+import RestInn.entities.Habitacion;
+import RestInn.entities.enums.H_Estado;
 import RestInn.service.HabitacionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -32,4 +34,13 @@ public class HabitacionController {
         return "POST funciona";
     }
 
+
+    @GetMapping
+    public List<Habitacion> filtrarProductos(
+            @RequestParam(required = false) H_Estado tipo,
+            @RequestParam(required = false) Integer capacidad,
+            @RequestParam(required = false) Double precioNoche,
+            @RequestParam(required = false) Integer cantCamas) {
+        return habitacionService.buscarProductos (tipo, capacidad, precioNoche, cantCamas);
+    }
 }
