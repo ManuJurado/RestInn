@@ -15,7 +15,7 @@ public class HabitacionSprecification {
                 capacidad == null ? null :
                         criteriaBuilder.equal(root.get("capacidad"), capacidad);
     }
-    public static Specification<Habitacion> precioNocheMenorA (Double precioNoche) {
+    public static Specification<Habitacion> precioNocheMenorA(Double precioNoche) {
         return (root, query, criteriaBuilder) ->
                 precioNoche == null ? null :
                         criteriaBuilder.lessThanOrEqualTo(root.get("precioNoche"), precioNoche);
