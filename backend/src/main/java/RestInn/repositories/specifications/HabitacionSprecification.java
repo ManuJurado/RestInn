@@ -10,7 +10,7 @@ public class HabitacionSprecification {
                 tipo == null ? null :
                         criteriaBuilder.equal(root.get("tipo"), tipo);
     }
-    public static Specification<Habitacion> tieneCapacidad (Integer capacidad) {
+    public static Specification<Habitacion> tieneCapacidad(Integer capacidad) {
         return (root, query, criteriaBuilder) ->
                 capacidad == null ? null :
                         criteriaBuilder.equal(root.get("capacidad"), capacidad);
