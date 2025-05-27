@@ -50,6 +50,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     }
 
+    //Comportamiento del button para crear reservas en cliente
+    document.getElementById('btnCrearReserva').addEventListener('click', () => {
+        window.location.href = '/clientes/crearReserva.html';
+    });
+
     // Ejemplo simple para renderizar las reservas en HTML:
     function renderTabla(reservas) {
         if (!reservas || reservas.length === 0) {
