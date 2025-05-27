@@ -34,13 +34,12 @@ public class HabitacionController {
         return "POST funciona";
     }
 
-
-    @GetMapping
-    public List<Habitacion> filtrarProductos(
+    @GetMapping("/filtrar")
+    public List<Habitacion> filtrarHabitaciones(
             @RequestParam(required = false) H_Estado tipo,
             @RequestParam(required = false) Integer capacidad,
             @RequestParam(required = false) Double precioNoche,
             @RequestParam(required = false) Integer cantCamas) {
-        return habitacionService.buscarProductos (tipo, capacidad, precioNoche, cantCamas);
+        return habitacionService.buscarHabitaciones (tipo, capacidad, precioNoche, cantCamas);
     }
 }

@@ -22,8 +22,7 @@ public class Habitacion {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-        @Column(columnDefinition = "boolean default true",
-                nullable = false)
+    @Column(columnDefinition = "boolean default true", nullable = false)
     private Boolean activo;     // Borrado Lógico.
 
     @Enumerated(EnumType.STRING)
@@ -54,6 +53,6 @@ public class Habitacion {
 
     private String comentario;
 
-        @Embedded
+    @Embedded
     private Imagen imagen;
 }

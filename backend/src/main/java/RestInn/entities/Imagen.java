@@ -3,20 +3,16 @@ package RestInn.entities;
 import jakarta.persistence.*;
 import lombok.*;
 
-@Entity
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Embeddable
 public class Imagen {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
+    private Long imagenId;
     private String nombre;
 
-    private String tipo; // ej: "image/png"
+    private String tipoImagen; // ej: "image/png"
 
     @Lob
     @Column(columnDefinition = "LONGBLOB")
