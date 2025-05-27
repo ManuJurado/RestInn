@@ -19,10 +19,6 @@ public class HabitacionController {
 
     private final HabitacionService habitacionService;
 
-    public HabitacionController (HabitacionService habitacionService) {
-        this.habitacionService = habitacionService;
-    }
-
     @GetMapping
     public List<HabitacionResponseDTO> listarHabitaciones() {
         return habitacionService.listarTodas();
