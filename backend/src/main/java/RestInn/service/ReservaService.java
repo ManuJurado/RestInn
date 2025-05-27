@@ -103,9 +103,20 @@ public class ReservaService {
 
     // --- Mapeos privados ---
 
+    public List<ReservaResponseDTO> obtenerReservasPorUsuarioId(Long usuarioId) {
+        List<Reserva> reservas = reservaRepository.findByUsuarioId(usuarioId);
+        return reservas.stream()
+                .map(this::mapReservaAResponseDTO)
+                .toList();
+    }
+
     private ReservaResponseDTO mapReservaAResponseDTO(Reserva reserva) {
         List<Long> huespedesIds = reserva.getHuespedes() != null
-                ? reserva.getHuespedes().stream().map(h -> h.getId()).toList()
+                ? reserva.getHuespedes().stream().map(Huesped::getId).toList()
+                : List.of();
+
+        List<Huesped> huespedes = reserva.getHuespedes() != null
+                ? reserva.getHuespedes()
                 : List.of();
 
         return new ReservaResponseDTO(
@@ -116,15 +127,10 @@ public class ReservaService {
                 reserva.getUsuario().getId(),
                 reserva.getHabitacion().getId(),
                 huespedesIds,
-                reserva.getEstadoReserva().name() // o .toString() según quieras
+                reserva.getEstadoReserva().name(),
+                reserva.getHabitacion().getNumero(),
+                huespedes
         );
-    }
-
-    public List<ReservaResponseDTO> obtenerReservasPorUsuarioId(Long usuarioId) {
-        List<Reserva> reservas = reservaRepository.findByUsuarioId(usuarioId);
-        return reservas.stream()
-                .map(this::mapReservaAResponseDTO)
-                .toList();
     }
 
     private Huesped mapHuespedRequestDtoAEntidad(HuespedRequestDTO dto) {

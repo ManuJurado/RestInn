@@ -1,13 +1,23 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Reservas</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Reservas</title>
+    <!-- Rutas absolutas para CSS en static/css -->
+    <link rel="stylesheet" href="/css/base.css" />
+    <link rel="stylesheet" href="/css/layout.css" />
+    <link rel="stylesheet" href="/css/buttons.css" />
+    <link rel="stylesheet" href="/css/labels.css" />
+    <link rel="stylesheet" href="/css/inputs.css" />
+    <link rel="stylesheet" href="/css/wrapper.css" />
+    <link rel="stylesheet" href="/css/contenedorReservas.css" />
 </head>
 <body>
-<h1>Mis reservas</h1>
-<div id="contenedorReservas"></div>
+<h1 class="labels">Mis reservas</h1>
+<!-- Contenedor donde se monta la tabla -->
+<div class="contenedorReservas" id="contenedorReservas"></div>
+<!-- Script modularizado -->
 <script src="/js/reservas.js"></script>
 </body>
-
 </html>

@@ -1,5 +1,6 @@
 package RestInn.dto.reservasDTO;
 
+import RestInn.entities.enums.EstadoReserva;
 import RestInn.validation.ReservaValida;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -10,7 +11,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@ReservaValida // validador personalizado que asegura que fechaIngreso < fechaSalida
+@ReservaValida
 public class ReservaRequestDTO {
 
     @NotNull(message = "La fecha de ingreso es obligatoria.")
@@ -19,11 +20,16 @@ public class ReservaRequestDTO {
     @NotNull(message = "La fecha de salida es obligatoria.")
     private LocalDate fechaSalida;
 
+    private LocalDate fechaReserva; // opcional: puede ser asignada automáticamente en el service si viene null
+
+    private EstadoReserva estadoReserva = EstadoReserva.PENDIENTE; // valor por defecto, si no se envía
+
     @NotNull(message = "El ID del usuario es obligatorio.")
     private Long usuarioId;
 
     @NotNull(message = "El ID de la habitación es obligatorio.")
     private Long habitacionId;
 
+    @NotNull(message = "Debe especificar al menos un huésped.")
     private List<HuespedRequestDTO> huespedes;
 }

@@ -45,7 +45,7 @@ function configurarEventos() {
 
     if (btnReservas) {
         btnReservas.addEventListener("click", () => {
-            window.location.href = "/cliente/reservas.html";
+            window.location.href = "/clientes/reservas.html";
         });
     }
 

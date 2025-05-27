@@ -18,7 +18,6 @@ function login() {
         }
     })
     .then(data => {
-        alert(`Login exitoso\nUsuario: ${data.username}\nRol: ${data.rol}`);
         window.location.href = "/home.html";
     })
     .catch(err => {
