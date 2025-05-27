@@ -96,7 +96,7 @@ public class HabitacionService {
                 .build();
     }
 
-    public List<Habitacion> buscarProductos (H_Estado tipo, Integer capacidad, Double precioNoche, Integer cantCamas) {
+    public List<Habitacion> buscarHabitaciones (H_Estado tipo, Integer capacidad, Double precioNoche, Integer cantCamas) {
         Specification<Habitacion> spec = Specification
                 .where (HabitacionSprecification.tieneTipo (tipo))
                 .and (HabitacionSprecification.tieneCapacidad (capacidad))
