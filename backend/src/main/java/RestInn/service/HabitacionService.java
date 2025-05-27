@@ -4,6 +4,7 @@ import RestInn.dto.habitacionesDTO.HabitacionRequestDTO;
 import RestInn.dto.habitacionesDTO.HabitacionResponseDTO;
 import RestInn.dto.usuariosDTO.UsuarioResponseDTO;
 import RestInn.entities.Habitacion;
+import RestInn.entities.Imagen;
 import RestInn.entities.enums.H_Estado;
 import RestInn.entities.usuarios.Usuario;
 import RestInn.repositories.HabitacionRepository;
@@ -11,6 +12,7 @@ import RestInn.repositories.specifications.HabitacionSprecification;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;
@@ -96,7 +98,7 @@ public class HabitacionService {
                 .build();
     }
 
-    public List<Habitacion> buscarProductos (H_Estado tipo, Integer capacidad, Double precioNoche, Integer cantCamas) {
+    public List<Habitacion> buscarHabitaciones (H_Estado tipo, Integer capacidad, Double precioNoche, Integer cantCamas) {
         Specification<Habitacion> spec = Specification
                 .where (HabitacionSprecification.tieneTipo (tipo))
                 .and (HabitacionSprecification.tieneCapacidad (capacidad))
@@ -104,5 +106,18 @@ public class HabitacionService {
                 .and (HabitacionSprecification.tieneCantCamas(cantCamas));
 // La consulta se ejecuta con los filtros aplicados
         return habitacionRepository.findAll(spec);
+    }
+
+
+    public Imagen guardarImagen(MultipartFile archivo) throws Exception {
+        Imagen imagen = new Imagen();
+        imagen.setNombre(archivo.getOriginalFilename());
+        imagen.setTipoImagen(archivo.getContentType());
+        imagen.setDatos(archivo.getBytes());
+        return habitacionRepository.saveImagen(imagen);
+    }
+
+    public Imagen obtenerImagen(Long id) {
+        return habitacionRepository.findByImagenId(id).orElse(null);
     }
 }

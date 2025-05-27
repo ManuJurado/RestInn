@@ -10,13 +10,11 @@ import lombok.*;
 @NoArgsConstructor
 @Embeddable
 public class Imagen {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long Imagen_id;
 
     private String nombre;
 
-    private String tipo; // ej: "image/png"
+    private String tipoImagen; // ej: "image/png"
 
     @Lob
     @Column(columnDefinition = "LONGBLOB")
