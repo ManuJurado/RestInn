@@ -36,7 +36,7 @@ public class HabitacionController {
 
 
     @GetMapping
-    public List<Habitacion> filtrarProductos (
+    public List<Habitacion> filtrarProductos(
             @RequestParam(required = false) H_Estado tipo,
             @RequestParam(required = false) Integer capacidad,
             @RequestParam(required = false) Double precioNoche,
