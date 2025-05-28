@@ -22,6 +22,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*") // permite peticiones desde el frontend local
 public class HabitacionController {
+    @Autowired
     private final HabitacionService habitacionService;
 
     @GetMapping
@@ -48,6 +49,7 @@ public class HabitacionController {
             @RequestParam(required = false) Integer cantCamas) {
         return habitacionService.buscarHabitaciones (tipo, capacidad, precioNoche, cantCamas);
     }
+
 
     //Get para recibir lsita de habitaciones disponibles en un rango de fechas. Considera las habitaciones que no esten reservadas dentro de el rango establecido
     @GetMapping("/disponibles")

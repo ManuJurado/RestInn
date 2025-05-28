@@ -61,6 +61,9 @@ public class ReservaService {
                 habitacion, dto.getFechaSalida(), dto.getFechaIngreso()
         );
 
+        HabitacionResponseDTO habitacionDTO = habitacionService.buscarDTOPorId(dto.getHabitacionId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Habitación no encontrada"));
+        Habitacion habitacionEntidad = habitacionService.convertirAEntidad(habitacionDTO);
         if (ocupado) {
             throw new ResponseStatusException(
                     HttpStatus.CONFLICT,
@@ -70,7 +73,7 @@ public class ReservaService {
 
         Reserva reserva = new Reserva();
         reserva.setUsuario(usuario);
-        reserva.setHabitacion(habitacion);
+        reserva.setHabitacion(habitacionEntidad);
         reserva.setFechaIngreso(dto.getFechaIngreso());
         reserva.setFechaSalida(dto.getFechaSalida());
         reserva.setFechaReserva(LocalDate.now());
