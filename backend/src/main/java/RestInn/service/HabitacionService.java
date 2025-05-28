@@ -10,25 +10,27 @@ import RestInn.entities.usuarios.Usuario;
 import RestInn.repositories.HabitacionRepository;
 import RestInn.repositories.ImagenRepository;
 import RestInn.repositories.specifications.HabitacionSprecification;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class HabitacionService {
     private final HabitacionRepository habitacionRepository;
-    private final ImagenRepository imagenRepository;
+    private final ReservaService reservaService;
 
     @Autowired
-    public HabitacionService(HabitacionRepository habitacionRepository, ImagenRepository imagenRepository) {
+    public HabitacionService(HabitacionRepository habitacionRepository, @Lazy ReservaService reservaService) {
         this.habitacionRepository = habitacionRepository;
-        this.imagenRepository = imagenRepository;
+        this.reservaService = reservaService;
     }
-
 
     public HabitacionResponseDTO crearHabitacion(HabitacionRequestDTO habReqDTO) {
         Habitacion habitacion = convertirAEntidad(habReqDTO);
@@ -61,7 +63,6 @@ public class HabitacionService {
     }
 
     public void borrarHabitacion(Long id){
-
     }
 
     public HabitacionResponseDTO buscarPorId(Long id) {
@@ -78,6 +79,9 @@ public class HabitacionService {
 
     }
 
+    public List<HabitacionResponseDTO> obtenerHabitacionesDisponibles(){
+        return List.of();
+    }
 
     public List<HabitacionResponseDTO> listarTodas() {
         return habitacionRepository.findAll()
@@ -109,16 +113,34 @@ public class HabitacionService {
         return habitacionRepository.findAll(spec);
     }
 
+    //metodo agregado para obtener lista de habitaciones disponibles en un rango de fechas. Se usa reservaService
+    public List<HabitacionResponseDTO> obtenerHabitacionesDisponibles(LocalDate ingreso,
+                                                                      LocalDate salida) {
+        // 1) Todas las habitaciones
+        List<HabitacionResponseDTO> todas = habitacionRepository.findAll()
+                .stream()
+                .map(h -> new HabitacionResponseDTO(
+                        h.getId(),
+                        h.getActivo(),
+                        h.getEstado(),
+                        h.getTipo(),
+                        h.getNumero(),
+                        h.getPiso(),
+                        h.getCapacidad(),
+                        h.getCantCamas(),
+                        h.getPrecioNoche(),
+                        h.getComentario(),
+                        h.getImagenes()
+                ))
+                .toList();
 
-    public Imagen guardarImagen(MultipartFile archivo) throws Exception {
-        Imagen imagen = new Imagen();
-        imagen.setNombre(archivo.getOriginalFilename());
-        imagen.setTipoImagen(archivo.getContentType());
-        imagen.setDatos(archivo.getBytes());
-        return habitacionRepository.saveImagen(imagen);
+        // 2) IDs ocupadas delegadas al service de reservas
+        Set<Long> ocupadasIds = reservaService.obtenerIdsHabitacionesOcupadas(ingreso, salida);
+
+        // 3) Quedarnos sólo con las libres
+        return todas.stream()
+                .filter(dto -> !ocupadasIds.contains(dto.getId()))
+                .toList();
     }
 
-    public Imagen obtenerImagen(Long id) {
-        return habitacionRepository.findByImagenId(id).orElse(null);
-    }
 }

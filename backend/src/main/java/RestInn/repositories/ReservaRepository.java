@@ -21,4 +21,9 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
             LocalDate fechaSalida,
             LocalDate fechaIngreso
     );
+
+    List<Reserva> findByFechaIngresoLessThanAndFechaSalidaGreaterThan(
+            LocalDate fechaSalida, LocalDate fechaIngreso);
+
+
 }

@@ -31,7 +31,6 @@ public class ReservaController {
         this.usuarioService = usuarioService;
     }
 
-
     //ENDPOINTS GET-----------------------------------------------------------------------------------------------
     @GetMapping
     public List<ReservaResponseDTO> getAllReservas() {
@@ -93,6 +92,18 @@ public class ReservaController {
                 .buscarEntidadPorNombreLogin(userName)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
         return reservaService.crearReservaDesdeDto(dto, usuario);
+    }
+
+    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLEADO')")
+    @PostMapping("/{reservaId}/checkin")
+    public void checkIn(@PathVariable Long reservaId) {
+        reservaService.realizarCheckIn(reservaId);
+    }
+
+    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLEADO')")
+    @PostMapping("/{reservaId}/checkout")
+    public void checkOut(@PathVariable Long reservaId) {
+        reservaService.realizarCheckOut(reservaId);
     }
 
     //ENDPOINTS PUT-----------------------------------------------------------------------------------------------

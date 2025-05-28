@@ -25,6 +25,21 @@ public class UsuarioController {
         this.usuarioService = usuarioService;
     }
 
+    //ENDPOINTS GET----------------------------------------------------------------------------------------------
+    // Cualquier autenticado puede buscar por ID (pero en el servicio validás si es su propia cuenta o si tiene permisos)
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/{id}")
+    public ResponseEntity<UsuarioResponseDTO> buscarUsuarioPorId(@PathVariable Long id) {
+        return ResponseEntity.ok(usuarioService.buscarPorId(id));
+    }
+
+    // Solo ADMIN y EMPLEADO pueden ver todos los usuarios(sin su informacion sensible)
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping
+    public ResponseEntity<List<UsuarioResponseDTO>> listarUsuarios() {
+        return ResponseEntity.ok(usuarioService.verUsuarios());
+    }
+
     @GetMapping("/current")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<UsuarioResponseDTO> getUsuarioActual(Authentication authentication) {
@@ -70,19 +85,5 @@ public class UsuarioController {
     public ResponseEntity<Void> borrarUsuario(@PathVariable Long id) {
         usuarioService.borrarUsuario(id);
         return ResponseEntity.noContent().build();
-    }
-
-    // Solo ADMIN y EMPLEADO pueden ver todos los usuarios
-    @PreAuthorize("isAuthenticated()")
-    @GetMapping
-    public ResponseEntity<List<UsuarioResponseDTO>> listarUsuarios() {
-        return ResponseEntity.ok(usuarioService.verUsuarios());
-    }
-
-    // Cualquier autenticado puede buscar por ID (pero en el servicio validás si es su propia cuenta o si tiene permisos)
-    @PreAuthorize("isAuthenticated()")
-    @GetMapping("/{id}")
-    public ResponseEntity<UsuarioResponseDTO> buscarUsuarioPorId(@PathVariable Long id) {
-        return ResponseEntity.ok(usuarioService.buscarPorId(id));
     }
 }
