@@ -7,16 +7,16 @@ import RestInn.entities.enums.H_Estado;
 import RestInn.service.HabitacionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/habitaciones")
+@RequestMapping("/api/habitaciones")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*") // permite peticiones desde el frontend local
 public class HabitacionController {
-
     private final HabitacionService habitacionService;
 
     @GetMapping

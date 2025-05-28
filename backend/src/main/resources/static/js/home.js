@@ -1,31 +1,21 @@
-// home.js
-
-// Función para obtener datos del usuario actual
-async function fetchUsuarioActual() {
-    try {
-        const res = await fetch("/api/usuarios/current", {
-            credentials: "include"
-        });
-
-        if (res.status === 401) {
-            // No logueado, no hago nada (o redirijo)
-            return null;
-        }
-
-        if (!res.ok) {
-            throw new Error("Error inesperado: " + res.status);
-        }
-
-        const data = await res.json();
-        return data;
-
-    } catch (error) {
-        console.error("Error al obtener usuario:", error);
-        if (window.location.pathname !== "/login.html") {
-            window.location.href = "/login.html";
-        }
+async function obtenerUsuarioActual() {
+    const token = localStorage.getItem("jwt");
+    if (!token) {
+        window.location.href = "/login.html";
         return null;
     }
+
+    const res = await fetch("/api/usuarios/current", {
+        headers: { "Authorization": `Bearer ${token}` }
+    });
+
+    if (res.status === 401) {
+        window.location.href = "/login.html";
+        return null;
+    }
+    if (!res.ok) throw new Error("Error inesperado: " + res.status);
+
+    return await res.json();
 }
 
 // Función para actualizar UI con datos del usuario
@@ -43,54 +33,26 @@ function configurarEventos() {
     const btnDatos = document.getElementById("btnDatos");
     const btnCerrar = document.getElementById("btnCerrar");
 
-    if (btnReservas) {
-        btnReservas.addEventListener("click", () => {
-            window.location.href = "/cliente/reservas.html";
-        });
-    }
-
-    if (btnHabitaciones) {
-        btnHabitaciones.addEventListener("click", () => {
-            window.location.href = "/habitaciones.html";
-        });
-    }
-
-    if (btnDatos) {
-        btnDatos.addEventListener("click", () => {
-            window.location.href = "/cliente/mis-datos.html";
-        });
-    }
+    if (btnReservas) btnReservas.addEventListener("click", () => window.location.href = "/clientes/reservas.html");
+    if (btnHabitaciones) btnHabitaciones.addEventListener("click", () => window.location.href = "/habitaciones.html");
+    if (btnDatos) btnDatos.addEventListener("click", () => window.location.href = "/cliente/mis-datos.html");
 
     if (btnCerrar) {
-        btnCerrar.addEventListener("click", async () => {
-            try {
-                const res = await fetch("/logout", {
-                    method: "POST",
-                    credentials: "include"
-                });
-                if (res.ok) {
-                    window.location.href = "/login.html";
-                } else {
-                    alert("Error al cerrar sesión");
-                }
-            } catch {
-                alert("Error al cerrar sesión");
-            }
+        btnCerrar.addEventListener("click", () => {
+            // Para "cerrar sesión" con JWT, simplemente borramos el token local
+            localStorage.removeItem("jwt");
+            window.location.href = "/login.html";
         });
     }
 }
 
-// Función principal para inicializar el home
+// Función principal para inicializar home
 async function initHome() {
-    const usuario = await fetchUsuarioActual();
-    if (!usuario) {
-        // No logueado, redirigir a login
-        window.location.href = "/login.html";
-        return;
-    }
+    const usuario = await obtenerUsuarioActual();
+    if (!usuario) return; // Ya redirige a login en obtenerUsuarioActual
+
     mostrarNombreUsuario(usuario.nombreLogin);
     configurarEventos();
 }
 
-// Ejecutar al cargar el script
 document.addEventListener("DOMContentLoaded", initHome);

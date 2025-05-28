@@ -1,23 +1,141 @@
 document.addEventListener("DOMContentLoaded", async () => {
-    try {
-        const res = await fetch("/reservas/mias", {
-            credentials: "include"
-        });
+    const contenedor = document.getElementById('contenedorReservas');
+    const btnFiltrar = document.getElementById('btnFiltrar');
+    const btnLimpiar = document.getElementById('btnLimpiar');
+    const inputInicio = document.getElementById('fechaInicio');
+    const inputFin = document.getElementById('fechaFin');
 
-        if (!res.ok) {
-            throw new Error("Error al obtener reservas");
+    let userName;
+
+    // Reutilizamos obtenerUsuarioActual definida en home.js (o repetirla igual acá)
+    async function obtenerUsuarioActual() {
+        const token = localStorage.getItem('jwt');
+        if (!token) throw new Error('No hay token guardado');
+
+        const res = await fetch('/api/usuarios/current', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (!res.ok) throw new Error('No se pudo obtener el usuario autenticado');
+        return await res.json();
+    }
+
+    try {
+        const user = await obtenerUsuarioActual();
+        userName = user.nombreLogin;
+    } catch (err) {
+        alert('No se pudo obtener el usuario autenticado');
+        window.location.href = "/login.html";
+        return;
+    }
+
+    async function fetchReservas(inicio, fin) {
+        contenedor.innerHTML = 'Cargando...';
+        let url = `/api/reservas/${userName}/misReservas`;
+        if (inicio && fin) url += `/${inicio}/${fin}`;
+
+        try {
+            const token = localStorage.getItem('jwt');
+            const res = await fetch(url, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (!res.ok) {
+                const txt = await res.text();
+                throw new Error(`${res.status} – ${txt}`);
+            }
+            const reservas = await res.json();
+            return reservas;
+        } catch (err) {
+            contenedor.innerHTML = `<p class="error">Error al cargar reservas: ${err.message}</p>`;
+            return null;
+        }
+    }
+
+    // Ejemplo simple para renderizar las reservas en HTML:
+    function renderTabla(reservas) {
+        if (!reservas || reservas.length === 0) {
+            contenedor.innerHTML = '<p>No hay reservas para mostrar.</p>';
+            return;
         }
 
-        const reservas = await res.json();
-        const ul = document.getElementById("listaReservas");
+        const table = document.createElement('table');
+        table.classList.add('tabla-reservas');
 
-        reservas.forEach(r => {
-            const li = document.createElement("li");
-            li.textContent = `Reserva ID ${r.id} - Entrada: ${r.fechaEntrada}, Salida: ${r.fechaSalida}`;
-            ul.appendChild(li);
+        // Crear encabezado
+        const thead = document.createElement('thead');
+        const trHead = document.createElement('tr');
+        const headers = ['ID', 'Ingreso', 'Salida', 'Reserva', 'Estado', 'Habitación', 'Huéspedes'];
+        headers.forEach(txt => {
+            const th = document.createElement('th');
+            th.textContent = txt;
+            trHead.appendChild(th);
         });
-    } catch (error) {
-        console.error("Error:", error);
-        alert("No se pudieron cargar las reservas.");
+        thead.appendChild(trHead);
+        table.appendChild(thead);
+
+        // Crear cuerpo de tabla
+        const tbody = document.createElement('tbody');
+        reservas.forEach(r => {
+            const tr = document.createElement('tr');
+
+            const tdId = document.createElement('td');
+            tdId.textContent = r.id;
+            tr.appendChild(tdId);
+
+            const tdIngreso = document.createElement('td');
+            tdIngreso.textContent = r.fechaIngreso;
+            tr.appendChild(tdIngreso);
+
+            const tdSalida = document.createElement('td');
+            tdSalida.textContent = r.fechaSalida;
+            tr.appendChild(tdSalida);
+
+            const tdReserva = document.createElement('td');
+            tdReserva.textContent = r.fechaReserva;
+            tr.appendChild(tdReserva);
+
+            const tdEstado = document.createElement('td');
+            tdEstado.textContent = r.estado;
+            tr.appendChild(tdEstado);
+
+            const tdHabitacion = document.createElement('td');
+            tdHabitacion.textContent = r.habitacionNumero;
+            tr.appendChild(tdHabitacion);
+
+            const tdHuespedes = document.createElement('td');
+            tdHuespedes.textContent = r.huespedes.map(h => `${h.nombre} ${h.apellido}`).join(', ');
+            tr.appendChild(tdHuespedes);
+
+            tbody.appendChild(tr);
+        });
+
+        table.appendChild(tbody);
+        contenedor.innerHTML = ''; // Limpiar el contenedor
+        contenedor.appendChild(table);
     }
+
+    // Carga inicial de reservas
+    const inicial = await fetchReservas();
+    renderTabla(inicial);
+
+    btnFiltrar.addEventListener('click', async () => {
+        const inicio = inputInicio.value;
+        const fin = inputFin.value;
+        if (!inicio || !fin) {
+            alert('Seleccioná ambas fechas para filtrar.');
+            return;
+        }
+        if (inicio > fin) {
+            alert('La fecha "Desde" no puede ser posterior a "Hasta".');
+            return;
+        }
+        const filtradas = await fetchReservas(inicio, fin);
+        renderTabla(filtradas);
+    });
+
+    btnLimpiar.addEventListener('click', async () => {
+        inputInicio.value = '';
+        inputFin.value = '';
+        const todas = await fetchReservas();
+        renderTabla(todas);
+    });
 });
