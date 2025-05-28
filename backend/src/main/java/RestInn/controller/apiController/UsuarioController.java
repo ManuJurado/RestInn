@@ -33,7 +33,6 @@ public class UsuarioController {
         return ResponseEntity.ok(usuario);
     }
 
-
     // Solo ADMIN puede crear EMPLEADOS
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/empleados")

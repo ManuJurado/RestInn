@@ -10,8 +10,7 @@ import lombok.*;
 @NoArgsConstructor
 @Embeddable
 public class Imagen {
-    private Long Imagen_id;
-
+    private Long imagenId;
     private String nombre;
 
     private String tipoImagen; // ej: "image/png"

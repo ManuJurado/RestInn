@@ -17,11 +17,10 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 @RestController
-@RequestMapping("/habitaciones")
+@RequestMapping("/api/habitaciones")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*") // permite peticiones desde el frontend local
 public class HabitacionController {
-
     private final HabitacionService habitacionService;
 
     @GetMapping
@@ -53,7 +52,7 @@ public class HabitacionController {
     public ResponseEntity<String> subirImagen(@RequestParam("archivo") MultipartFile archivo) {
         try {
             Imagen img = habitacionService.guardarImagen(archivo);
-            return ResponseEntity.ok("Imagen guardada con ID: " + img.getImagen_id());
+            return ResponseEntity.ok("Imagen guardada con ID: " + img.getImagenId());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al guardar imagen");
         }

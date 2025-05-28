@@ -1,13 +1,42 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <title>Reservas</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Mis Reservas</title>
+    <!-- Rutas absolutas para CSS en static/css -->
+    <link rel="stylesheet" href="/css/base.css" />
+    <link rel="stylesheet" href="/css/layout.css" />
+    <link rel="stylesheet" href="/css/buttons.css" />
+    <link rel="stylesheet" href="/css/labels.css" />
+    <link rel="stylesheet" href="/css/inputs.css" />
+    <link rel="stylesheet" href="/css/wrapper.css" />
+    <link rel="stylesheet" href="/css/contenedorReservas.css" />
 </head>
 <body>
-<h1>Mis reservas</h1>
-<div id="contenedorReservas"></div>
+<h1 class="labels">Mis reservas</h1>
+
+<div class="wrapper" style="display: flex; gap: 20px;">
+    <!-- Panel lateral de filtros -->
+    <aside style="min-width: 200px;">
+        <div class="filtro-fecha">
+            <label for="fechaInicio" class="labels">Desde</label>
+            <input id="fechaInicio" type="date" class="inputs" />
+        </div>
+        <div class="filtro-fecha">
+            <label for="fechaFin" class="labels">Hasta</label>
+            <input id="fechaFin" type="date" class="inputs" />
+        </div>
+        <button id="btnFiltrar" class="btn-filtrar">Aplicar filtro</button>
+        <button id="btnLimpiar" class="btn-limpiar">Limpiar filtro</button>
+    </aside>
+
+    <!-- Contenedor principal de la tabla -->
+    <main style="flex: 1; overflow-x: auto;">
+        <div id="contenedorReservas" class="contenedorReservas"></div>
+    </main>
+</div>
+
 <script src="/js/reservas.js"></script>
 </body>
-
 </html>
