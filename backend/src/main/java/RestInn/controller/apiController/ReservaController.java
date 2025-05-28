@@ -2,7 +2,7 @@ package RestInn.controller.apiController;
 
 import RestInn.dto.reservasDTO.ReservaRequestDTO;
 import RestInn.dto.reservasDTO.ReservaResponseDTO;
-import RestInn.entities.Reserva;
+import RestInn.entities.usuarios.Cliente;
 import RestInn.entities.usuarios.Usuario;
 import RestInn.service.ReservaService;
 import RestInn.service.UsuarioService;
@@ -12,14 +12,12 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.nio.file.LinkOption;
-import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/reservas")
@@ -73,13 +71,22 @@ public class ReservaController {
         return reservaService.buscarReservasEntreFechas(usuario, fechaInicio, fechaFin);
     }
 
-
-
     @PostMapping//luego tendriamos que asignar la division de roles tambien para las creaciones de reservas... un cliente solo podra reservar para si mismo...
     public ReservaResponseDTO createReserva(@RequestBody @Valid ReservaRequestDTO dto) {
         return reservaService.crearReservaDesdeDto(dto);
     }
 
+    @PostMapping("/reservaCliente")
+    @PreAuthorize("hasRole('Cliente')")
+    public ReservaResponseDTO createReservaCliente(@RequestBody @Valid ReservaRequestDTO dto, Authentication auth) {
+        String userName = auth.getName();
+        Usuario usuario = usuarioService.buscarEntidadPorNombreLogin(userName)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        dto.setUsuarioId(usuario.getId());
+
+        return reservaService.crearReservaDesdeDto(dto);
+    }
 
     @PutMapping("/{id}")
     public ReservaResponseDTO updateReserva(@PathVariable Long id, @Valid @RequestBody ReservaRequestDTO dto) {
