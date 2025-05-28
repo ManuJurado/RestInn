@@ -6,6 +6,7 @@ import RestInn.entities.enums.H_Tipo;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Getter
 @Setter
@@ -20,5 +21,5 @@ public class HabitacionResponseDTO {
     private Integer numero, piso, capacidad, cantCamas;
     private BigDecimal precioNoche;
     private String comentario;
-    private Imagen imagen;
+    private List<Imagen> imagenes;
 }

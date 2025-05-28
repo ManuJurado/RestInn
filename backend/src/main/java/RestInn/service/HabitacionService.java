@@ -2,31 +2,26 @@ package RestInn.service;
 
 import RestInn.dto.habitacionesDTO.HabitacionRequestDTO;
 import RestInn.dto.habitacionesDTO.HabitacionResponseDTO;
-import RestInn.dto.usuariosDTO.UsuarioResponseDTO;
 import RestInn.entities.Habitacion;
-import RestInn.entities.Imagen;
 import RestInn.entities.enums.H_Estado;
-import RestInn.entities.usuarios.Usuario;
+import RestInn.exceptions.BadRequestException;
 import RestInn.repositories.HabitacionRepository;
-import RestInn.repositories.ImagenRepository;
 import RestInn.repositories.specifications.HabitacionSprecification;
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
 public class HabitacionService {
-    private final HabitacionRepository habitacionRepository;
-    private final ImagenRepository imagenRepository;
+    public final HabitacionRepository habitacionRepository;
 
     @Autowired
-    public HabitacionService(HabitacionRepository habitacionRepository, ImagenRepository imagenRepository) {
+    public HabitacionService(HabitacionRepository habitacionRepository) {
         this.habitacionRepository = habitacionRepository;
-        this.imagenRepository = imagenRepository;
     }
 
 
@@ -55,6 +50,20 @@ public class HabitacionService {
                 .build();
     }
 
+    public Habitacion convertirAEntidad(HabitacionResponseDTO dto) {
+        return Habitacion.builder()
+                .estado(dto.getEstado())
+                .tipo(dto.getTipo())
+                .numero(dto.getNumero())
+                .piso(dto.getPiso())
+                .capacidad(dto.getCapacidad())
+                .cantCamas(dto.getCantCamas())
+                .precioNoche(dto.getPrecioNoche())
+                .comentario(dto.getComentario())
+                .activo(dto.getActivo())
+                .build();
+    }
+
     public HabitacionResponseDTO modificarHabitacion(Long id, HabitacionRequestDTO habReqDTO){
 
         return null;
@@ -70,14 +79,18 @@ public class HabitacionService {
         return convertirAResponseDTO(habitacion);
     }
 
-    public Optional<Habitacion> buscarEntidadPorId(Long id) {
-        return habitacionRepository.findById(id);
+    public Optional<HabitacionResponseDTO> buscarDTOPorId(Long id) {
+        Optional<Habitacion> hab = habitacionRepository.findById(id);
+        if (hab.isPresent()) {
+            return Optional.ofNullable(convertirAResponseDTO(hab.get()));
+        } else {
+            throw new BadRequestException("El id de la habitación no existe.");
+        }
     }
 
     public void cambiarEstadoHabitacion(Long id,  H_Estado nuevoEstado){
 
     }
-
 
     public List<HabitacionResponseDTO> listarTodas() {
         return habitacionRepository.findAll()
@@ -105,20 +118,6 @@ public class HabitacionService {
                 .and (HabitacionSprecification.tieneCapacidad (capacidad))
                 .and (HabitacionSprecification.precioNocheMenorA(precioNoche))
                 .and (HabitacionSprecification.tieneCantCamas(cantCamas));
-// La consulta se ejecuta con los filtros aplicados
         return habitacionRepository.findAll(spec);
-    }
-
-
-    public Imagen guardarImagen(MultipartFile archivo) throws Exception {
-        Imagen imagen = new Imagen();
-        imagen.setNombre(archivo.getOriginalFilename());
-        imagen.setTipoImagen(archivo.getContentType());
-        imagen.setDatos(archivo.getBytes());
-        return habitacionRepository.saveImagen(imagen);
-    }
-
-    public Imagen obtenerImagen(Long id) {
-        return habitacionRepository.findByImagenId(id).orElse(null);
     }
 }

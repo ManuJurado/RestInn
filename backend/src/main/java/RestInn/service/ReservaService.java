@@ -1,5 +1,6 @@
 package RestInn.service;
 
+import RestInn.dto.habitacionesDTO.HabitacionResponseDTO;
 import RestInn.dto.reservasDTO.HuespedRequestDTO;
 import RestInn.dto.reservasDTO.ReservaRequestDTO;
 import RestInn.dto.reservasDTO.ReservaResponseDTO;
@@ -47,12 +48,13 @@ public class ReservaService {
         Usuario usuario = usuarioService.buscarEntidadPorId(dto.getUsuarioId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
 
-        Habitacion habitacion = habitacionService.buscarEntidadPorId(dto.getHabitacionId())
+        HabitacionResponseDTO habitacion = habitacionService.buscarDTOPorId(dto.getHabitacionId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Habitación no encontrada"));
+        Habitacion habitacionEntidad = habitacionService.convertirAEntidad(habitacion);
 
         Reserva reserva = new Reserva();
         reserva.setUsuario(usuario);
-        reserva.setHabitacion(habitacion);
+        reserva.setHabitacion(habitacionEntidad);
         reserva.setFechaIngreso(dto.getFechaIngreso());
         reserva.setFechaSalida(dto.getFechaSalida());
         reserva.setFechaReserva(LocalDate.now());

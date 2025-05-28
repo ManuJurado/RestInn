@@ -3,10 +3,13 @@ package RestInn.controller.apiController;
 import RestInn.dto.habitacionesDTO.HabitacionRequestDTO;
 import RestInn.dto.habitacionesDTO.HabitacionResponseDTO;
 import RestInn.entities.Habitacion;
+import RestInn.entities.Imagen;
 import RestInn.entities.enums.H_Estado;
 import RestInn.service.HabitacionService;
+import RestInn.service.ImagenService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,6 +20,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*") // permite peticiones desde el frontend local
 public class HabitacionController {
+    @Autowired
     private final HabitacionService habitacionService;
 
     @GetMapping
@@ -44,4 +48,5 @@ public class HabitacionController {
             @RequestParam(required = false) Integer cantCamas) {
         return habitacionService.buscarHabitaciones (tipo, capacidad, precioNoche, cantCamas);
     }
+
 }
