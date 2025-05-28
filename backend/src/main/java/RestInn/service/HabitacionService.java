@@ -2,21 +2,15 @@ package RestInn.service;
 
 import RestInn.dto.habitacionesDTO.HabitacionRequestDTO;
 import RestInn.dto.habitacionesDTO.HabitacionResponseDTO;
-import RestInn.dto.usuariosDTO.UsuarioResponseDTO;
 import RestInn.entities.Habitacion;
-import RestInn.entities.Imagen;
 import RestInn.entities.enums.H_Estado;
-import RestInn.entities.usuarios.Usuario;
 import RestInn.exceptions.BadRequestException;
 import RestInn.repositories.HabitacionRepository;
-import RestInn.repositories.ImagenRepository;
 import RestInn.repositories.specifications.HabitacionSprecification;
-import lombok.Getter;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -129,42 +123,31 @@ public class HabitacionService {
                 .build();
     }
 
-    public List<Habitacion> buscarHabitaciones (H_Estado tipo, Integer capacidad, Double precioNoche, Integer cantCamas) {
+    public List<HabitacionResponseDTO> buscarHabitaciones (H_Estado tipo, Integer capacidad, Double precioNoche, Integer cantCamas) {
         Specification<Habitacion> spec = Specification
                 .where (HabitacionSprecification.tieneTipo (tipo))
                 .and (HabitacionSprecification.tieneCapacidad (capacidad))
                 .and (HabitacionSprecification.precioNocheMenorA(precioNoche))
                 .and (HabitacionSprecification.tieneCantCamas(cantCamas));
-// La consulta se ejecuta con los filtros aplicados
-        return habitacionRepository.findAll(spec);
+                // La consulta se ejecuta con los filtros aplicados
+        return habitacionRepository.findAll(spec).stream().map(this::convertirAResponseDTO).toList();
     }
 
     //metodo agregado para obtener lista de habitaciones disponibles en un rango de fechas. Se usa reservaService
     public List<HabitacionResponseDTO> obtenerHabitacionesDisponibles(LocalDate ingreso, LocalDate salida) {
-        // 1) Todas las habitaciones
-        List<HabitacionResponseDTO> todas = habitacionRepository.findAll()
-                .stream()
-                .map(h -> new HabitacionResponseDTO(
-                        h.getId(),
-                        h.getActivo(),
-                        h.getEstado(),
-                        h.getTipo(),
-                        h.getNumero(),
-                        h.getPiso(),
-                        h.getCapacidad(),
-                        h.getCantCamas(),
-                        h.getPrecioNoche(),
-                        h.getComentario(),
-                        h.getImagenes()
-                ))
-                .toList();
 
-        // 2) IDs ocupadas delegadas al service de reservas
+        // IDs ocupadas delegadas al service de reservas
         Set<Long> ocupadasIds = reservaService.obtenerIdsHabitacionesOcupadas(ingreso, salida);
 
-        // 3) Quedarnos sólo con las libres
-        return todas.stream()
+        // Quedarnos sólo con las libres
+        return listarTodas().stream()
                 .filter(dto -> !ocupadasIds.contains(dto.getId()))
                 .toList();
+    }
+
+    public List<HabitacionResponseDTO> habitacionesReservables() {
+        return habitacionRepository.findByEstadoNot(H_Estado.MANTENIMIENTO)
+                .stream()
+                .map(this::convertirAResponseDTO).toList();
     }
 }
