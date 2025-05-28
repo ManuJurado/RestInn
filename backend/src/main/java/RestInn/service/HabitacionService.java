@@ -4,13 +4,16 @@ import RestInn.dto.habitacionesDTO.HabitacionRequestDTO;
 import RestInn.dto.habitacionesDTO.HabitacionResponseDTO;
 import RestInn.dto.usuariosDTO.UsuarioResponseDTO;
 import RestInn.entities.Habitacion;
+import RestInn.entities.Imagen;
 import RestInn.entities.enums.H_Estado;
 import RestInn.entities.usuarios.Usuario;
 import RestInn.repositories.HabitacionRepository;
+import RestInn.repositories.ImagenRepository;
 import RestInn.repositories.specifications.HabitacionSprecification;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;
@@ -18,11 +21,14 @@ import java.util.Optional;
 @Service
 public class HabitacionService {
     private final HabitacionRepository habitacionRepository;
+    private final ImagenRepository imagenRepository;
 
     @Autowired
-    public HabitacionService(HabitacionRepository habitacionRepository) {
+    public HabitacionService(HabitacionRepository habitacionRepository, ImagenRepository imagenRepository) {
         this.habitacionRepository = habitacionRepository;
+        this.imagenRepository = imagenRepository;
     }
+
 
     public HabitacionResponseDTO crearHabitacion(HabitacionRequestDTO habReqDTO) {
         Habitacion habitacion = convertirAEntidad(habReqDTO);
@@ -55,6 +61,7 @@ public class HabitacionService {
     }
 
     public void borrarHabitacion(Long id){
+
     }
 
     public HabitacionResponseDTO buscarPorId(Long id) {
@@ -71,10 +78,6 @@ public class HabitacionService {
 
     }
 
-    public List<HabitacionResponseDTO> obtenerHabitacionesDisponibles(){
-
-        return List.of();
-    }
 
     public List<HabitacionResponseDTO> listarTodas() {
         return habitacionRepository.findAll()
