@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -50,7 +49,6 @@ public class HabitacionController {
         return habitacionService.buscarHabitaciones (tipo, capacidad, precioNoche, cantCamas);
     }
 
-
     //Get para recibir lsita de habitaciones disponibles en un rango de fechas. Considera las habitaciones que no esten reservadas dentro de el rango establecido
     @GetMapping("/disponibles")
     @PreAuthorize("isAuthenticated()")
@@ -67,4 +65,5 @@ public class HabitacionController {
 
         return ResponseEntity.ok(disponibles);
     }
+
 }

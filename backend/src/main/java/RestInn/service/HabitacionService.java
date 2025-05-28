@@ -36,11 +36,9 @@ public class HabitacionService {
 
     public HabitacionResponseDTO crearHabitacion(HabitacionRequestDTO habReqDTO) {
         Habitacion habitacion = convertirAEntidad(habReqDTO);
-
         // Por default, si no envían activo/disponible, ponemos true
         if (habitacion.getActivo() == null) habitacion.setActivo(true);
         if (habitacion.getEstado() == null) habitacion.setEstado(H_Estado.DISPONIBLE);
-
         Habitacion habitacionGuardada = habitacionRepository.save(habitacion);
         return convertirAResponseDTO(habitacionGuardada);
     }

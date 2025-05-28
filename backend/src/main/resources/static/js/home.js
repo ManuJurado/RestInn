@@ -1,7 +1,7 @@
 async function obtenerUsuarioActual() {
     const token = sessionStorage.getItem("jwt");
     if (!token) {
-        window.location.href = "/login.html";
+        window.location.href = "/login";
         return null;
     }
 
@@ -10,7 +10,7 @@ async function obtenerUsuarioActual() {
     });
 
     if (res.status === 401) {
-        window.location.href = "/login.html";
+        window.location.href = "/login";
         return null;
     }
     if (!res.ok) throw new Error("Error inesperado: " + res.status);
@@ -18,41 +18,72 @@ async function obtenerUsuarioActual() {
     return await res.json();
 }
 
-// Función para actualizar UI con datos del usuario
 function mostrarNombreUsuario(nombreLogin) {
-    const spanUsuario = document.getElementById("username");
-    if (spanUsuario) {
-        spanUsuario.textContent = nombreLogin || "...";
-    }
+    // Si querés mostrar en algún lado, podrías añadir un <span id="username"></span> en el HTML
+    console.log("Usuario:", nombreLogin);
 }
 
-// Función para configurar eventos de botones
 function configurarEventos() {
-    const btnReservas = document.getElementById("btnReservas");
-    const btnHabitaciones = document.getElementById("btnHabitaciones");
-    const btnDatos = document.getElementById("btnDatos");
-    const btnCerrar = document.getElementById("btnCerrar");
-
-    if (btnReservas) btnReservas.addEventListener("click", () => window.location.href = "/clientes/reservas.html");
-    if (btnHabitaciones) btnHabitaciones.addEventListener("click", () => window.location.href = "/habitaciones.html");
-    if (btnDatos) btnDatos.addEventListener("click", () => window.location.href = "/cliente/mis-datos.html");
-
-    if (btnCerrar) {
-        btnCerrar.addEventListener("click", () => {
-            // Para "cerrar sesión" con JWT, simplemente borramos el token local
+    document.getElementById("btnReservas")
+        .addEventListener("click", () => window.location.href = "/clientes/reservas.html");
+    document.getElementById("btnDatos")
+        .addEventListener("click", () => window.location.href = "/cliente/mis-datos.html");
+    document.getElementById("btnCerrar")
+        .addEventListener("click", () => {
             sessionStorage.removeItem("jwt");
-            window.location.href = "/login.html";
+            window.location.href = "/login";
         });
+}
+
+async function cargarHabitaciones() {
+    const cont = document.getElementById("tablaHabitaciones");
+    cont.textContent = "Cargando habitaciones...";
+    const token = sessionStorage.getItem("jwt");
+
+    try {
+        const res = await fetch("/api/habitaciones/disponibles", {
+            headers: { "Authorization": `Bearer ${token}` }
+        });
+        if (!res.ok) throw new Error(res.status);
+        const habs = await res.json();
+
+        if (!habs.length) {
+            cont.innerHTML = "<p>No hay habitaciones disponibles.</p>";
+            return;
+        }
+
+        // Construir tabla
+        let html = `<table class="tabla-habitaciones">
+          <thead><tr>
+            <th>N°</th><th>Tipo</th><th>Piso</th><th>Capacidad</th><th>Precio Noche</th>
+          </tr></thead><tbody>`;
+
+        habs.forEach(h => {
+            html += `<tr>
+              <td>${h.numero}</td>
+              <td>${h.tipo}</td>
+              <td>${h.piso}</td>
+              <td>${h.capacidad}</td>
+              <td>${h.precioNoche}</td>
+            </tr>`;
+        });
+
+        html += `</tbody></table>`;
+        cont.innerHTML = html;
+
+    } catch (err) {
+        cont.innerHTML = `<p class="error">Error cargando habitaciones: ${err.message}</p>`;
+        console.error(err);
     }
 }
 
-// Función principal para inicializar home
 async function initHome() {
     const usuario = await obtenerUsuarioActual();
-    if (!usuario) return; // Ya redirige a login en obtenerUsuarioActual
+    if (!usuario) return;
 
     mostrarNombreUsuario(usuario.nombreLogin);
     configurarEventos();
+    cargarHabitaciones();   // <-- cargamos la tabla
 }
 
 document.addEventListener("DOMContentLoaded", initHome);

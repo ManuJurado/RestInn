@@ -9,19 +9,24 @@
     <link rel="stylesheet" href="css/labels.css" />
     <link rel="stylesheet" href="css/inputs.css" />
     <link rel="stylesheet" href="css/wrapper.css" />
+    <link rel="stylesheet" href="css/taberna-table.css" /> <!-- NUEVO CSS -->
 </head>
 <body>
 
 <div class="wrapper">
     <div class="button-column left">
         <button class="button-left" id="btnReservas">Ver mis reservas</button>
-        <button class="button-left" id="btnHabitaciones">Ver habitaciones disponibles</button>
-        <!-- más botones si querés -->
     </div>
     <div class="button-column right">
         <button class="button-right" id="btnDatos">Ver mis datos</button>
         <button class="button-right" id="btnCerrar">Cerrar sesión</button>
     </div>
+</div>
+
+<!-- Aquí insertamos la tabla -->
+<div class="tabla-container">
+    <h2 class="labels">Habitaciones disponibles</h2>
+    <div id="tablaHabitaciones">Cargando habitaciones...</div>
 </div>
 
 <!-- Contenedor para la alerta -->
@@ -31,11 +36,7 @@
 </div>
 
 <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
-
-<!-- Primero el archivo con las funciones de alerta -->
 <script src="/js/alertas.js"></script>
-
-<script src="/js/home.js"></script>
-
+<script src="js/home.js"></script>
 </body>
 </html>
