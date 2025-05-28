@@ -2,14 +2,19 @@ package RestInn.service;
 
 import RestInn.dto.habitacionesDTO.HabitacionRequestDTO;
 import RestInn.dto.habitacionesDTO.HabitacionResponseDTO;
+import RestInn.dto.usuariosDTO.UsuarioResponseDTO;
 import RestInn.entities.Habitacion;
+import RestInn.entities.Imagen;
 import RestInn.entities.enums.H_Estado;
+import RestInn.entities.usuarios.Usuario;
 import RestInn.repositories.HabitacionRepository;
+import RestInn.repositories.ImagenRepository;
 import RestInn.repositories.specifications.HabitacionSprecification;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -53,6 +58,7 @@ public class HabitacionService {
     }
 
     public HabitacionResponseDTO modificarHabitacion(Long id, HabitacionRequestDTO habReqDTO){
+
         return null;
     }
 
@@ -70,6 +76,7 @@ public class HabitacionService {
     }
 
     public void cambiarEstadoHabitacion(Long id,  H_Estado nuevoEstado){
+
     }
 
     public List<HabitacionResponseDTO> obtenerHabitacionesDisponibles(){
@@ -102,7 +109,7 @@ public class HabitacionService {
                 .and (HabitacionSprecification.tieneCapacidad (capacidad))
                 .and (HabitacionSprecification.precioNocheMenorA(precioNoche))
                 .and (HabitacionSprecification.tieneCantCamas(cantCamas));
-        // La consulta se ejecuta con los filtros aplicados
+// La consulta se ejecuta con los filtros aplicados
         return habitacionRepository.findAll(spec);
     }
 
@@ -123,7 +130,7 @@ public class HabitacionService {
                         h.getCantCamas(),
                         h.getPrecioNoche(),
                         h.getComentario(),
-                        h.getImagen()
+                        h.getImagenes()
                 ))
                 .toList();
 

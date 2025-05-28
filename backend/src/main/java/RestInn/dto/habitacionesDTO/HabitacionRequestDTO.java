@@ -13,7 +13,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class HabitacionRequestDTO {
+public class HabitacionRequestDTO { //Recibe del front para la creacion o edicion de la entidad
 
     @NotNull(message = "El estado es obligatorio")
     private H_Estado estado;

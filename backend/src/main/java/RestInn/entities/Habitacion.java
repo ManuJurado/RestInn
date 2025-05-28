@@ -53,6 +53,6 @@ public class Habitacion {
 
     private String comentario;
 
-    @Embedded
-    private Imagen imagen;
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Imagen> imagenes;
 }

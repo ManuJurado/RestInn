@@ -11,9 +11,9 @@ public class EnvironmentConfig {
     private static final String ENV_FILE_PATH = ".env";
 
     static {
-        Dotenv dotenv = Dotenv.configure().ignoreIfMissing().load();
+        Dotenv dotenv = Dotenv.load();
 
-        String jwtSecret = dotenv.get("JWT_SECRET");
+        String jwtSecret = dotenv.get("JWT_SECRET"); //TODO No deveria generar una clave nueva.
         if (jwtSecret == null || jwtSecret.isBlank()) {
             jwtSecret = generateSecureRandomKey(64); // 64 bytes = 86 chars en base64
             saveEnvVariable("JWT_SECRET", jwtSecret);
@@ -26,6 +26,7 @@ public class EnvironmentConfig {
         }
 
         // Otras variables
+        System.out.println(jwtSecret);
         System.setProperty("JWT_SECRET", jwtSecret);
         System.setProperty("JWT_EXPIRATION", jwtExpiration);
         System.setProperty("DB_HOST", dotenv.get("DB_HOST"));
