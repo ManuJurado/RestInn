@@ -7,6 +7,7 @@ import lombok.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Data
 @AllArgsConstructor
@@ -24,7 +25,6 @@ public class ReservaRequestDTO {
 
     private EstadoReserva estadoReserva = EstadoReserva.PENDIENTE; // valor por defecto, si no se envía
 
-    @NotNull(message = "El ID del usuario es obligatorio.")
     private Long usuarioId;
 
     @NotNull(message = "El ID de la habitación es obligatorio.")
