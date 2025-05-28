@@ -1,8 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Pirata+One&display=swap');
 
 .contenedorReservas {
-  max-width: 900px;
-  margin: 20px auto;
+  max-width: none;
+  margin: 20px 0;
   padding: 15px;
   border-radius: 8px;
   box-shadow: 0 0 8px rgba(0,0,0,0.1);

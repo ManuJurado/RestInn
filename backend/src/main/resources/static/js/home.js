@@ -1,5 +1,5 @@
 async function obtenerUsuarioActual() {
-    const token = localStorage.getItem("jwt");
+    const token = sessionStorage.getItem("jwt");
     if (!token) {
         window.location.href = "/login.html";
         return null;
@@ -40,7 +40,7 @@ function configurarEventos() {
     if (btnCerrar) {
         btnCerrar.addEventListener("click", () => {
             // Para "cerrar sesión" con JWT, simplemente borramos el token local
-            localStorage.removeItem("jwt");
+            sessionStorage.removeItem("jwt");
             window.location.href = "/login.html";
         });
     }

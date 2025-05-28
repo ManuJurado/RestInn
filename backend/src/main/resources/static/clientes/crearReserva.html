@@ -11,6 +11,9 @@
 </head>
 <body>
 <h1 class="labels">Nueva Reserva</h1>
+
+<button type="button" class="return-button" onclick="history.back()">← Volver</button>
+
 <form id="formReserva" class="formulario">
     <label class="labels">Fecha de ingreso:
         <input type="date" id="fechaIngreso" class="inputs" required>
@@ -18,8 +21,10 @@
     <label class="labels">Fecha de salida:
         <input type="date" id="fechaSalida" class="inputs" required>
     </label>
-    <label class="labels">ID de habitación:
-        <input type="number" id="habitacionId" class="inputs" required>
+    <label class="labels">Habitación disponible:
+        <select id="habitacionSelect" class="inputs" required>
+            <option value="" disabled selected>— Seleccioná fechas primero —</option>
+        </select>
     </label>
     <fieldset>
         <legend class="labels">Huéspedes</legend>
@@ -28,6 +33,17 @@
     </fieldset>
     <button type="submit" class="btn-crear">Confirmar Reserva</button>
 </form>
+
+<!-- Contenedor para la alerta -->
+<div id="alerta" class="alert">
+    <span class="msg"></span>
+    <button class="close-btn" onclick="cerrarAlerta()">X</button>
+</div>
+
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+
+<!-- Primero el archivo con las funciones de alerta -->
+<script src="/js/alertas.js"></script>
 
 <script src="/js/crearReserva.js"></script>
 </body>

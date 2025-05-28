@@ -20,7 +20,6 @@ public class FacturaService {
     }
 
     public List<Factura> obtenerFacturas()  {
-
         return null;
     }
 
