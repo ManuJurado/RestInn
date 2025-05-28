@@ -15,7 +15,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     async function obtenerUsuarioActual() {
-        const token = localStorage.getItem('jwt');
+        const token = sessionStorage.getItem('jwt');
         const res = await fetch('/api/usuarios/current', {
             headers: { 'Authorization': `Bearer ${token}` }
         });
@@ -37,7 +37,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }));
 
         if (huespedes.length === 0) {
-            alert("Agregá al menos un huésped.");
+            mostrarAlerta("Agregá al menos un huésped.");
             return;
         }
 
@@ -52,7 +52,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 huespedes
             };
 
-            const token = localStorage.getItem('jwt');
+            const token = sessionStorage.getItem('jwt');
             const res = await fetch('/api/reservas', {
                 method: 'POST',
                 headers: {
@@ -67,10 +67,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 throw new Error(errorText);
             }
 
-            alert("Reserva creada exitosamente");
-            window.location.href = "/clientes/misReservas.html";
+            mostrarAlerta("Reserva creada exitosamente");
+            window.location.href = "/clientes/reservas.html";
         } catch (err) {
-            alert("Error al crear la reserva: " + err.message);
+            mostrarAlerta("Error al crear la reserva: " + err.message);
         }
     });
 });

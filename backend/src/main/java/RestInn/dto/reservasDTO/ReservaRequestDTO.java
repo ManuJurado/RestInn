@@ -2,6 +2,8 @@ package RestInn.dto.reservasDTO;
 
 import RestInn.entities.enums.EstadoReserva;
 import RestInn.validation.ReservaValida;
+import jakarta.persistence.Embedded;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
@@ -14,7 +16,6 @@ import java.util.Optional;
 @NoArgsConstructor
 @ReservaValida
 public class ReservaRequestDTO {
-
     @NotNull(message = "La fecha de ingreso es obligatoria.")
     private LocalDate fechaIngreso;
 
@@ -25,11 +26,10 @@ public class ReservaRequestDTO {
 
     private EstadoReserva estadoReserva = EstadoReserva.PENDIENTE; // valor por defecto, si no se envía
 
-    private Long usuarioId;
-
     @NotNull(message = "El ID de la habitación es obligatorio.")
     private Long habitacionId;
 
     @NotNull(message = "Debe especificar al menos un huésped.")
+    @Embedded
     private List<HuespedRequestDTO> huespedes;
 }

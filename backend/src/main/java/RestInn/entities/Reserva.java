@@ -30,9 +30,8 @@ public class Reserva {
     @JoinColumn(name = "habitacion_id")
     private Habitacion habitacion;
 
-    // Relación con Huespedes (una reserva tiene muchos huéspedes)
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "reserva_id") // clave foránea en Huesped apuntando a esta reserva
+    @ElementCollection
+    @CollectionTable(name = "reserva_huespedes", joinColumns = @JoinColumn(name = "reserva_id"))
     private List<Huesped> huespedes;
 
     // Enum de estado

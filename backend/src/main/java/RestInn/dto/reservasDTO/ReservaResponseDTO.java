@@ -1,6 +1,5 @@
 package RestInn.dto.reservasDTO;
 
-import RestInn.entities.Huesped;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -12,19 +11,13 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 public class ReservaResponseDTO {
-
-    private Long id;
-    private LocalDate fechaIngreso;
-    private LocalDate fechaSalida;
-    private LocalDate fechaReserva;
-
-    private Long usuarioId;
-    private Long habitacionId;
-    private List<Long> huespedesIds;
-
-    private String estado; // Podés usar EstadoReserva directamente si querés devolver el enum
-
-    private Integer habitacionNumero;
-    private List<Huesped> huespedes;
-
+        private Long id;
+        private LocalDate fechaIngreso;
+        private LocalDate fechaSalida;
+        private LocalDate fechaReserva;
+        private Long usuarioId;
+        private Long habitacionId;
+        private String estado;
+        private Integer habitacionNumero;
+        private List<HuespedResponseDTO> huespedes;
 }

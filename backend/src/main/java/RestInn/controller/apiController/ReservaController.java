@@ -2,7 +2,6 @@ package RestInn.controller.apiController;
 
 import RestInn.dto.reservasDTO.ReservaRequestDTO;
 import RestInn.dto.reservasDTO.ReservaResponseDTO;
-import RestInn.entities.usuarios.Cliente;
 import RestInn.entities.usuarios.Usuario;
 import RestInn.service.ReservaService;
 import RestInn.service.UsuarioService;
@@ -17,7 +16,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/reservas")
@@ -31,6 +29,18 @@ public class ReservaController {
     public ReservaController(ReservaService reservaService, UsuarioService usuarioService) {
         this.reservaService = reservaService;
         this.usuarioService = usuarioService;
+    }
+
+
+    //ENDPOINTS GET-----------------------------------------------------------------------------------------------
+    @GetMapping
+    public List<ReservaResponseDTO> getAllReservas() {
+        return reservaService.obtenerReservas();  // Ya viene completo desde el servicio
+    }
+
+    @GetMapping("/{id}")
+    public ReservaResponseDTO getReservaById(@PathVariable Long id) {
+        return reservaService.obtenerReservaPorId(id);
     }
 
     @GetMapping("/mias")
@@ -71,38 +81,28 @@ public class ReservaController {
         return reservaService.buscarReservasEntreFechas(usuario, fechaInicio, fechaFin);
     }
 
-    @PostMapping//luego tendriamos que asignar la division de roles tambien para las creaciones de reservas... un cliente solo podra reservar para si mismo...
-    public ReservaResponseDTO createReserva(@RequestBody @Valid ReservaRequestDTO dto) {
-        return reservaService.crearReservaDesdeDto(dto);
-    }
-
-    @PostMapping("/reservaCliente")
-    @PreAuthorize("hasRole('Cliente')")
-    public ReservaResponseDTO createReservaCliente(@RequestBody @Valid ReservaRequestDTO dto, Authentication auth) {
+    //ENDPOINTS POST-----------------------------------------------------------------------------------------------
+    //crear una reserva
+    @PostMapping
+    @PreAuthorize("isAuthenticated()")
+    public ReservaResponseDTO createReserva(
+            @RequestBody @Valid ReservaRequestDTO dto,
+            Authentication auth) {
         String userName = auth.getName();
-        Usuario usuario = usuarioService.buscarEntidadPorNombreLogin(userName)
+        Usuario usuario = usuarioService
+                .buscarEntidadPorNombreLogin(userName)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-
-        dto.setUsuarioId(usuario.getId());
-
-        return reservaService.crearReservaDesdeDto(dto);
+        return reservaService.crearReservaDesdeDto(dto, usuario);
     }
 
+    //ENDPOINTS PUT-----------------------------------------------------------------------------------------------
+    //modificar una reserva
     @PutMapping("/{id}")
     public ReservaResponseDTO updateReserva(@PathVariable Long id, @Valid @RequestBody ReservaRequestDTO dto) {
         return reservaService.actualizarReservaDesdeDto(id, dto);
     }
 
-    @GetMapping
-    public List<ReservaResponseDTO> getAllReservas() {
-        return reservaService.obtenerReservas();  // Ya viene completo desde el servicio
-    }
-
-    @GetMapping("/{id}")
-    public ReservaResponseDTO getReservaById(@PathVariable Long id) {
-        return reservaService.obtenerReservaPorId(id);
-    }
-
+    //ENDPOINTS DELETE-----------------------------------------------------------------------------------------------
     @DeleteMapping("/{id}")
     public void deleteReserva(@PathVariable Long id) {
         reservaService.eliminarReserva(id);

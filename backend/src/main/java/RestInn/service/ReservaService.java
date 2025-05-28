@@ -1,6 +1,7 @@
 package RestInn.service;
 
 import RestInn.dto.reservasDTO.HuespedRequestDTO;
+import RestInn.dto.reservasDTO.HuespedResponseDTO;
 import RestInn.dto.reservasDTO.ReservaRequestDTO;
 import RestInn.dto.reservasDTO.ReservaResponseDTO;
 import RestInn.entities.enums.EstadoReserva;
@@ -11,6 +12,8 @@ import RestInn.entities.usuarios.Usuario;
 import RestInn.repositories.ReservaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -41,14 +44,30 @@ public class ReservaService {
                 .toList();
     }
 
-    // Crear reserva desde DTO, mapeando huespedes también
-    public ReservaResponseDTO crearReservaDesdeDto(ReservaRequestDTO dto) {
-        // Validación de fechas la hace el validador @ReservaValida
-        Usuario usuario = usuarioService.buscarEntidadPorId(dto.getUsuarioId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
+    public ReservaResponseDTO crearReservaDesdeDto(ReservaRequestDTO dto, Usuario usuario) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String username = auth.getName();
 
-        Habitacion habitacion = habitacionService.buscarEntidadPorId(dto.getHabitacionId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Habitación no encontrada"));
+        usuario = usuarioService
+                .buscarEntidadPorNombreLogin(username)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Usuario no encontrado"));
+
+        Habitacion habitacion = habitacionService
+                .buscarEntidadPorId(dto.getHabitacionId())
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Habitación no encontrada"));
+
+        boolean ocupado = reservaRepository.existsByHabitacionAndFechaIngresoLessThanAndFechaSalidaGreaterThan(
+                habitacion, dto.getFechaSalida(), dto.getFechaIngreso()
+        );
+
+        if (ocupado) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "La habitación ya está reservada en esas fechas"
+            );
+        }
 
         Reserva reserva = new Reserva();
         reserva.setUsuario(usuario);
@@ -56,20 +75,20 @@ public class ReservaService {
         reserva.setFechaIngreso(dto.getFechaIngreso());
         reserva.setFechaSalida(dto.getFechaSalida());
         reserva.setFechaReserva(LocalDate.now());
-        reserva.setEstadoReserva(EstadoReserva.PENDIENTE); // Ajusta según tu lógica
+        reserva.setEstadoReserva(EstadoReserva.PENDIENTE);
 
-        // Mapear huespedes desde DTO a entidad
-        if (dto.getHuespedes() != null && !dto.getHuespedes().isEmpty()) {
-            List<Huesped> huespedes = dto.getHuespedes().stream()
-                    .map(this::mapHuespedRequestDtoAEntidad)
-                    .collect(Collectors.toList());
-            reserva.setHuespedes(huespedes);
-        }
+        List<Huesped> huespedes = dto.getHuespedes().stream()
+                .map(dtoH -> new Huesped(dtoH.getNombre(), dtoH.getApellido(), dtoH.getDni()))
+                .toList();
+
+        reserva.setHuespedes(huespedes);
 
         Reserva guardada = reservaRepository.save(reserva);
 
         return mapReservaAResponseDTO(guardada);
     }
+
+
 
     // Obtener reserva por ID
     public ReservaResponseDTO obtenerReservaPorId(Long id) {
@@ -114,12 +133,16 @@ public class ReservaService {
     }
 
     private ReservaResponseDTO mapReservaAResponseDTO(Reserva reserva) {
-        List<Long> huespedesIds = reserva.getHuespedes() != null
-                ? reserva.getHuespedes().stream().map(Huesped::getId).toList()
-                : List.of();
-
-        List<Huesped> huespedes = reserva.getHuespedes() != null
-                ? reserva.getHuespedes()
+        List<HuespedResponseDTO> huespedes = reserva.getHuespedes() != null
+                ? reserva.getHuespedes().stream()
+                .map(h -> {
+                    HuespedResponseDTO dto = new HuespedResponseDTO();
+                    dto.setNombre(h.getNombre());
+                    dto.setApellido(h.getApellido());
+                    dto.setDni(h.getDni());
+                    return dto;
+                })
+                .toList()
                 : List.of();
 
         return new ReservaResponseDTO(
@@ -129,12 +152,14 @@ public class ReservaService {
                 reserva.getFechaReserva(),
                 reserva.getUsuario().getId(),
                 reserva.getHabitacion().getId(),
-                huespedesIds,
                 reserva.getEstadoReserva().name(),
                 reserva.getHabitacion().getNumero(),
                 huespedes
         );
     }
+
+
+
 
     private Huesped mapHuespedRequestDtoAEntidad(HuespedRequestDTO dto) {
         Huesped huesped = new Huesped();
