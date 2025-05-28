@@ -130,7 +130,7 @@ public class ReservaService {
         return reservaRepository
                 .findByFechaIngresoLessThanAndFechaSalidaGreaterThan(salida, ingreso)
                 .stream()
-                .filter(r -> r.getEstadoReserva() != EstadoReserva.CANCELADA)
+                .filter(r -> r.getEstadoReserva() != EstadoReserva.CONFIRMADA)
                 .map(r -> r.getHabitacion().getId())
                 .collect(Collectors.toSet());
     }
