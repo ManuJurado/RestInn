@@ -2,26 +2,29 @@ package RestInn.service;
 
 import RestInn.dto.habitacionesDTO.HabitacionRequestDTO;
 import RestInn.dto.habitacionesDTO.HabitacionResponseDTO;
-import RestInn.dto.usuariosDTO.UsuarioResponseDTO;
 import RestInn.entities.Habitacion;
 import RestInn.entities.enums.H_Estado;
-import RestInn.entities.usuarios.Usuario;
 import RestInn.repositories.HabitacionRepository;
 import RestInn.repositories.specifications.HabitacionSprecification;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class HabitacionService {
     private final HabitacionRepository habitacionRepository;
+    private final ReservaService reservaService;
 
     @Autowired
-    public HabitacionService(HabitacionRepository habitacionRepository) {
+    public HabitacionService(HabitacionRepository habitacionRepository, @Lazy ReservaService reservaService) {
         this.habitacionRepository = habitacionRepository;
+        this.reservaService = reservaService;
     }
 
     public HabitacionResponseDTO crearHabitacion(HabitacionRequestDTO habReqDTO) {
@@ -50,7 +53,6 @@ public class HabitacionService {
     }
 
     public HabitacionResponseDTO modificarHabitacion(Long id, HabitacionRequestDTO habReqDTO){
-
         return null;
     }
 
@@ -68,11 +70,9 @@ public class HabitacionService {
     }
 
     public void cambiarEstadoHabitacion(Long id,  H_Estado nuevoEstado){
-
     }
 
     public List<HabitacionResponseDTO> obtenerHabitacionesDisponibles(){
-
         return List.of();
     }
 
@@ -102,7 +102,38 @@ public class HabitacionService {
                 .and (HabitacionSprecification.tieneCapacidad (capacidad))
                 .and (HabitacionSprecification.precioNocheMenorA(precioNoche))
                 .and (HabitacionSprecification.tieneCantCamas(cantCamas));
-// La consulta se ejecuta con los filtros aplicados
+        // La consulta se ejecuta con los filtros aplicados
         return habitacionRepository.findAll(spec);
     }
+
+    //metodo agregado para obtener lista de habitaciones disponibles en un rango de fechas. Se usa reservaService
+    public List<HabitacionResponseDTO> obtenerHabitacionesDisponibles(LocalDate ingreso,
+                                                                      LocalDate salida) {
+        // 1) Todas las habitaciones
+        List<HabitacionResponseDTO> todas = habitacionRepository.findAll()
+                .stream()
+                .map(h -> new HabitacionResponseDTO(
+                        h.getId(),
+                        h.getActivo(),
+                        h.getEstado(),
+                        h.getTipo(),
+                        h.getNumero(),
+                        h.getPiso(),
+                        h.getCapacidad(),
+                        h.getCantCamas(),
+                        h.getPrecioNoche(),
+                        h.getComentario(),
+                        h.getImagen()
+                ))
+                .toList();
+
+        // 2) IDs ocupadas delegadas al service de reservas
+        Set<Long> ocupadasIds = reservaService.obtenerIdsHabitacionesOcupadas(ingreso, salida);
+
+        // 3) Quedarnos sólo con las libres
+        return todas.stream()
+                .filter(dto -> !ocupadasIds.contains(dto.getId()))
+                .toList();
+    }
+
 }

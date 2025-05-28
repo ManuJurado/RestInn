@@ -21,8 +21,10 @@
     <label class="labels">Fecha de salida:
         <input type="date" id="fechaSalida" class="inputs" required>
     </label>
-    <label class="labels">ID de habitación:
-        <input type="number" id="habitacionId" maxlength="20" class="inputs" required>
+    <label class="labels">Habitación disponible:
+        <select id="habitacionSelect" class="inputs" required>
+            <option value="" disabled selected>— Seleccioná fechas primero —</option>
+        </select>
     </label>
     <fieldset>
         <legend class="labels">Huéspedes</legend>
