@@ -1,5 +1,6 @@
 package RestInn;
 
+import RestInn.config.EnvironmentConfig;
 import RestInn.service.HabitacionService;
 import RestInn.service.ReservaService;
 import RestInn.service.UsuarioService;
@@ -14,7 +15,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @EntityScan(basePackages = "RestInn.entities")
 @EnableJpaRepositories(basePackages = "RestInn.repositories")
 public class RestInnApp implements CommandLineRunner {
-
 	private final HabitacionService habitacionService;
 	private final UsuarioService usuarioService;
 	private final ReservaService reservaService;
@@ -29,11 +29,11 @@ public class RestInnApp implements CommandLineRunner {
 	}
 
 	public static void main(String[] args) {
+		EnvironmentConfig config = new EnvironmentConfig(); // Fuerza la carga del static block
 		SpringApplication.run(RestInnApp.class, args);
 	}
 
 	@Override
 	public void run(String... args) throws Exception {
-
 	}
 }
