@@ -1,6 +1,5 @@
 package RestInn.entities;
 
-import RestInn.entities.cobranzas.Factura;
 import RestInn.entities.enums.H_Estado;
 import RestInn.entities.enums.H_Tipo;
 import jakarta.persistence.*;
@@ -53,6 +52,6 @@ public class Habitacion {
 
     private String comentario;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+        @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Imagen> imagenes;
 }

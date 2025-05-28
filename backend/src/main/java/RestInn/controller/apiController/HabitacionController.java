@@ -3,10 +3,13 @@ package RestInn.controller.apiController;
 import RestInn.dto.habitacionesDTO.HabitacionRequestDTO;
 import RestInn.dto.habitacionesDTO.HabitacionResponseDTO;
 import RestInn.entities.Habitacion;
+import RestInn.entities.Imagen;
 import RestInn.entities.enums.H_Estado;
 import RestInn.service.HabitacionService;
+import RestInn.service.ImagenService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +25,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*") // permite peticiones desde el frontend local
 public class HabitacionController {
+    @Autowired
     private final HabitacionService habitacionService;
 
     @GetMapping
@@ -40,7 +44,8 @@ public class HabitacionController {
         return "POST funciona";
     }
 
-    @GetMapping("/filtrar")
+
+    @GetMapping ("/filtrar")
     public List<Habitacion> filtrarHabitaciones(
             @RequestParam(required = false) H_Estado tipo,
             @RequestParam(required = false) Integer capacidad,
@@ -48,6 +53,7 @@ public class HabitacionController {
             @RequestParam(required = false) Integer cantCamas) {
         return habitacionService.buscarHabitaciones (tipo, capacidad, precioNoche, cantCamas);
     }
+
 
 
     //Get para recibir lsita de habitaciones disponibles en un rango de fechas. Considera las habitaciones que no esten reservadas dentro de el rango establecido

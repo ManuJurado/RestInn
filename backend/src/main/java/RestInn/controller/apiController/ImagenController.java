@@ -9,6 +9,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Iterator;
+import java.util.List;
+
 @RestController
 @RequestMapping("/imagenes")
 public class ImagenController {
@@ -19,22 +22,15 @@ public class ImagenController {
     @PostMapping("/subir")
     public ResponseEntity<String> subirImagen(@RequestParam("archivo") MultipartFile archivo) {
         try {
-            Imagen img = imagenService.guardarImagen(archivo);
-            return ResponseEntity.ok("Imagen guardada con ID: " + img.getId());
+            imagenService.guardarImagen(archivo);
+            return ResponseEntity.ok("Imagen guardada.");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al guardar imagen");
         }
     }
 
     @GetMapping("/ver/{id}")
-    public ResponseEntity<byte[]> verImagen(@PathVariable Long id) {
-        Imagen img = imagenService.obtenerImagen(id);
-        if (img != null) {
-            return ResponseEntity.ok()
-                    .contentType(MediaType.parseMediaType(img.getTipo()))
-                    .body(img.getDatos());
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+    public List<Imagen> verImagenes(@PathVariable Long id) {
+        return imagenService.obtenerImagenesPorHabitacion(id);
     }
 }

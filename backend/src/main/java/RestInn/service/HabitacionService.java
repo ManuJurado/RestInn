@@ -7,9 +7,11 @@ import RestInn.entities.Habitacion;
 import RestInn.entities.Imagen;
 import RestInn.entities.enums.H_Estado;
 import RestInn.entities.usuarios.Usuario;
+import RestInn.exceptions.BadRequestException;
 import RestInn.repositories.HabitacionRepository;
 import RestInn.repositories.ImagenRepository;
 import RestInn.repositories.specifications.HabitacionSprecification;
+import lombok.Getter;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
@@ -27,7 +29,7 @@ public class HabitacionService {
     private final ReservaService reservaService;
 
     @Autowired
-    public HabitacionService(HabitacionRepository habitacionRepository, @Lazy ReservaService reservaService) {
+    public HabitacionService(HabitacionRepository habitacionRepository,@Lazy ReservaService reservaService) {
         this.habitacionRepository = habitacionRepository;
         this.reservaService = reservaService;
     }
@@ -57,18 +59,42 @@ public class HabitacionService {
                 .build();
     }
 
+    public Habitacion convertirAEntidad(HabitacionResponseDTO dto) {
+        return Habitacion.builder()
+                .estado(dto.getEstado())
+                .tipo(dto.getTipo())
+                .numero(dto.getNumero())
+                .piso(dto.getPiso())
+                .capacidad(dto.getCapacidad())
+                .cantCamas(dto.getCantCamas())
+                .precioNoche(dto.getPrecioNoche())
+                .comentario(dto.getComentario())
+                .activo(dto.getActivo())
+                .build();
+    }
+
     public HabitacionResponseDTO modificarHabitacion(Long id, HabitacionRequestDTO habReqDTO){
 
         return null;
     }
 
     public void borrarHabitacion(Long id){
+
     }
 
     public HabitacionResponseDTO buscarPorId(Long id) {
         Habitacion habitacion = habitacionRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
         return convertirAResponseDTO(habitacion);
+    }
+
+    public Optional<HabitacionResponseDTO> buscarDTOPorId(Long id) {
+        Optional<Habitacion> hab = habitacionRepository.findById(id);
+        if (hab.isPresent()) {
+            return Optional.ofNullable(convertirAResponseDTO(hab.get()));
+        } else {
+            throw new BadRequestException("El id de la habitación no existe.");
+        }
     }
 
     public Optional<Habitacion> buscarEntidadPorId(Long id) {
@@ -114,8 +140,7 @@ public class HabitacionService {
     }
 
     //metodo agregado para obtener lista de habitaciones disponibles en un rango de fechas. Se usa reservaService
-    public List<HabitacionResponseDTO> obtenerHabitacionesDisponibles(LocalDate ingreso,
-                                                                      LocalDate salida) {
+    public List<HabitacionResponseDTO> obtenerHabitacionesDisponibles(LocalDate ingreso, LocalDate salida) {
         // 1) Todas las habitaciones
         List<HabitacionResponseDTO> todas = habitacionRepository.findAll()
                 .stream()
@@ -142,5 +167,4 @@ public class HabitacionService {
                 .filter(dto -> !ocupadasIds.contains(dto.getId()))
                 .toList();
     }
-
 }
