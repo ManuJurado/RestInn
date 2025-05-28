@@ -49,7 +49,6 @@ public class HabitacionController {
         return habitacionService.buscarHabitaciones (tipo, capacidad, precioNoche, cantCamas);
     }
 
-
     //Get para recibir lsita de habitaciones disponibles en un rango de fechas. Considera las habitaciones que no esten reservadas dentro de el rango establecido
     @GetMapping("/disponibles")
     @PreAuthorize("isAuthenticated()")
