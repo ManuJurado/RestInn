@@ -108,4 +108,17 @@ public class HabitacionService {
 // La consulta se ejecuta con los filtros aplicados
         return habitacionRepository.findAll(spec);
     }
+
+
+    public Imagen guardarImagen(MultipartFile archivo) throws Exception {
+        Imagen imagen = new Imagen();
+        imagen.setNombre(archivo.getOriginalFilename());
+        imagen.setTipoImagen(archivo.getContentType());
+        imagen.setDatos(archivo.getBytes());
+        return habitacionRepository.saveImagen(imagen);
+    }
+
+    public Imagen obtenerImagen(Long id) {
+        return habitacionRepository.findByImagenId(id).orElse(null);
+    }
 }
