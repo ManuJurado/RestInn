@@ -2,7 +2,7 @@ function login() {
     const user = document.getElementById("usuario").value;
     const pass = document.getElementById("clave").value;
 
-    fetch("http://restinn.sytes.net/api/auth/login", {
+    fetch("http://localhost:8080/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username: user, password: pass })

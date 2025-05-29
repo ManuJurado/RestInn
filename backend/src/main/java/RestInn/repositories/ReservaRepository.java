@@ -11,7 +11,7 @@ import java.util.List;
 
 public interface ReservaRepository extends JpaRepository<Reserva, Long> {
     List<Reserva> findByUsuarioId(Long usuarioId);
-    // devuelve reservas cuyo ingreso ≤ hasta y salida ≥ desde (cualquier solapamiento)
+
     List<Reserva> findByUsuarioAndFechaIngresoLessThanEqualAndFechaSalidaGreaterThanEqual(
             Usuario usuario, LocalDate fechaFin, LocalDate fechaInicio
     );

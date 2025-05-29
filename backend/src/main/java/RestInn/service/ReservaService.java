@@ -25,7 +25,6 @@ import java.util.stream.Collectors;
 
 @Service
 public class ReservaService {
-
     private final ReservaRepository reservaRepository;
     private final UsuarioService usuarioService;
     private final HabitacionService habitacionService;
@@ -147,7 +146,6 @@ public class ReservaService {
         reserva.setFechaIngreso(dto.getFechaIngreso());
         reserva.setFechaSalida(dto.getFechaSalida());
         // Si querés actualizar huéspedes, hacelo acá
-
         Reserva actualizada = reservaRepository.save(reserva);
         return mapReservaAResponseDTO(actualizada);
     }
@@ -192,7 +190,6 @@ public class ReservaService {
         Reserva actualizada = reservaRepository.save(reserva);
         return mapReservaAResponseDTO(actualizada);
     }
-
 
     // ========================
     // MAPEO DE ENTIDADES A DTO

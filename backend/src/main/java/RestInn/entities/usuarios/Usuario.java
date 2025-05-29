@@ -29,5 +29,4 @@ public abstract class Usuario implements Serializable {
     private String email;
     private String password;
     private String CUIT;
-
 }

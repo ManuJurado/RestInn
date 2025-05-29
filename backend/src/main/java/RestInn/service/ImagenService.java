@@ -1,8 +1,10 @@
 package RestInn.service;
 
 import RestInn.dto.habitacionesDTO.HabitacionResponseDTO;
+import RestInn.entities.Habitacion;
 import RestInn.entities.Imagen;
 import RestInn.exceptions.BadRequestException;
+import RestInn.repositories.HabitacionRepository;
 import RestInn.repositories.ImagenRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,11 +21,13 @@ public class ImagenService {
     private ImagenRepository imagenRepository;
 
 
-    public Imagen guardarImagen(MultipartFile archivo) throws Exception {
+    public Imagen guardarImagen(MultipartFile archivo, Long idHabitacion) throws Exception {
+        Optional<Habitacion> habitacion = habitacionService.buscarEntidadPorId(idHabitacion); // asumimos que este método existe
         Imagen imagen = new Imagen();
         imagen.setNombre(archivo.getOriginalFilename());
         imagen.setTipo(archivo.getContentType());
         imagen.setDatos(archivo.getBytes());
+        imagen.setHabitacion(habitacion.get());
         return imagenRepository.save(imagen);
     }
 
@@ -32,8 +36,13 @@ public class ImagenService {
     }
 
     public List<Imagen> obtenerImagenesPorHabitacion(Long id) {
-        Optional<HabitacionResponseDTO> hab = Optional.of(habitacionService.buscarDTOPorId(id)
-                .orElseThrow(() -> new BadRequestException("Habitación inexistente")));
-        return hab.get().getImagenes();
+        Habitacion habitacion = habitacionService.buscarPorId(id)
+                .orElseThrow(() -> new BadRequestException("Habitación inexistente"));
+        return habitacion.getImagenes();
     }
+
+    public Optional<Imagen> buscarPorId(Long id) {
+        return imagenRepository.findById(id);
+    }
+
 }

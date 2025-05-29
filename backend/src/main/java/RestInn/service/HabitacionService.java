@@ -30,11 +30,9 @@ public class HabitacionService {
 
     public HabitacionResponseDTO crearHabitacion(HabitacionRequestDTO habReqDTO) {
         Habitacion habitacion = convertirAEntidad(habReqDTO);
-
         // Por default, si no envían activo/disponible, ponemos true
         if (habitacion.getActivo() == null) habitacion.setActivo(true);
         if (habitacion.getEstado() == null) habitacion.setEstado(H_Estado.DISPONIBLE);
-
         Habitacion habitacionGuardada = habitacionRepository.save(habitacion);
         return convertirAResponseDTO(habitacionGuardada);
     }
@@ -76,10 +74,8 @@ public class HabitacionService {
 
     }
 
-    public HabitacionResponseDTO buscarPorId(Long id) {
-        Habitacion habitacion = habitacionRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-        return convertirAResponseDTO(habitacion);
+    public Optional<Habitacion> buscarPorId(Long id) {
+        return habitacionRepository.findById(id);
     }
 
     public Optional<HabitacionResponseDTO> buscarDTOPorId(Long id) {
@@ -120,6 +116,7 @@ public class HabitacionService {
                 .tipo(habitacion.getTipo())
                 .precioNoche(habitacion.getPrecioNoche())
                 .comentario(habitacion.getComentario())
+                .cantCamas(habitacion.getCantCamas())
                 .build();
     }
 
@@ -129,8 +126,12 @@ public class HabitacionService {
                 .and (HabitacionSprecification.tieneCapacidad (capacidad))
                 .and (HabitacionSprecification.precioNocheMenorA(precioNoche))
                 .and (HabitacionSprecification.tieneCantCamas(cantCamas));
-                // La consulta se ejecuta con los filtros aplicados
+        // La consulta se ejecuta con los filtros aplicados
         return habitacionRepository.findAll(spec).stream().map(this::convertirAResponseDTO).toList();
+    }
+
+    void asignarImagen(Long idHabitacion){
+
     }
 
     //metodo agregado para obtener lista de habitaciones disponibles en un rango de fechas. Se usa reservaService
