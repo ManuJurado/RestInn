@@ -73,7 +73,7 @@ public class ReservaService {
 
         Reserva reserva = new Reserva();
         reserva.setUsuario(usuario);
-        reserva.setHabitacion(habitacionEntidad);
+        reserva.setHabitacion(habitacion);
         reserva.setFechaIngreso(dto.getFechaIngreso());
         reserva.setFechaSalida(dto.getFechaSalida());
         reserva.setFechaReserva(LocalDate.now());
