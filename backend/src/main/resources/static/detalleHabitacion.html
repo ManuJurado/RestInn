@@ -7,6 +7,8 @@
     <link rel="stylesheet" href="css/layout.css" />
     <link rel="stylesheet" href="css/buttons.css" />
     <link rel="stylesheet" href="css/wrapper.css" />
+    <link rel="stylesheet" href="css/components.css" />
+    <link rel="stylesheet" href="css/detalle.css" />
     <style>
         .galeria { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 20px; }
         .galeria img { width: 200px; height: 140px; object-fit: cover; border-radius: 6px; }
@@ -17,7 +19,7 @@
 </head>
 <body>
 <div class="wrapper">
-    <button onclick="window.history.back()">← Volver</button>
+    <button class="return-button" onclick="window.history.back()">← Volver</button>
 </div>
 
 <div class="detalle">
@@ -28,10 +30,10 @@
     <div class="descripcion" id="descripcion">
         <!-- Descripción detallada -->
     </div>
-    <button class="btn-reservar" id="btnReservar">Reservar habitación</button>
+    <button class="btn-detalle" id="btnReservar">Reservar habitación</button>
 </div>
 
-<script src="/js/detalleHabitacion.js">
+<script src="js/detalleHabitacion.js">
 </script>
 </body>
 </html>

@@ -5,13 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Mis Reservas</title>
     <!-- Rutas absolutas para CSS en static/css -->
-    <link rel="stylesheet" href="/css/base.css" />
-    <link rel="stylesheet" href="/css/layout.css" />
-    <link rel="stylesheet" href="/css/buttons.css" />
-    <link rel="stylesheet" href="/css/labels.css" />
-    <link rel="stylesheet" href="/css/inputs.css" />
-    <link rel="stylesheet" href="/css/wrapper.css" />
-    <link rel="stylesheet" href="/css/contenedorReservas.css" />
+    <link rel="stylesheet" href="../css/base.css" />
+    <link rel="stylesheet" href="../css/layout.css" />
+    <link rel="stylesheet" href="../css/buttons.css" />
+    <link rel="stylesheet" href="../css/wrapper.css" />
+    <link rel="stylesheet" href="../css/components.css" />
 </head>
 <body>
 <h1 class="labels">Mis reservas</h1>
@@ -19,7 +17,6 @@
 <button type="button" class="return-button" onclick="history.back()">← Volver</button>
 
 <div class="wrapper" style="display: flex; gap: 20px;">
-    <!-- Panel lateral de filtros -->
     <aside style="min-width: 200px;">
         <div class="filtro-fecha">
             <label for="fechaInicio" class="labels">Desde</label>
@@ -49,8 +46,8 @@
 <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 
 <!-- Primero el archivo con las funciones de alerta -->
-<script src="/js/alertas.js"></script>
+<script src="js/alertas.js"></script>
 
-<script src="/js/reservas.js"></script>
+<script src="js/reservas.js"></script>
 </body>
 </html>

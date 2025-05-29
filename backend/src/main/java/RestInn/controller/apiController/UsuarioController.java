@@ -73,7 +73,7 @@ public class UsuarioController {
         return ResponseEntity.ok(actualizado);
     }
 
-    // Solo ADMIN puede borrar usuarios
+    // Solo ADMIN puede borrar usuarios o un cliente puede borrar su propio usuario
     @PreAuthorize("isAuthenticated()")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> borrarUsuario(@PathVariable Long id) {
