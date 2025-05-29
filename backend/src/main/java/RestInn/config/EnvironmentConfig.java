@@ -13,8 +13,17 @@ public class EnvironmentConfig {
     static {
         Dotenv dotenv = Dotenv.load();
 
-        String jwtSecret = dotenv.get("JWT_SECRET");
+        String jwtSecret = dotenv.get("JWT_SECRET"); //TODO No deveria generar una clave nueva.
+        if (jwtSecret == null || jwtSecret.isBlank()) {
+            jwtSecret = generateSecureRandomKey(64); // 64 bytes = 86 chars en base64
+            saveEnvVariable("JWT_SECRET", jwtSecret);
+        }
+
         String jwtExpiration = dotenv.get("JWT_EXPIRATION");
+        if (jwtExpiration == null || jwtExpiration.isBlank()) {
+            jwtExpiration = "86400000";
+            saveEnvVariable("JWT_EXPIRATION", jwtExpiration);
+        }
 
         // Otras variables
         System.out.println(jwtSecret);
@@ -22,6 +31,29 @@ public class EnvironmentConfig {
         System.setProperty("JWT_EXPIRATION", jwtExpiration);
         System.setProperty("DB_HOST", dotenv.get("DB_HOST"));
         System.setProperty("DB_PASSWORD", dotenv.get("DB_PASSWORD"));
+    }
+
+    public static void regenerateJwtSecret() {
+        SecureRandom secureRandom = new SecureRandom();
+        byte[] secretBytes = new byte[64]; // 512 bits
+        secureRandom.nextBytes(secretBytes);
+        String newSecret = Base64.getUrlEncoder().withoutPadding().encodeToString(secretBytes);
+
+        // Guardar en archivo .env
+        saveEnvVariable("JWT_SECRET", newSecret);
+
+        // Opcional: Mostrar o setear en runtime
+        System.out.println("Nuevo JWT_SECRET generado:");
+        System.out.println(newSecret);
+        System.setProperty("JWT_SECRET", newSecret);
+    }
+
+
+    private static String generateSecureRandomKey(int byteLength) {
+        SecureRandom random = new SecureRandom();
+        byte[] key = new byte[byteLength];
+        random.nextBytes(key);
+        return Base64.getUrlEncoder().withoutPadding().encodeToString(key);
     }
 
     private static void saveEnvVariable(String key, String value) {

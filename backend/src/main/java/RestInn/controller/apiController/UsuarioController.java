@@ -7,13 +7,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/usuarios")
@@ -63,10 +59,8 @@ public class UsuarioController {
         return new ResponseEntity<>(nuevoCliente, HttpStatus.CREATED);
     }
 
-    // Solo ADMIN puede crear otros ADMINISTRADORES
-    @PreAuthorize("isAuthenticated()")
-    @PostMapping("/administradores")
-    public ResponseEntity<UsuarioResponseDTO> crearAdministrador(@RequestBody UsuarioRequestDTO dto) {
+    @PostMapping("/admin")
+    public ResponseEntity<UsuarioResponseDTO> crearAdmin(@RequestBody UsuarioRequestDTO dto) {
         UsuarioResponseDTO nuevoAdmin = usuarioService.crearAdministrador(dto);
         return new ResponseEntity<>(nuevoAdmin, HttpStatus.CREATED);
     }

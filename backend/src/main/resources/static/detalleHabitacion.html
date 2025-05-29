@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <title>Detalle Habitación</title>
+    <link rel="stylesheet" href="css/base.css" />
+    <link rel="stylesheet" href="css/layout.css" />
+    <link rel="stylesheet" href="css/buttons.css" />
+    <link rel="stylesheet" href="css/wrapper.css" />
+    <style>
+        .galeria { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 20px; }
+        .galeria img { width: 200px; height: 140px; object-fit: cover; border-radius: 6px; }
+        .detalle { max-width: 600px; margin: auto; padding: 20px; }
+        .detalle p { margin: 8px 0; }
+        .btn-reservar { display: block; margin: 30px auto; padding: 12px 24px; }
+    </style>
+</head>
+<body>
+<div class="wrapper">
+    <button onclick="window.history.back()">← Volver</button>
+</div>
+
+<div class="detalle">
+    <h2 id="titulo">Habitación #</h2>
+    <div class="galeria" id="galeria">
+        <!-- Aquí van las miniaturas -->
+    </div>
+    <div class="descripcion" id="descripcion">
+        <!-- Descripción detallada -->
+    </div>
+    <button class="btn-reservar" id="btnReservar">Reservar habitación</button>
+</div>
+
+<script src="/js/detalleHabitacion.js">
+</script>
+</body>
+</html>

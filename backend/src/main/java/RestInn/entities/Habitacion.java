@@ -1,5 +1,6 @@
 package RestInn.entities;
 
+import RestInn.entities.cobranzas.Factura;
 import RestInn.entities.enums.H_Estado;
 import RestInn.entities.enums.H_Tipo;
 import jakarta.persistence.*;
@@ -7,8 +8,10 @@ import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
+import javax.swing.text.html.Option;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 @Entity
 @Getter
@@ -52,6 +55,7 @@ public class Habitacion {
 
     private String comentario;
 
-        @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "habitacion", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Imagen> imagenes;
+
 }

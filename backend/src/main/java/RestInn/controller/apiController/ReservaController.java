@@ -73,7 +73,6 @@ public class ReservaController {
         if (!auth.getName().equalsIgnoreCase(userName)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No puedes ver reservas de otro usuario");
         }
-
         Usuario usuario = usuarioService.buscarEntidadPorNombreLogin(userName)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Cliente no encontrado"));
 

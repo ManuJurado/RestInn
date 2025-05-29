@@ -31,7 +31,7 @@ function configurarEventos() {
     document.getElementById("btnCerrar")
         .addEventListener("click", () => {
             sessionStorage.removeItem("jwt");
-            window.location.href = "/login";
+            window.location.href = "/login.html";
         });
 }
 
@@ -41,7 +41,7 @@ async function cargarHabitaciones() {
     const token = sessionStorage.getItem("jwt");
 
     try {
-        const res = await fetch("/api/habitaciones/disponibles", {
+        const res = await fetch("/api/habitaciones/reservables", {
             headers: { "Authorization": `Bearer ${token}` }
         });
         if (!res.ok) throw new Error(res.status);
@@ -52,21 +52,45 @@ async function cargarHabitaciones() {
             return;
         }
 
-        // Construir tabla
         let html = `<table class="tabla-habitaciones">
           <thead><tr>
-            <th>N°</th><th>Tipo</th><th>Piso</th><th>Capacidad</th><th>Precio Noche</th>
+            <th>N°</th><th>Tipo</th><th>Piso</th><th>Capacidad</th><th>Precio Noche</th><th>Imagen</th><th>Acciones</th>
           </tr></thead><tbody>`;
 
-        habs.forEach(h => {
+        for (const h of habs) {
+            // Cargar primera imagen (o fallback)
+            let urlImagen = "/img/no-image.png";
+            try {
+                const imgRes = await fetch(`/api/imagenes/ver/${h.id}`, {
+                    headers: { "Authorization": `Bearer ${token}` }
+                });
+                if (imgRes.ok) {
+                    const urls = await imgRes.json();
+                    if (urls.length > 0) urlImagen = urls[0];
+                }
+            } catch { /* ignorar fallos de imagen */ }
+
             html += `<tr>
               <td>${h.numero}</td>
               <td>${h.tipo}</td>
-              <td>${h.piso}</td>
+              <td>${h.piso === 0 ? 'PB' : h.piso}</td>
               <td>${h.capacidad}</td>
-              <td>${h.precioNoche}</td>
+              <td>$${h.precioNoche}</td>
+              <td>
+                <img
+                  src="${urlImagen}"
+                  alt="hab ${h.numero}"
+                  style="width:260px; height:160px; object-fit:cover; border-radius:8px;" />
+              </td>
+              <td>
+                <button
+                  class="btn-detalle"
+                  onclick="window.location.href='detalleHabitacion.html?id=${h.id}'">
+                  Ver detalle
+                </button>
+              </td>
             </tr>`;
-        });
+        }
 
         html += `</tbody></table>`;
         cont.innerHTML = html;
@@ -76,6 +100,7 @@ async function cargarHabitaciones() {
         console.error(err);
     }
 }
+
 
 async function initHome() {
     const usuario = await obtenerUsuarioActual();

@@ -2,20 +2,16 @@ package RestInn.controller.apiController;
 
 import RestInn.dto.habitacionesDTO.HabitacionRequestDTO;
 import RestInn.dto.habitacionesDTO.HabitacionResponseDTO;
-import RestInn.entities.Habitacion;
-import RestInn.entities.Imagen;
 import RestInn.entities.enums.H_Estado;
 import RestInn.service.HabitacionService;
-import RestInn.service.ImagenService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -25,7 +21,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*") // permite peticiones desde el frontend local
 public class HabitacionController {
-    @Autowired
     private final HabitacionService habitacionService;
 
     @GetMapping
@@ -33,13 +28,29 @@ public class HabitacionController {
         return habitacionService.listarTodas();
     }
 
-    @GetMapping ("/filtrar")
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PostMapping
+    public HabitacionResponseDTO crearHabitacion(@RequestBody @Valid HabitacionRequestDTO dto) {
+        return habitacionService.crearHabitacion(dto);
+    }
+
+    @GetMapping("/filtrar")
     public List<HabitacionResponseDTO> filtrarHabitaciones(
             @RequestParam(required = false) H_Estado tipo,
             @RequestParam(required = false) Integer capacidad,
             @RequestParam(required = false) Double precioNoche,
             @RequestParam(required = false) Integer cantCamas) {
         return habitacionService.buscarHabitaciones (tipo, capacidad, precioNoche, cantCamas);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<HabitacionResponseDTO> getHabitacionById(@PathVariable Long id) {
+        HabitacionResponseDTO dto = habitacionService
+                .buscarDTOPorId(id)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Habitación no encontrada"
+                ));
+        return ResponseEntity.ok(dto);
     }
 
     @GetMapping ("/reservables")
@@ -64,9 +75,5 @@ public class HabitacionController {
         return ResponseEntity.ok(disponibles);
     }
 
-    //@PreAuthorize("hasRole('ADMINISTRADOR')")
-    @PostMapping
-    public HabitacionResponseDTO crearHabitacion(@RequestBody @Valid HabitacionRequestDTO dto) {
-        return habitacionService.crearHabitacion(dto);
-    }
+
 }

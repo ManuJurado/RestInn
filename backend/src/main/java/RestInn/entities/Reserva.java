@@ -31,7 +31,7 @@ public class Reserva {
     private Habitacion habitacion;
 
     @ElementCollection
-    @CollectionTable(name = "reserva_huespedes", joinColumns = @JoinColumn(name = "reserva_id"))
+    @CollectionTable(name = "huespedes", joinColumns = @JoinColumn(name = "reserva_id"))
     private List<Huesped> huespedes;
 
     // Enum de estado
