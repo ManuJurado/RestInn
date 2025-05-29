@@ -6,14 +6,28 @@ body, html {
 }
 
 .wrapper {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  width: 100vw;              /* ocupa todo el ancho de la pantalla */
-  padding: 0 20px;           /* espacio lateral interno opcional */
-  box-sizing: border-box;    /* padding incluido en el width */
-  gap: 20px;
-}
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;    /* para que el contenido arranque por arriba */
+      width: 100vw;
+      padding: 0 20px;
+      box-sizing: border-box;
+      gap: 40px;                   /* separa botones de tabla */
+    }
+    /* Ajustes al contenedor de la tabla */
+    .tabla-container {
+      flex: 1;                     /* que ocupe el espacio restante */
+    }
+    .tabla-habitaciones {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .tabla-habitaciones th,
+    .tabla-habitaciones td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: center;
+    }
 
 .button-column {
   display: flex;
