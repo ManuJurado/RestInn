@@ -145,6 +145,25 @@
   width: 20%;
 }
 
+.tabla-reservas {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1em;
+}
+.tabla-reservas th,
+.tabla-reservas td {
+  border: 1px solid #ccc;
+  padding: 8px 12px;
+}
+.tabla-reservas th {
+  background-color: #f5f5f5;
+  font-weight: bold;
+}
+.tabla-reservas tr:nth-child(even) {
+  background-color: #fafafa;
+}
+
+
 /*--------------------------------------------------INPUTS--------------------------------------------------*/
 input[type="text"],
 input[type="email"],

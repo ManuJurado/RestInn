@@ -45,7 +45,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             const reservas = await res.json();
             return reservas;
         } catch (err) {
-            contenedor.innerHTML = `<p class="error">Error al cargar reservas: ${err.message}</p>`;
+            contenedor.innerHTML = `<p class="erFror">Error al cargar reservas: ${err.message}</p>`;
             return null;
         }
     }

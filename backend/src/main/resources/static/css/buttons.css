@@ -44,7 +44,7 @@
   margin-top: 15px;
   padding: 18px 25px; /* más espacio para el texto dentro del botón */
   font-size: 1.5em;
-  background-image: url('../images/botonsiguiente.png');
+  background-image: url('../images/cuadrotexto2.png');
   background-repeat: no-repeat;
   background-position: center;
   background-size: 90% 90%; /* la imagen cubre tdo el botón */
@@ -69,6 +69,39 @@
 .normal-button:hover {
   filter: brightness(1.3); /* ilumina solo la imagen de fondo y texto */
 }
+
+.next-button {
+  display: block;
+  width: 250px;
+  margin-top: 15px;
+  padding: 18px 25px; /* más espacio para el texto dentro del botón */
+  font-size: 1.5em;
+  background-image: url('../images/botonsiguiente.png');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 90% 90%; /* la imagen cubre tdo el botón */
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  text-align: center;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  /*fuente de letras de botones */
+      font-family: 'Pirata One', cursive;
+        font-size: 1.8em;
+        color: #000;
+        text-shadow:
+          2px 2px 4px rgba(150, 75, 0, 0.7),
+          -1px -1px 0 #fff;
+
+  background-color: transparent;
+  transition: filter 0.3s ease; /* solo el filtro cambia */
+}
+.next-button:hover {
+  filter: brightness(1.3); /* ilumina solo la imagen de fondo y texto */
+}
+
 .return-button {
   display: block;
   width: 250px;
