@@ -32,6 +32,7 @@ public class AuthController {
         this.jwtUtil      = jwtUtil;
     }
 
+
     @PostMapping("/login")
     public Map<String, String> login(@RequestBody AuthRequest req) {
         // 1) Autenticar credenciales
