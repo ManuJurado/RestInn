@@ -3,7 +3,9 @@ package RestInn.dto.reservasDTO;
 import RestInn.entities.enums.EstadoReserva;
 import RestInn.validation.ReservaValida;
 import jakarta.persistence.Embedded;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
@@ -29,7 +31,7 @@ public class ReservaRequestDTO {
     @NotNull(message = "El ID de la habitación es obligatorio.")
     private Long habitacionId;
 
-    @NotNull(message = "Debe especificar al menos un huésped.")
-    @Embedded
+    @NotEmpty(message = "Debe especificar al menos un huésped.")
+    @Valid
     private List<HuespedRequestDTO> huespedes;
 }
