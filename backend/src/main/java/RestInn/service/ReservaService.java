@@ -10,14 +10,17 @@ import RestInn.entities.Habitacion;
 import RestInn.entities.Huesped;
 import RestInn.entities.Reserva;
 import RestInn.entities.usuarios.Usuario;
+import RestInn.exceptions.ReservaNoDisponibleException;
 import RestInn.repositories.ReservaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.beans.Transient;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
@@ -43,6 +46,7 @@ public class ReservaService {
     // ========================
 
     //Crea una nueva reserva validando disponibilidad de la habitación
+    @Transactional(rollbackFor = Exception.class)
     public ReservaResponseDTO crearReservaDesdeDto(ReservaRequestDTO dto, Usuario usuario) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String username = auth.getName();
@@ -52,10 +56,9 @@ public class ReservaService {
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "Usuario no encontrado"));
 
-        Habitacion habitacion = habitacionService
-                .buscarEntidadPorId(dto.getHabitacionId())
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Habitación no encontrada"));
+        // Bloqueo pesimista accediendo desde el service
+        Habitacion habitacion = habitacionService.buscarConBloqueo(dto.getHabitacionId());
+
 
         boolean ocupado = reservaRepository.existsByHabitacionAndFechaIngresoLessThanAndFechaSalidaGreaterThan(
                 habitacion, dto.getFechaSalida(), dto.getFechaIngreso()
@@ -65,10 +68,7 @@ public class ReservaService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Habitación no encontrada"));
         Habitacion habitacionEntidad = habitacionService.convertirAEntidad(habitacionDTO);
         if (ocupado) {
-            throw new ResponseStatusException(
-                    HttpStatus.CONFLICT,
-                    "La habitación ya está reservada en esas fechas"
-            );
+            throw new ReservaNoDisponibleException("La habitación ya está reservada en esas fechas");
         }
 
         Reserva reserva = new Reserva();
@@ -93,6 +93,7 @@ public class ReservaService {
     // ========================
     // CONSULTA DE RESERVAS
     // ========================
+
 
     //Retorna todas las reservas
     public List<ReservaResponseDTO> obtenerReservas() {

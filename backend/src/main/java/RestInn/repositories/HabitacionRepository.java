@@ -2,13 +2,19 @@ package RestInn.repositories;
 
 import RestInn.entities.Habitacion;
 import RestInn.entities.enums.H_Estado;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import org.springframework.data.jpa.repository.Modifying;
+import jakarta.persistence.LockModeType;
+import org.springframework.data.jpa.repository.*;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface HabitacionRepository extends JpaRepository<Habitacion, Long>, JpaSpecificationExecutor<Habitacion> {
 
     List<Habitacion> findByEstadoNot(H_Estado estado);
+
+    // necesario para bloquear el acceso de reservas por parte de la creacion de una reserva...
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT h FROM Habitacion h WHERE h.id = :id")
+    Optional<Habitacion> findByIdConBloqueo(@Param("id") Long id);
 }
