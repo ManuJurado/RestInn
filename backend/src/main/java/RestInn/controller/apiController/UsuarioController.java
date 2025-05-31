@@ -7,22 +7,32 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/usuarios")
 public class UsuarioController {
-
     private final UsuarioService usuarioService;
 
     public UsuarioController(UsuarioService usuarioService) {
         this.usuarioService = usuarioService;
+    }
+
+    //ENDPOINTS GET----------------------------------------------------------------------------------------------
+    // Cualquier autenticado puede buscar por ID (pero en el servicio validás si es su propia cuenta o si tiene permisos)
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/{id}")
+    public ResponseEntity<UsuarioResponseDTO> buscarUsuarioPorId(@PathVariable Long id) {
+        return ResponseEntity.ok(usuarioService.buscarPorId(id));
+    }
+
+    // Solo ADMIN y EMPLEADO pueden ver todos los usuarios(sin su informacion sensible)
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping
+    public ResponseEntity<List<UsuarioResponseDTO>> listarUsuarios() {
+        return ResponseEntity.ok(usuarioService.verUsuarios());
     }
 
     @GetMapping("/current")
@@ -48,10 +58,8 @@ public class UsuarioController {
         return new ResponseEntity<>(nuevoCliente, HttpStatus.CREATED);
     }
 
-    // Solo ADMIN puede crear otros ADMINISTRADORES
-    @PreAuthorize("isAuthenticated()")
-    @PostMapping("/administradores")
-    public ResponseEntity<UsuarioResponseDTO> crearAdministrador(@RequestBody UsuarioRequestDTO dto) {
+    @PostMapping("/admin")
+    public ResponseEntity<UsuarioResponseDTO> crearAdmin(@RequestBody UsuarioRequestDTO dto) {
         UsuarioResponseDTO nuevoAdmin = usuarioService.crearAdministrador(dto);
         return new ResponseEntity<>(nuevoAdmin, HttpStatus.CREATED);
     }
@@ -64,25 +72,11 @@ public class UsuarioController {
         return ResponseEntity.ok(actualizado);
     }
 
-    // Solo ADMIN puede borrar usuarios
+    // Solo ADMIN puede borrar usuarios o un cliente puede borrar su propio usuario
     @PreAuthorize("isAuthenticated()")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> borrarUsuario(@PathVariable Long id) {
         usuarioService.borrarUsuario(id);
         return ResponseEntity.noContent().build();
-    }
-
-    // Solo ADMIN y EMPLEADO pueden ver todos los usuarios
-    @PreAuthorize("isAuthenticated()")
-    @GetMapping
-    public ResponseEntity<List<UsuarioResponseDTO>> listarUsuarios() {
-        return ResponseEntity.ok(usuarioService.verUsuarios());
-    }
-
-    // Cualquier autenticado puede buscar por ID (pero en el servicio validás si es su propia cuenta o si tiene permisos)
-    @PreAuthorize("isAuthenticated()")
-    @GetMapping("/{id}")
-    public ResponseEntity<UsuarioResponseDTO> buscarUsuarioPorId(@PathVariable Long id) {
-        return ResponseEntity.ok(usuarioService.buscarPorId(id));
     }
 }

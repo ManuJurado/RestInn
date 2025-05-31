@@ -12,10 +12,17 @@ function login() {
         return response.json();
     })
     .then(data => {
-        localStorage.setItem("jwt", data.token); // Guardar token en "jwt"
+        sessionStorage.setItem("jwt", data.token);
         window.location.href = "/home.html";
     })
     .catch(err => {
-        alert(err.message);
+        mostrarAlerta(err.message);
     });
 }
+
+document.addEventListener("keydown", function(event) {
+    if (event.key === "Enter") {
+        login();
+    }
+});
+

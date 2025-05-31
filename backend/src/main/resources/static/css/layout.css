@@ -6,6 +6,32 @@
     flex-wrap: wrap;
 }
 
+.wrapper {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;    /* para que el contenido arranque por arriba */
+      width: 100vw;
+      padding: 0 20px;
+      box-sizing: border-box;
+      gap: 40px;                   /* separa botones de tabla */
+}
+
+.button-column {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-height: 100vh;
+  overflow-y: auto;
+}
+
+.left {
+  align-items: flex-start;
+}
+
+.right {
+  align-items: flex-end;
+}
+
 body {
 overflow-y: scroll;
     display: flex;
@@ -13,4 +39,21 @@ overflow-y: scroll;
     justify-content: center;
     align-items: center;
     text-align: center;
+}
+
+@import url('https://fonts.googleapis.com/css?family=Poppins:400,500,600,700&display=swap');
+*{
+  margin: 0;
+  padding: 0;
+  user-select: none;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+}
+html,body{
+  height: 100%;
+}
+
+main {
+  padding: 0
+  margin: 0
 }

@@ -36,13 +36,6 @@ public class ReservaValidator implements ConstraintValidator<ReservaValida, Rese
             valido = false;
         }
 
-        if (dto.getUsuarioId() == null) {
-            context.buildConstraintViolationWithTemplate("El ID de usuario es obligatorio")
-                    .addPropertyNode("usuarioId")
-                    .addConstraintViolation();
-            valido = false;
-        }
-
         if (dto.getHabitacionId() == null) {
             context.buildConstraintViolationWithTemplate("El ID de habitación es obligatorio")
                     .addPropertyNode("habitacionId")

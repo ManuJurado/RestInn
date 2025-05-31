@@ -8,8 +8,10 @@ import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
+import javax.swing.text.html.Option;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 @Entity
 @Getter
@@ -36,7 +38,7 @@ public class Habitacion {
         @Column(nullable = false)
     private Integer numero;
 
-    @Column(nullable = false)
+        @Column(nullable = false)
     private Integer piso;
 
         @Column(nullable = false)
@@ -53,6 +55,7 @@ public class Habitacion {
 
     private String comentario;
 
-    @Embedded
-    private Imagen imagen;
+    @OneToMany(mappedBy = "habitacion", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Imagen> imagenes;
+
 }

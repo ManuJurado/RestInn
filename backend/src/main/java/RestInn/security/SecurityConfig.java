@@ -52,7 +52,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/login").permitAll()
                         .requestMatchers("/api/usuarios/current").authenticated()
                         // Solo clientes autenticados
-                        .requestMatchers("/api/reservas/**").hasRole("CLIENTE")
+                        .requestMatchers("/api/reservas/**").authenticated()
                         // Solo administradores
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         // Recepcionistas y admins

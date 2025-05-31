@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // Reutilizamos obtenerUsuarioActual definida en home.js (o repetirla igual acá)
     async function obtenerUsuarioActual() {
-        const token = localStorage.getItem('jwt');
+        const token = sessionStorage.getItem('jwt');
         if (!token) throw new Error('No hay token guardado');
 
         const res = await fetch('/api/usuarios/current', {
@@ -23,7 +23,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const user = await obtenerUsuarioActual();
         userName = user.nombreLogin;
     } catch (err) {
-        alert('No se pudo obtener el usuario autenticado');
+        mostrarAlerta('No se pudo obtener el usuario autenticado');
         window.location.href = "/login.html";
         return;
     }
@@ -34,7 +34,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (inicio && fin) url += `/${inicio}/${fin}`;
 
         try {
-            const token = localStorage.getItem('jwt');
+            const token = sessionStorage.getItem('jwt');
             const res = await fetch(url, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
@@ -45,7 +45,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             const reservas = await res.json();
             return reservas;
         } catch (err) {
-            contenedor.innerHTML = `<p class="error">Error al cargar reservas: ${err.message}</p>`;
+            contenedor.innerHTML = `<p class="erFror">Error al cargar reservas: ${err.message}</p>`;
             return null;
         }
     }
@@ -107,7 +107,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             tr.appendChild(tdHabitacion);
 
             const tdHuespedes = document.createElement('td');
-            tdHuespedes.textContent = r.huespedes.map(h => `${h.nombre} ${h.apellido}`).join(', ');
+            tdHuespedes.textContent = r.huespedes.map(h => `${h.nombre} ${h.apellido}, ${h.dni}`).join(', ');
             tr.appendChild(tdHuespedes);
 
             tbody.appendChild(tr);
@@ -126,11 +126,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         const inicio = inputInicio.value;
         const fin = inputFin.value;
         if (!inicio || !fin) {
-            alert('Seleccioná ambas fechas para filtrar.');
+            mostrarAlerta('Seleccioná ambas fechas para filtrar.');
             return;
         }
         if (inicio > fin) {
-            alert('La fecha "Desde" no puede ser posterior a "Hasta".');
+            mostrarAlerta('La fecha "Desde" no puede ser posterior a "Hasta".');
             return;
         }
         const filtradas = await fetchReservas(inicio, fin);

@@ -2,18 +2,43 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8" />
-    <title>RestInn - Bienvenido</title>
+    <title>RestInn - Inicio</title>
     <link href="https://fonts.googleapis.com/css2?family=Pirata+One&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="css/base.css" />
     <link rel="stylesheet" href="css/layout.css" />
     <link rel="stylesheet" href="css/buttons.css" />
+    <link rel="stylesheet" href="css/wrapper.css" />
+    <link rel="stylesheet" href="css/components.css" />
 </head>
 <body>
-<div class="button-container-left">
-    <button class="button-left" onclick="window.location.href='/login.html'">Iniciar sesión</button>
-    <button class="button-left" onclick="window.location.href='/registro'">Registrarse</button>
-    <button class="button-left" onclick="window.location.href='/recuperar-password'">¿Olvidaste tu contraseña?</button>
+<div class="wrapper">
+    <!-- Menú de botones -->
+    <div class="button-column left">
+        <button class="button-left" onclick="window.location.href='/login.html'">Iniciar sesión</button>
+        <button class="button-left" onclick="window.location.href='/registro.html'">Registrarse</button>
+        <button class="button-left" onclick="window.location.href='/recuperar-password.html'">¿Olvidaste tu contraseña?</button>
+    </div>
+
+    <!-- Tabla de habitaciones -->
+    <div class="tabla-container">
+        <h2 class="labels">Habitaciones disponibles</h2>
+        <div id="tablaHabitaciones">Cargando habitaciones...</div>
+    </div>
+
+    <!-- Espacio derecho (si quisieras otro menu) -->
+    <div class="button-column right">
+        <!-- Podrías dejarlo vacío o meter algo aquí -->
+    </div>
 </div>
 
+<!-- Alerta global -->
+<div id="alerta" class="alert">
+    <span class="msg"></span>
+    <button class="close-btn" onclick="cerrarAlerta()">X</button>
+</div>
+
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+<script src="js/alertas.js"></script>
+<script src="js/home.js"></script>
 </body>
 </html>

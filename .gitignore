@@ -33,4 +33,6 @@ build/
 .vscode/
 
 # Ocultar configuración sensible
+backend/
+
 .env
