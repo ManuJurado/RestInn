@@ -2,125 +2,110 @@ package RestInn.controller.apiController;
 
 import RestInn.dto.reservasDTO.ReservaRequestDTO;
 import RestInn.dto.reservasDTO.ReservaResponseDTO;
-import RestInn.entities.usuarios.Usuario;
-import RestInn.exceptions.ReservaNoDisponibleException;
 import RestInn.service.ReservaService;
-import RestInn.service.UsuarioService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/reservas")
-@CrossOrigin(origins = "*") // permite peticiones desde el frontend local
+@CrossOrigin(origins = "*")
 public class ReservaController {
 
     private final ReservaService reservaService;
-    private final UsuarioService usuarioService;
 
-    @Autowired
-    public ReservaController(ReservaService reservaService, UsuarioService usuarioService) {
+    public ReservaController(ReservaService reservaService) {
         this.reservaService = reservaService;
-        this.usuarioService = usuarioService;
     }
 
-    //ENDPOINTS GET-----------------------------------------------------------------------------------------------
-    @GetMapping
-    public List<ReservaResponseDTO> getAllReservas() {
-        return reservaService.obtenerReservas();  // Ya viene completo desde el servicio
-    }
-
-    @GetMapping("/{id}")
-    public ReservaResponseDTO getReservaById(@PathVariable Long id) {
-        return reservaService.obtenerReservaPorId(id);
-    }
-
-    @GetMapping("/mias")
-    @PreAuthorize("isAuthenticated()")
-    public List<ReservaResponseDTO> reservasDelUsuario(Authentication auth) {
-        Usuario usuario = usuarioService.buscarEntidadPorNombreLogin(auth.getName())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
-        return reservaService.obtenerReservasPorUsuarioId(usuario.getId());
-    }
-
-    @GetMapping("/{userName}/misReservas")
-    @PreAuthorize("isAuthenticated()") //creamos metodo para filtrar Reservas segun un Cliente logueado
-    public List<ReservaResponseDTO> reservasDeCliente(@PathVariable String userName, Authentication auth) {
-        if (!auth.getName().equalsIgnoreCase(userName)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "no puedes ver reservas de otro usuario");
-        }
-
-        Usuario usuario = usuarioService.buscarEntidadPorNombreLogin(userName)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Cliente no encontrado"));
-        return reservaService.obtenerReservasPorUsuarioId(usuario.getId());
-    }
-
-    @GetMapping("/{userName}/misReservas/{fechaInicio}/{fechaFin}")
-    @PreAuthorize("isAuthenticated()")
-    public List<ReservaResponseDTO> reservasPorFecha(
-            @PathVariable String userName,
-            @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaInicio,
-            @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaFin,
-            Authentication auth
-    ) {
-        if (!auth.getName().equalsIgnoreCase(userName)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No puedes ver reservas de otro usuario");
-        }
-        Usuario usuario = usuarioService.buscarEntidadPorNombreLogin(userName)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Cliente no encontrado"));
-
-        return reservaService.buscarReservasEntreFechas(usuario, fechaInicio, fechaFin);
-    }
-
-    //ENDPOINTS POST-----------------------------------------------------------------------------------------------
-    //crear una reserva
+    // ====================================================
+    // 1) CREAR RESERVA (CLIENTE, EMPLEADO O ADMIN AUTENTICADO)
+    // ====================================================
     @PostMapping
+    @PreAuthorize("hasAnyRole('CLIENTE','RECEPCIONISTA','CONSERJE','LIMPIEZA','ADMINISTRADOR')")
+    public ResponseEntity<ReservaResponseDTO> crearReserva(
+            @Valid @RequestBody ReservaRequestDTO dto) {
+        ReservaResponseDTO nueva = reservaService.crearReservaComoUsuarioAutenticado(dto);
+        return new ResponseEntity<>(nueva, HttpStatus.CREATED);
+    }
+
+    // ====================================================
+    // 2) LISTAR MIS RESERVAS (solo CLIENTE)
+    // ====================================================
+    @GetMapping("/mis-reservas")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> createReserva(
-            @RequestBody @Valid ReservaRequestDTO dto,
-            Authentication auth) {
-
-        String userName = auth.getName();
-        Usuario usuario = usuarioService
-                .buscarEntidadPorNombreLogin(userName)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-
-        ReservaResponseDTO response = reservaService.crearReservaDesdeDto(dto, usuario);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<List<ReservaResponseDTO>> listarMisReservas() {
+        List<ReservaResponseDTO> lista = reservaService.listarReservasDeClienteActual();
+        return ResponseEntity.ok(lista);
     }
 
-
-    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLEADO')")
-    @PostMapping("/{reservaId}/checkin")
-    public void checkIn(@PathVariable Long reservaId) {
-        reservaService.realizarCheckIn(reservaId);
-    }
-
-    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLEADO')")
-    @PostMapping("/{reservaId}/checkout")
-    public void checkOut(@PathVariable Long reservaId) {
-        reservaService.realizarCheckOut(reservaId);
-    }
-
-    //ENDPOINTS PUT-----------------------------------------------------------------------------------------------
-    //modificar una reserva
-    @PutMapping("/{id}")
-    public ReservaResponseDTO updateReserva(@PathVariable Long id, @Valid @RequestBody ReservaRequestDTO dto) {
-        return reservaService.actualizarReservaDesdeDto(id, dto);
-    }
-
-    //ENDPOINTS DELETE-----------------------------------------------------------------------------------------------
+    // ====================================================
+    // 3) CANCELAR RESERVA (solo CLIENTE, estado PENDIENTE)
+    // ====================================================
     @DeleteMapping("/{id}")
-    public void deleteReserva(@PathVariable Long id) {
+    @PreAuthorize("hasRole('CLIENTE')")
+    public ResponseEntity<Void> cancelarReserva(@PathVariable Long id) {
+        reservaService.cancelarReserva(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    // ====================================================
+    // 4) LISTAR RESERVAS CON FILTROS (RECEPCIONISTA, ADMINISTRADOR)
+    // ====================================================
+    @GetMapping
+    @PreAuthorize("hasAnyRole('RECEPCIONISTA','ADMINISTRADOR')")
+    public ResponseEntity<List<ReservaResponseDTO>> listarReservas(
+            @RequestParam(required = false) String estado,
+            @RequestParam(required = false) Long reservaId) {
+        List<ReservaResponseDTO> lista = reservaService.listarReservasConFiltros(estado, reservaId);
+        return ResponseEntity.ok(lista);
+    }
+
+    // ====================================================
+    // 5) CHECK-IN (solo RECEPCIONISTA, ADMINISTRADOR)
+    // ====================================================
+    @PostMapping("/checkin/{reservaId}")
+    @PreAuthorize("hasAnyRole('RECEPCIONISTA','ADMINISTRADOR')")
+    public ResponseEntity<ReservaResponseDTO> realizarCheckIn(
+            @PathVariable Long reservaId) {
+        ReservaResponseDTO dto = reservaService.realizarCheckIn(reservaId);
+        return ResponseEntity.ok(dto);
+    }
+
+    // ====================================================
+    // 6) CHECK-OUT (solo RECEPCIONISTA, ADMINISTRADOR)
+    // ====================================================
+    @PostMapping("/checkout/{reservaId}")
+    @PreAuthorize("hasAnyRole('RECEPCIONISTA','ADMINISTRADOR')")
+    public ResponseEntity<ReservaResponseDTO> realizarCheckOut(
+            @PathVariable Long reservaId) {
+        ReservaResponseDTO dto = reservaService.realizarCheckOut(reservaId);
+        return ResponseEntity.ok(dto);
+    }
+
+    // ====================================================
+    // 7) ACTUALIZAR RESERVA (cualquier usuario autenticado que pase validación interna)
+    // ====================================================
+    @PutMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<ReservaResponseDTO> updateReserva(
+            @PathVariable Long id,
+            @Valid @RequestBody ReservaRequestDTO dto) {
+        ReservaResponseDTO updated = reservaService.actualizarReservaDesdeDto(id, dto);
+        return ResponseEntity.ok(updated);
+    }
+
+    // ====================================================
+    // 8) ELIMINAR RESERVA (cualquier usuario autenticado que pase validación interna)
+    // ====================================================
+    @DeleteMapping("/administrador/{id}")
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    public ResponseEntity<Void> deleteReservaPorAdministrador(@PathVariable Long id) {
         reservaService.eliminarReserva(id);
+        return ResponseEntity.noContent().build();
     }
 }
