@@ -21,6 +21,7 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(new ErrorDetails("Error interno del servidor", ex.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+
     // Maneja excepciones cuando los datos de la solicitud son inválidos
     @ExceptionHandler(InvalidDataException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -51,6 +52,17 @@ public class GlobalExceptionHandler {
 
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(ReservaNoDisponibleException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ResponseEntity<Object> handleReservaNoDisponible(ReservaNoDisponibleException ex) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("mensaje", ex.getMessage());
+        response.put("estado", HttpStatus.CONFLICT.value());
+        response.put("fecha", LocalDateTime.now());
+        return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+    }
+
 
     // Maneja excepciones cuando el cliente no tiene permisos suficientes
     @ExceptionHandler(UnauthorizedException.class)

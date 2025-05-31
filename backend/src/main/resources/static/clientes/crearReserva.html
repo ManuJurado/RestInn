@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <title>Crear Reserva</title>
-    <link rel="stylesheet" href="/css/base.css" />
-    <link rel="stylesheet" href="/css/layout.css" />
-    <link rel="stylesheet" href="/css/inputs.css" />
-    <link rel="stylesheet" href="/css/labels.css" />
-    <link rel="stylesheet" href="/css/buttons.css" />
+    <link rel="stylesheet" href="../css/base.css" />
+    <link rel="stylesheet" href="../css/layout.css" />
+    <link rel="stylesheet" href="../css/buttons.css" />
+    <link rel="stylesheet" href="../css/wrapper.css" />
+    <link rel="stylesheet" href="../css/components.css" />
 </head>
 <body>
 <h1 class="labels">Nueva Reserva</h1>
@@ -21,17 +21,19 @@
     <label class="labels">Fecha de salida:
         <input type="date" id="fechaSalida" class="inputs" required>
     </label>
+    <label class="labels">Cantidad de huéspedes (máximo 5):
+        <input type="number" id="cantidadHuespedes" class="inputs" min="1" max="5" value="1" required>
+    </label>
     <label class="labels">Habitación disponible:
         <select id="habitacionSelect" class="inputs" required>
-            <option value="" disabled selected>— Seleccioná fechas primero —</option>
+            <option value="" disabled selected>— Seleccioná fechas y cantidad —</option>
         </select>
     </label>
     <fieldset>
         <legend class="labels">Huéspedes</legend>
         <div id="huespedesContainer"></div>
-        <button type="button" id="btnAgregarHuesped" class="btn-agregar">Agregar Huésped</button>
     </fieldset>
-    <button type="submit" class="btn-crear">Confirmar Reserva</button>
+    <button type="submit" class="normal-button">Confirmar Reserva</button>
 </form>
 
 <!-- Contenedor para la alerta -->
@@ -41,10 +43,8 @@
 </div>
 
 <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+<script src="../js/alertas.js"></script>
+<script src="../js/crearReserva.js"></script>
 
-<!-- Primero el archivo con las funciones de alerta -->
-<script src="/js/alertas.js"></script>
-
-<script src="/js/crearReserva.js"></script>
 </body>
 </html>

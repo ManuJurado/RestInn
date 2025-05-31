@@ -1,0 +1,37 @@
+.custom-datepicker {
+  position: absolute;
+  display: none;
+  background-size: cover;
+  background-position: center;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  z-index: 1000;
+}
+.custom-datepicker .header {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px;
+  background: rgba(255,255,255,0.8);
+}
+.custom-datepicker .header button {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+.custom-datepicker .days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  padding: 8px;
+  background: rgba(255,255,255,0.8);
+}
+.custom-datepicker .day {
+  padding: 8px;
+  text-align: center;
+  cursor: pointer;
+  border-radius: 4px;
+}
+.custom-datepicker .day:hover {
+  background: rgba(0,0,0,0.1);
+}

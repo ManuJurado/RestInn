@@ -10,7 +10,10 @@ import RestInn.repositories.specifications.HabitacionSprecification;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -30,7 +33,6 @@ public class HabitacionService {
 
     public HabitacionResponseDTO crearHabitacion(HabitacionRequestDTO habReqDTO) {
         Habitacion habitacion = convertirAEntidad(habReqDTO);
-        // Por default, si no envían activo/disponible, ponemos true
         if (habitacion.getActivo() == null) habitacion.setActivo(true);
         if (habitacion.getEstado() == null) habitacion.setEstado(H_Estado.DISPONIBLE);
         Habitacion habitacionGuardada = habitacionRepository.save(habitacion);
@@ -79,7 +81,7 @@ public class HabitacionService {
     }
 
     public Optional<HabitacionResponseDTO> buscarDTOPorId(Long id) {
-        Optional<Habitacion> hab = habitacionRepository.findById(id);
+        Optional<Habitacion> hab = habitacionRepository.findByIdConBloqueo(id);
         if (hab.isPresent()) {
             return Optional.ofNullable(convertirAResponseDTO(hab.get()));
         } else {
@@ -151,4 +153,11 @@ public class HabitacionService {
                 .stream()
                 .map(this::convertirAResponseDTO).toList();
     }
+
+    @Transactional( readOnly = true )
+    public Habitacion buscarConBloqueo(Long id) {
+        return habitacionRepository.findByIdConBloqueo(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Habitación no encontrada"));
+    }
+
 }

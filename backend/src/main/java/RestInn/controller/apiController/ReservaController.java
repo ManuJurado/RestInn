@@ -3,12 +3,14 @@ package RestInn.controller.apiController;
 import RestInn.dto.reservasDTO.ReservaRequestDTO;
 import RestInn.dto.reservasDTO.ReservaResponseDTO;
 import RestInn.entities.usuarios.Usuario;
+import RestInn.exceptions.ReservaNoDisponibleException;
 import RestInn.service.ReservaService;
 import RestInn.service.UsuarioService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -83,15 +85,19 @@ public class ReservaController {
     //crear una reserva
     @PostMapping
     @PreAuthorize("isAuthenticated()")
-    public ReservaResponseDTO createReserva(
+    public ResponseEntity<?> createReserva(
             @RequestBody @Valid ReservaRequestDTO dto,
             Authentication auth) {
+
         String userName = auth.getName();
         Usuario usuario = usuarioService
                 .buscarEntidadPorNombreLogin(userName)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-        return reservaService.crearReservaDesdeDto(dto, usuario);
+
+        ReservaResponseDTO response = reservaService.crearReservaDesdeDto(dto, usuario);
+        return ResponseEntity.ok(response);
     }
+
 
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLEADO')")
     @PostMapping("/{reservaId}/checkin")

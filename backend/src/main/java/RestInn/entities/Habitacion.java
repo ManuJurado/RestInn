@@ -38,7 +38,7 @@ public class Habitacion {
         @Column(nullable = false)
     private Integer numero;
 
-    @Column(nullable = false)
+        @Column(nullable = false)
     private Integer piso;
 
         @Column(nullable = false)

@@ -1,10 +1,8 @@
 package RestInn.service;
 
-import RestInn.dto.habitacionesDTO.HabitacionResponseDTO;
 import RestInn.entities.Habitacion;
 import RestInn.entities.Imagen;
 import RestInn.exceptions.BadRequestException;
-import RestInn.repositories.HabitacionRepository;
 import RestInn.repositories.ImagenRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
