@@ -10,7 +10,6 @@ import RestInn.entities.Habitacion;
 import RestInn.entities.Huesped;
 import RestInn.entities.Reserva;
 import RestInn.entities.usuarios.Usuario;
-import RestInn.exceptions.ReservaNoDisponibleException;
 import RestInn.repositories.ReservaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

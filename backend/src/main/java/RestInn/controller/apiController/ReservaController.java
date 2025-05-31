@@ -3,7 +3,6 @@ package RestInn.controller.apiController;
 import RestInn.dto.reservasDTO.ReservaRequestDTO;
 import RestInn.dto.reservasDTO.ReservaResponseDTO;
 import RestInn.entities.usuarios.Usuario;
-import RestInn.exceptions.ReservaNoDisponibleException;
 import RestInn.service.ReservaService;
 import RestInn.service.UsuarioService;
 import jakarta.validation.Valid;
