@@ -2,11 +2,13 @@ package RestInn.service;
 
 import RestInn.entities.cobranzas.Factura;
 import RestInn.repositories.FacturaRepository;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Service
 public class FacturaService {
-    private FacturaRepository facturacionRepository;
+    private FacturaRepository facturaRepository;
     private ReservaService reservaService;
 
     public Factura generarFactura(Long reservaId) {
