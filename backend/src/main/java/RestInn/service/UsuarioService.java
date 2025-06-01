@@ -157,6 +157,8 @@ public class UsuarioService {
                 .email(usuario.getEmail())
                 .CUIT(usuario.getCUIT())
                 .activo(usuario.getActivo())
+                .rol(usuario.getClass().getSimpleName().toUpperCase()) // <--- esta línea es clave
                 .build();
     }
+
 }

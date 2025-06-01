@@ -49,39 +49,18 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authorizeHttpRequests(auth -> auth
-                        // Archivos estáticos y frontend público
-                        .requestMatchers(
-                                "/", "/index.html", "/login.html", "/registro", "/recuperar-password",
-                                "/detalleHabitacion.html",
-                                "/api/habitaciones/reservables", "/api/imagenes/ver/**",
-                                "/css/**", "/js/**", "/images/**", "/favicon.ico",
-                                "/api/usuarios/**", "/api/habitaciones/{id:[0-9]+}","/home.html","/reservas.html"
-                        ).permitAll()
-
-                        // Auth y rutas públicas de API
-                        .requestMatchers("/api/auth/login", "/api/public/**").permitAll()
-
-                        // Usuarios autenticados
-                        .requestMatchers("/api/usuarios/current", "/api/reservas/mis-reservas").authenticated()
-
-                        // Reservas
-                        .requestMatchers("/api/reservas").hasAnyRole("CLIENTE","RECEPCIONISTA","CONSERJE","LIMPIEZA","ADMINISTRADOR")
-                        .requestMatchers("/api/reservas/{id}").hasRole("CLIENTE")
-                        .requestMatchers("/api/reservas/checkin/**").hasAnyRole("RECEPCIONISTA","ADMINISTRADOR")
-                        .requestMatchers("/api/reservas/checkout/**").hasAnyRole("RECEPCIONISTA","ADMINISTRADOR")
-                        .requestMatchers("/api/reservas").hasAnyRole("RECEPCIONISTA","ADMINISTRADOR")
-
-                        // Otras rutas por rol
-                        .requestMatchers("/api/empleados/limpieza/**").hasAnyRole("LIMPIEZA","ADMINISTRADOR")
-                        .requestMatchers("/api/empleados/conserjeria/**").hasAnyRole("CONSERJE","ADMINISTRADOR")
-                        .requestMatchers("/api/admin/**").hasRole("ADMINISTRADOR")
-                        .requestMatchers("/api/clientes/**").hasRole("CLIENTE")
-
-                        // Tdo lo demás requiere autenticación
-                        .anyRequest().authenticated()
+                        .requestMatchers("/api/auth/login").permitAll()
+                        .requestMatchers("/api/usuarios/current").authenticated()
+                        // Solo clientes autenticados
+                        .requestMatchers("/api/reservas/**").authenticated()
+                        // Solo administradores
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        // Recepcionistas y admins
+                        .requestMatchers("/api/empleados/**").hasAnyRole("ADMIN", "EMPLEADO")
+                        .anyRequest().permitAll()
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
-                .logout(logout -> logout.disable());
+                .logout(logout -> logout.disable()); // opcional deshabilitar logout de sesión
 
         return http.build();
     }

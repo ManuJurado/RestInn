@@ -28,14 +28,6 @@ public class JwtFilter extends OncePerRequestFilter {
                                     FilterChain chain)
             throws ServletException, IOException {
 
-        String path = req.getServletPath();
-
-        // Excluir rutas públicas (puedes agregar más si lo necesitás)
-        if (path.equals("/api/auth/login") || path.equals("/api/registro") || path.equals("/api/verificacion")) {
-            chain.doFilter(req, res);
-            return;
-        }
-
         String header = req.getHeader("Authorization");
         if (header != null && header.startsWith("Bearer ")) {
             String token = header.substring(7);
@@ -57,5 +49,4 @@ public class JwtFilter extends OncePerRequestFilter {
 
         chain.doFilter(req, res);
     }
-
 }

@@ -1,18 +1,20 @@
-// 1) Solo para la parte de usuario (login/logout/reservas)
+// home.js
 async function obtenerUsuarioActual() {
     const token = sessionStorage.getItem("jwt");
     if (!token) {
-        // Si no hay token, simplemente no mostramos los botones privados
+        window.location.href = "/login.html";
         return null;
     }
 
     const res = await fetch("/api/usuarios/current", {
         headers: { "Authorization": `Bearer ${token}` }
     });
+
     if (res.status === 401) {
         sessionStorage.removeItem("jwt");
         return null;
     }
+
     if (!res.ok) throw new Error("Error inesperado: " + res.status);
     return await res.json();
 }
@@ -22,22 +24,18 @@ function mostrarNombreUsuario(nombreLogin) {
     if (span) span.textContent = nombreLogin;
 }
 
-  function ajustarMargenTabla() {
+function ajustarMargenTabla() {
     const contIzq = document.querySelector('.button-container-left');
     const contDer = document.querySelector('.button-container-right');
     const tabla = document.querySelector('.tabla-container');
 
     if (contIzq && contDer && tabla) {
-      const maxAltura = Math.max(contIzq.offsetHeight, contDer.offsetHeight);
-      tabla.style.marginTop = (maxAltura + 20) + 'px';
+        const maxAltura = Math.max(contIzq.offsetHeight, contDer.offsetHeight);
+        tabla.style.marginTop = (maxAltura + 20) + 'px';
     }
-  }
-
-  window.addEventListener('load', ajustarMargenTabla);
-  window.addEventListener('resize', ajustarMargenTabla);
+}
 
 function configurarEventos() {
-    // Solo si existen esos botones en el DOM
     const btnR = document.getElementById("btnReservar");
     const btnD = document.getElementById("btnDatos");
     const btnC = document.getElementById("btnCerrar");
@@ -50,12 +48,12 @@ function configurarEventos() {
     });
 }
 
-// 2) **Carga pública** de habitaciones, sin auth
 async function cargarHabitaciones() {
     const cont = document.getElementById("tablaHabitaciones");
     cont.textContent = "Cargando habitaciones...";
+
     try {
-        const res = await fetch("/api/habitaciones/reservables"); // ← sin headers
+        const res = await fetch("/api/habitaciones/reservables");
         if (!res.ok) throw new Error(res.status);
         const habs = await res.json();
 
@@ -65,14 +63,13 @@ async function cargarHabitaciones() {
         }
 
         let html = `<table class="tabla-habitaciones">
-          <thead><tr>
-            <th>Habitación</th>
-            <th>Imagen</th>
-            <th>Acción</th>
-          </tr></thead><tbody>`;
+            <thead><tr>
+                <th>Habitación</th>
+                <th>Imagen</th>
+                <th>Acción</th>
+            </tr></thead><tbody>`;
 
         for (const h of habs) {
-            // Cargar primera imagen (o fallback)
             let urlImagen = "/img/no-image.png";
             try {
                 const imgRes = await fetch(`/api/imagenes/ver/${h.id}`);
@@ -83,28 +80,26 @@ async function cargarHabitaciones() {
             } catch {}
 
             html += `<tr>
-              <td style="text-align:left; line-height:1.6;">
-                <strong>N°:</strong> ${h.numero}<br />
-                <strong>Tipo:</strong> ${h.tipo}<br />
-                <strong>Piso:</strong> ${h.piso === 0 ? 'PB' : h.piso}<br />
-                <strong>Capacidad:</strong> ${h.capacidad} personas<br />
-                <strong>Precio:</strong> $${h.precioNoche} / noche
-              </td>
-              <td>
-                <img
-                  src="${urlImagen}"
-                  alt="hab ${h.numero}"
-                  style="width:240px; height:160px; object-fit:cover; border-radius:8px;" />
-              </td>
-              <td style="text-align:center; vertical-align:middle;">
-                <button
-                  class="btn-detalle"
-                  onclick="window.location.href='detalleHabitacion.html?id=${h.id}'">
-                  Ver detalle
-                </button>
-              </td>
+                <td style="text-align:left; line-height:1.6;">
+                    <strong>N°:</strong> ${h.numero}<br />
+                    <strong>Tipo:</strong> ${h.tipo}<br />
+                    <strong>Piso:</strong> ${h.piso === 0 ? 'PB' : h.piso}<br />
+                    <strong>Capacidad:</strong> ${h.capacidad} personas<br />
+                    <strong>Precio:</strong> $${h.precioNoche} / noche
+                </td>
+                <td>
+                    <img src="${urlImagen}" alt="hab ${h.numero}"
+                         style="width:240px; height:160px; object-fit:cover; border-radius:8px;" />
+                </td>
+                <td style="text-align:center; vertical-align:middle;">
+                    <button class="btn-detalle"
+                            onclick="window.location.href='detalleHabitacion.html?id=${h.id}'">
+                        Ver detalle
+                    </button>
+                </td>
             </tr>`;
         }
+
         html += `</tbody></table>`;
         cont.innerHTML = html;
 
@@ -114,9 +109,8 @@ async function cargarHabitaciones() {
     }
 }
 
-// 3) Inicialización: primero tabla, luego (si existe) login
 async function initHome() {
-    await cargarHabitaciones();     // ← carga **siempre** la tabla
+    await cargarHabitaciones();
 
     const usuario = await obtenerUsuarioActual();
     if (usuario) {
@@ -125,4 +119,6 @@ async function initHome() {
     }
 }
 
+window.addEventListener('load', ajustarMargenTabla);
+window.addEventListener('resize', ajustarMargenTabla);
 document.addEventListener("DOMContentLoaded", initHome);

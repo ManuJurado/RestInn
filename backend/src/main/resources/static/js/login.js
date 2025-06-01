@@ -2,7 +2,7 @@ function login() {
     const user = document.getElementById("usuario").value;
     const pass = document.getElementById("clave").value;
 
-    fetch("http://restinn.sytes.net/api/auth/login", {
+    fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username: user, password: pass })
@@ -13,6 +13,9 @@ function login() {
     })
     .then(data => {
         sessionStorage.setItem("jwt", data.token);
+        sessionStorage.setItem("usuarioId", data.id);
+        sessionStorage.setItem("usuarioLogin", data.nombreLogin);
+        sessionStorage.setItem("rol", data.rol);
         window.location.href = "/home.html";
     })
     .catch(err => {
@@ -25,4 +28,3 @@ document.addEventListener("keydown", function(event) {
         login();
     }
 });
-
