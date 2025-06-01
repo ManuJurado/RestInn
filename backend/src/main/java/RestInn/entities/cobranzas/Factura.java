@@ -1,9 +1,8 @@
 package RestInn.entities.cobranzas;
 
-import RestInn.entities.Habitacion;
 import RestInn.entities.Reserva;
-import RestInn.entities.enums.EstadoFactura;
 import RestInn.entities.enums.MetodoPago;
+import RestInn.entities.enums.TipoFactura;
 import RestInn.entities.usuarios.Cliente;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMin;
@@ -29,19 +28,23 @@ public class Factura {
     @JoinColumn(name = "cliente_id", nullable = false)
     private Cliente cliente;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "reserva_id", nullable = false)
     private Reserva reserva;
 
     @Column(name = "fecha_emision", nullable = false)
     private LocalDate fechaEmision;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private TipoFactura tipoFactura;
+
     @OneToMany(mappedBy = "factura", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private List<Consumo> consumos;
 
     @Column(nullable = false)
     @DecimalMin("0.00")
-    private BigDecimal subtotal;  // reserva + consumos
+    private BigDecimal subtotal;  // reserva habitacion
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -59,14 +62,4 @@ public class Factura {
     @Column(name = "total_final", nullable = false)
     @DecimalMin("0.00")
     private BigDecimal totalFinal;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private EstadoFactura estado;
-
-    @DecimalMin("0.00")
-    private BigDecimal haber;   // pagado
-
-    @DecimalMin("0.00")
-    private BigDecimal debe;    // deuda
 }
