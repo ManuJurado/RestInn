@@ -30,7 +30,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     async function fetchReservas(inicio, fin) {
         contenedor.innerHTML = 'Cargando...';
-        let url = `/api/reservas/${userName}/misReservas`;
+        let url = `/api/reservas/mis-reservas`;
         if (inicio && fin) url += `/${inicio}/${fin}`;
 
         try {

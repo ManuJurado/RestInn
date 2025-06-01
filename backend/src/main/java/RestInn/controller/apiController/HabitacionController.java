@@ -21,44 +21,101 @@ import java.util.List;
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*") // permite peticiones desde el frontend local
 public class HabitacionController {
+
     private final HabitacionService habitacionService;
 
+    // ============================
+    // 1) LISTAR HABITACIONES ACTIVAS (público)
+    // ============================
     @GetMapping
-    public List<HabitacionResponseDTO> listarHabitaciones() {
-        return habitacionService.listarTodas();
+    public List<HabitacionResponseDTO> listarHabitacionesActivas() {
+        return habitacionService.listarActivas();
     }
 
+    // ============================
+    // 2) LISTAR TODAS INCLUYENDO INACTIVAS (ADMIN)
+    // ============================
+    @GetMapping("/admin/todas")
     @PreAuthorize("hasRole('ADMINISTRADOR')")
-    @PostMapping
-    public HabitacionResponseDTO crearHabitacion(@RequestBody @Valid HabitacionRequestDTO dto) {
-        return habitacionService.crearHabitacion(dto);
+    public List<HabitacionResponseDTO> listarTodasHabitacionesAdmin() {
+        return habitacionService.listarTodasIncluidasInactivas();
     }
 
+    // ============================
+    // 3) OBTENER HABITACIÓN POR ID PÚBLICO (solo activas)
+    // ============================
+    @GetMapping("/{id}")
+    public ResponseEntity<HabitacionResponseDTO> getHabitacionByIdPublic(@PathVariable Long id) {
+        HabitacionResponseDTO dto = habitacionService.buscarDTOPorIdPublic(id);
+        return ResponseEntity.ok(dto);
+    }
+
+    // ============================
+    // 4) OBTENER HABITACIÓN POR ID ADMIN (incluye inactivas)
+    // ============================
+    @GetMapping("/admin/{id}")
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    public ResponseEntity<HabitacionResponseDTO> getHabitacionByIdAdmin(@PathVariable Long id) {
+        HabitacionResponseDTO dto = habitacionService.buscarDTOPorIdAdmin(id);
+        return ResponseEntity.ok(dto);
+    }
+
+    // ============================
+    // 5) CREAR NUEVA HABITACIÓN (solo ADMINISTRADOR)
+    // ============================
+    @PostMapping
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    public ResponseEntity<HabitacionResponseDTO> crearHabitacion(
+            @RequestBody @Valid HabitacionRequestDTO dto) {
+        HabitacionResponseDTO creada = habitacionService.crearHabitacion(dto);
+        return new ResponseEntity<>(creada, HttpStatus.CREATED);
+    }
+
+    // ============================
+    // 6) MODIFICAR HABITACIÓN (solo ADMINISTRADOR)
+    // ============================
+    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    public ResponseEntity<HabitacionResponseDTO> modificarHabitacion(
+            @PathVariable Long id,
+            @RequestBody @Valid HabitacionRequestDTO dto) {
+        HabitacionResponseDTO actualizada = habitacionService.modificarHabitacion(id, dto);
+        return ResponseEntity.ok(actualizada);
+    }
+
+    // ============================
+    // 7) ELIMINAR HABITACIÓN (borrado lógico - solo ADMINISTRADOR)
+    // ============================
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    public ResponseEntity<Void> eliminarHabitacion(@PathVariable Long id) {
+        habitacionService.eliminarHabitacion(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    // ============================
+    // 8) FILTRAR HABITACIONES ACTIVAS (público)
+    // ============================
     @GetMapping("/filtrar")
     public List<HabitacionResponseDTO> filtrarHabitaciones(
             @RequestParam(required = false) H_Estado tipo,
             @RequestParam(required = false) Integer capacidad,
             @RequestParam(required = false) Double precioNoche,
             @RequestParam(required = false) Integer cantCamas) {
-        return habitacionService.buscarHabitaciones (tipo, capacidad, precioNoche, cantCamas);
+        return habitacionService.buscarHabitaciones(tipo, capacidad, precioNoche, cantCamas);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<HabitacionResponseDTO> getHabitacionById(@PathVariable Long id) {
-        HabitacionResponseDTO dto = habitacionService
-                .buscarDTOPorId(id)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Habitación no encontrada"
-                ));
-        return ResponseEntity.ok(dto);
-    }
-
-    @GetMapping ("/reservables")
+    // ============================
+    // 9) HABITACIONES RESERVABLES (público)
+    // ============================
+    @GetMapping("/reservables")
     public List<HabitacionResponseDTO> mostrarHabitacionesReservables() {
         return habitacionService.habitacionesReservables();
     }
 
-    //Get para recibir lsita de habitaciones disponibles en un rango de fechas. Considera las habitaciones que no esten reservadas dentro de el rango establecido
+    // ============================
+    // 10) HABITACIONES DISPONIBLES EN RANGO (autenticado)
+    // ============================
     @GetMapping("/disponibles")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<HabitacionResponseDTO>> getDisponibles(
@@ -71,9 +128,6 @@ public class HabitacionController {
 
         List<HabitacionResponseDTO> disponibles =
                 habitacionService.obtenerHabitacionesDisponibles(desde, hasta);
-
         return ResponseEntity.ok(disponibles);
     }
-
-
 }
