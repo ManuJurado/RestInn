@@ -54,9 +54,9 @@ public class SecurityConfig {
                         // Solo clientes autenticados
                         .requestMatchers("/api/reservas/**").authenticated()
                         // Solo administradores
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/admin/**").hasRole("ADMINISTRADOR")
                         // Recepcionistas y admins
-                        .requestMatchers("/api/empleados/**").hasAnyRole("ADMIN", "EMPLEADO")
+                        .requestMatchers("/api/empleados/**").hasAnyRole("ADMINISTRADOR", "EMPLEADO")
                         .anyRequest().permitAll()
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)

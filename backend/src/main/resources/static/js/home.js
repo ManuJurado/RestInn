@@ -1,4 +1,5 @@
 // home.js
+
 async function obtenerUsuarioActual() {
     const token = sessionStorage.getItem("jwt");
     if (!token) {
@@ -12,11 +13,11 @@ async function obtenerUsuarioActual() {
 
     if (res.status === 401) {
         sessionStorage.removeItem("jwt");
+        window.location.href = "/login.html";
         return null;
     }
-
     if (!res.ok) throw new Error("Error inesperado: " + res.status);
-    return await res.json();
+    return await res.json(); // viene con campo "role": ej. "LIMPIEZA"
 }
 
 function mostrarNombreUsuario(nombreLogin) {
@@ -24,7 +25,7 @@ function mostrarNombreUsuario(nombreLogin) {
     if (span) span.textContent = nombreLogin;
 }
 
-function ajustarMargenTabla() {
+function ajustarMargenTablaHome() {
     const contIzq = document.querySelector('.button-container-left');
     const contDer = document.querySelector('.button-container-right');
     const tabla = document.querySelector('.tabla-container');
@@ -35,26 +36,37 @@ function ajustarMargenTabla() {
     }
 }
 
-function configurarEventos() {
-    const btnR = document.getElementById("btnReservar");
-    const btnD = document.getElementById("btnDatos");
-    const btnC = document.getElementById("btnCerrar");
+function configurarEventosHome() {
+    const btnReservar = document.getElementById("btnReservar");
+    const btnDatos = document.getElementById("btnDatos");
+    const btnCerrar = document.getElementById("btnCerrar");
 
-    if (btnR) btnR.addEventListener("click", () => window.location.href = "/clientes/reservas.html");
-    if (btnD) btnD.addEventListener("click", () => window.location.href = "/clientes/mis-datos.html");
-    if (btnC) btnC.addEventListener("click", () => {
-        sessionStorage.removeItem("jwt");
-        window.location.href = "/login.html";
-    });
+    if (btnReservar) {
+        btnReservar.addEventListener("click", () => {
+            window.location.href = "/clientes/reservas.html";
+        });
+    }
+    if (btnDatos) {
+        btnDatos.addEventListener("click", () => {
+            window.location.href = "/clientes/mis-datos.html";
+        });
+    }
+    if (btnCerrar) {
+        btnCerrar.addEventListener("click", () => {
+            sessionStorage.removeItem("jwt");
+            window.location.href = "/login.html";
+        });
+    }
 }
 
-async function cargarHabitaciones() {
+async function cargarHabitacionesHome() {
     const cont = document.getElementById("tablaHabitaciones");
-    cont.textContent = "Cargando habitaciones...";
+    if (!cont) return;
 
+    cont.textContent = "Cargando habitaciones...";
     try {
         const res = await fetch("/api/habitaciones/reservables");
-        if (!res.ok) throw new Error(res.status);
+        if (!res.ok) throw new Error("HTTP " + res.status);
         const habs = await res.json();
 
         if (!habs.length) {
@@ -99,7 +111,6 @@ async function cargarHabitaciones() {
                 </td>
             </tr>`;
         }
-
         html += `</tbody></table>`;
         cont.innerHTML = html;
 
@@ -110,15 +121,40 @@ async function cargarHabitaciones() {
 }
 
 async function initHome() {
-    await cargarHabitaciones();
-
     const usuario = await obtenerUsuarioActual();
-    if (usuario) {
-        mostrarNombreUsuario(usuario.nombreLogin);
-        configurarEventos();
+    if (!usuario) return;
+
+    switch (usuario.role) {
+        case "CLIENTE":
+            mostrarNombreUsuario(usuario.nombreLogin);
+            configurarEventosHome();
+            ajustarMargenTablaHome();
+            await cargarHabitacionesHome();
+            break;
+
+        case "LIMPIEZA":
+            window.location.href = "/empleados/menuLimpieza.html";
+            break;
+
+        case "RECEPCIONISTA":
+            window.location.href = "/empleados/menuRecepcionista.html";
+            break;
+
+        case "CONSERJE":
+            window.location.href = "/empleados/menuConserje.html";
+            break;
+
+        case "ADMINISTRADOR":
+            window.location.href = "/menuAdministrador.html";
+            break;
+
+        default:
+            alert("Rol de usuario desconocido");
+            sessionStorage.removeItem("jwt");
+            window.location.href = "/login.html";
     }
 }
 
-window.addEventListener('load', ajustarMargenTabla);
-window.addEventListener('resize', ajustarMargenTabla);
-document.addEventListener("DOMContentLoaded", initHome);
+window.addEventListener('load', () => {
+    initHome();
+});
