@@ -9,7 +9,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
-
 import java.util.List;
 import java.util.Optional;
 
@@ -18,7 +17,6 @@ public class ImagenService {
 
     @Autowired
     private HabitacionService habitacionService;
-
     @Autowired
     private ImagenRepository imagenRepository;
 
@@ -28,7 +26,6 @@ public class ImagenService {
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.BAD_REQUEST, "Habitación inexistente"));
 
-        // Opcional: verificar que la habitación esté activa antes de asociar la imagen
         if (!Boolean.TRUE.equals(habitacion.getActivo())) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST, "No puede asociar imagen a habitación inactiva");
@@ -54,7 +51,7 @@ public class ImagenService {
         return habitacion.getImagenes();
     }
 
-    /** Busca una imagen por su ID. */
+    // Busca una imagen por su ID.
     public Optional<Imagen> buscarPorId(Long id) {
         return imagenRepository.findById(id);
     }
