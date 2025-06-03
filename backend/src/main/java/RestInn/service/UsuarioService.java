@@ -2,6 +2,7 @@ package RestInn.service;
 
 import RestInn.dto.usuariosDTO.UsuarioRequestDTO;
 import RestInn.dto.usuariosDTO.UsuarioResponseDTO;
+import RestInn.entities.enums.RolEmpleado;
 import RestInn.entities.usuarios.*;
 import RestInn.repositories.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -146,7 +147,24 @@ public class UsuarioService {
     // ----------------------------------------
     // DTO → Response
     // ----------------------------------------
+    // UsuarioService.java (o donde tengas el método mapToResponse)
     private UsuarioResponseDTO mapToResponse(Usuario usuario) {
+        String roleValue;
+
+        if (usuario instanceof Empleado) {
+            // Tomo el enum RolEmpleado directamente:
+            roleValue = ((Empleado) usuario).getRolEmpleado().name();
+        }
+        else if (usuario instanceof Cliente) {
+            roleValue = "CLIENTE";
+        }
+        else if (usuario instanceof Administrador) {
+            roleValue = "ADMINISTRADOR";
+        }
+        else {
+            roleValue = usuario.getClass().getSimpleName().toUpperCase();
+        }
+
         return UsuarioResponseDTO.builder()
                 .id(usuario.getId())
                 .nombre(usuario.getNombre())
@@ -157,8 +175,9 @@ public class UsuarioService {
                 .email(usuario.getEmail())
                 .CUIT(usuario.getCUIT())
                 .activo(usuario.getActivo())
-                .rol(usuario.getClass().getSimpleName().toUpperCase()) // <--- esta línea es clave
+                .role(roleValue)  // Ej: "LIMPIEZA", "RECEPCIONISTA", "CONSERJE", etc.
                 .build();
     }
+
 
 }

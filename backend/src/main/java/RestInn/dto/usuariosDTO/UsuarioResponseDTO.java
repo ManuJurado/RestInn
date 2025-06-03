@@ -13,10 +13,11 @@ public class UsuarioResponseDTO {
     private String nombreLogin;
     private String dni;
     private String phoneNumber;
-    // UsuarioResponseDTO.java
-    private String rol;
     private String email;
     private String CUIT;
     private Boolean activo;
     // NO incluimos password en el response
+
+    // UsuarioResponseDTO.java
+    private String role;
 }

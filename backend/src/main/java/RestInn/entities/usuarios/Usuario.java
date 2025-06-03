@@ -1,5 +1,6 @@
 package RestInn.entities.usuarios;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -29,4 +30,15 @@ public abstract class Usuario implements Serializable {
     private String email;
     private String password;
     private String CUIT;
+
+
+    @JsonProperty("role")
+    @Transient
+    public String getRole() {
+        if (this instanceof Cliente) return "CLIENTE";
+        else if (this instanceof Empleado) return "EMPLEADO";
+        else if (this instanceof Administrador) return "ADMINISTRADOR";
+        else return "desconocido";
+    }
+
 }
