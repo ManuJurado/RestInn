@@ -5,7 +5,6 @@ import RestInn.entities.enums.H_Tipo;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
-
 import java.math.BigDecimal;
 
 @Getter
@@ -39,5 +38,5 @@ public class HabitacionRequestDTO { //Recibe del front para la creacion o edicio
 
     private String comentario;
 
-    private Boolean activo;      // opcional, puede venir o no
+    private Boolean activo;
 }
