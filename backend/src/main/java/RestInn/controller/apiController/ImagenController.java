@@ -20,6 +20,7 @@ public class ImagenController {
     @Autowired
     private ImagenService imagenService;
 
+    //region Subir Imagen
     @PostMapping("/{habitacionId}")
     @PreAuthorize("hasRole('ADMINISTRADOR')")
     public ResponseEntity<String> subirImagen(@RequestParam("archivo") MultipartFile archivo,
@@ -31,7 +32,10 @@ public class ImagenController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al guardar imagen");
         }
     }
+    //endregion
 
+
+    //region Ver Todas las Imágenes de una habitacion
     @GetMapping("/ver/{habitacionId}")
     public ResponseEntity<List<String>> verImagenes(@PathVariable Long habitacionId) {
         List<Imagen> imagenes = imagenService.obtenerImagenesPorHabitacion(habitacionId);
@@ -40,7 +44,10 @@ public class ImagenController {
                 .toList();
         return ResponseEntity.ok(urls);
     }
+    //endregion
 
+
+    //region Ver imagen de muestra de una Habitación
     @GetMapping("/ver/una/{id}")
     public ResponseEntity<byte[]> verImagen(@PathVariable Long id) {
         Imagen imagen = imagenService.buscarPorId(id)
@@ -53,5 +60,5 @@ public class ImagenController {
 
         return new ResponseEntity<>(imagen.getDatos(), headers, HttpStatus.OK);
     }
-
+    //endregion
 }

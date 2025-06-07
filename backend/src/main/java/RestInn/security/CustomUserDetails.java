@@ -1,5 +1,9 @@
 package RestInn.security;
 
+import RestInn.entities.enums.RolEmpleado;
+import RestInn.entities.usuarios.Administrador;
+import RestInn.entities.usuarios.Cliente;
+import RestInn.entities.usuarios.Empleado;
 import RestInn.entities.usuarios.Usuario;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -18,11 +22,26 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // Ejemplo: dependiendo del tipo de usuario asignamos un rol
-        String role = "ROLE_" + usuario.getClass().getSimpleName().toUpperCase();
-        return List.of(new SimpleGrantedAuthority(role));
-    }
+        String roleString;
 
+        if (usuario instanceof Empleado) {
+            // Si es empleado, tomamos su RolEmpleado
+            RolEmpleado rolEmp = ((Empleado) usuario).getRolEmpleado();
+            roleString = "ROLE_" + rolEmp.name();   // e.g. "ROLE_LIMPIEZA"
+        }
+        else if (usuario instanceof Cliente) {
+            roleString = "ROLE_CLIENTE";
+        }
+        else if (usuario instanceof Administrador) {
+            roleString = "ROLE_ADMINISTRADOR";
+        }
+        else {
+            // Fallback: por si hubiera otra subclase en el futuro
+            roleString = "ROLE_" + usuario.getClass().getSimpleName().toUpperCase();
+        }
+
+        return List.of(new SimpleGrantedAuthority(roleString));
+    }
     @Override
     public String getPassword() {
         return usuario.getPassword();

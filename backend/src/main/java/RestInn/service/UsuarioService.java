@@ -2,6 +2,7 @@ package RestInn.service;
 
 import RestInn.dto.usuariosDTO.UsuarioRequestDTO;
 import RestInn.dto.usuariosDTO.UsuarioResponseDTO;
+import RestInn.entities.enums.RolEmpleado;
 import RestInn.entities.usuarios.*;
 import RestInn.repositories.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +27,9 @@ public class UsuarioService {
         this.passwordEncoder = passwordEncoder;
     }
 
+    // ----------------------------------------
     // CREAR USUARIOS SEGÚN TIPO
+    // ----------------------------------------
     public UsuarioResponseDTO crearEmpleado(UsuarioRequestDTO dto) {
         Empleado empleado = new Empleado();
         mapDtoToUsuario(dto, empleado, true);
@@ -41,58 +44,92 @@ public class UsuarioService {
         return mapToResponse(cliente);
     }
 
-    public UsuarioResponseDTO crearAdministrador(UsuarioRequestDTO dto) {// ver si dejar o sacar
+    public UsuarioResponseDTO crearAdministrador(UsuarioRequestDTO dto) {
         Administrador admin = new Administrador();
         mapDtoToUsuario(dto, admin, true);
         usuarioRepository.save(admin);
         return mapToResponse(admin);
     }
 
+    // ----------------------------------------
     // MODIFICAR USUARIO (cualquier tipo)
+    // ----------------------------------------
     public UsuarioResponseDTO modificarUsuario(Long id, UsuarioRequestDTO dto) {
         Usuario usuario = usuarioRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Usuario no encontrado"));
         mapDtoToUsuario(dto, usuario, false);
         usuarioRepository.save(usuario);
         return mapToResponse(usuario);
     }
 
+    // ----------------------------------------
     // BORRAR USUARIO
+    // ----------------------------------------
     public void borrarUsuario(Long id) {
         Usuario usuario = usuarioRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Usuario no encontrado"));
         usuarioRepository.delete(usuario);
     }
 
-    // VER TODOS
+    // ----------------------------------------
+    // VER TODOS LOS USUARIOS
+    // ----------------------------------------
     public List<UsuarioResponseDTO> verUsuarios() {
         return usuarioRepository.findAll().stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
 
+    // ----------------------------------------
+    // VER SOLO EMPLEADOS
+    // ----------------------------------------
+    public List<UsuarioResponseDTO> verEmpleados() {
+        return usuarioRepository.findAll().stream()
+                .filter(u -> u instanceof Empleado)
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
+
+    // ----------------------------------------
+    // BUSCAR POR ID (DTO)
+    // ----------------------------------------
     public UsuarioResponseDTO buscarPorId(Long id) {
         Usuario usuario = usuarioRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Usuario no encontrado"));
         return mapToResponse(usuario);
     }
 
+    // ----------------------------------------
+    // BUSCAR POR NOMBRE_LOGIN (DTO)
+    // ----------------------------------------
     public UsuarioResponseDTO buscarPorNombreLogin(String nombreLogin) {
         Usuario usuario = usuarioRepository.findByNombreLogin(nombreLogin)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Usuario no encontrado"));
         return mapToResponse(usuario);
     }
 
+    // ----------------------------------------
+    // BUSCAR ENTIDAD POR ID (para otros servicios)
+    // ----------------------------------------
     public Optional<Usuario> buscarEntidadPorId(Long id) {
         return usuarioRepository.findById(id);
     }
 
+    // ----------------------------------------
+    // BUSCAR ENTIDAD POR NOMBRE_LOGIN (para otros servicios)
+    // ----------------------------------------
     public Optional<Usuario> buscarEntidadPorNombreLogin(String nombreLogin) {
         return usuarioRepository.findByNombreLogin(nombreLogin);
     }
 
+    // ----------------------------------------
     // UTILIDAD: mapear DTO → entidad
-    private void mapDtoToUsuario(UsuarioRequestDTO dto, Usuario usuario, boolean esNuevo) {// metodo encargado de mapear un usuario recibido al tipo que es
+    // ----------------------------------------
+    private void mapDtoToUsuario(UsuarioRequestDTO dto, Usuario usuario, boolean esNuevo) {
         usuario.setNombre(dto.getNombre());
         usuario.setApellido(dto.getApellido());
         usuario.setNombreLogin(dto.getNombreLogin());
@@ -107,18 +144,27 @@ public class UsuarioService {
         }
     }
 
-    // OPCIONAL: si querés centralizar creación por tipo (sin pasarlo en el DTO)
-    private Usuario crearInstanciaPorTipo(String tipo) {
-        return switch (tipo.toLowerCase()) {
-            case "empleado" -> new Empleado();
-            case "cliente" -> new Cliente();
-            case "administrador" -> new Administrador();
-            default -> throw new IllegalArgumentException("Tipo inválido");
-        };
-    }
-
+    // ----------------------------------------
     // DTO → Response
+    // ----------------------------------------
+    // UsuarioService.java (o donde tengas el método mapToResponse)
     private UsuarioResponseDTO mapToResponse(Usuario usuario) {
+        String roleValue;
+
+        if (usuario instanceof Empleado) {
+            // Tomo el enum RolEmpleado directamente:
+            roleValue = ((Empleado) usuario).getRolEmpleado().name();
+        }
+        else if (usuario instanceof Cliente) {
+            roleValue = "CLIENTE";
+        }
+        else if (usuario instanceof Administrador) {
+            roleValue = "ADMINISTRADOR";
+        }
+        else {
+            roleValue = usuario.getClass().getSimpleName().toUpperCase();
+        }
+
         return UsuarioResponseDTO.builder()
                 .id(usuario.getId())
                 .nombre(usuario.getNombre())
@@ -129,6 +175,9 @@ public class UsuarioService {
                 .email(usuario.getEmail())
                 .CUIT(usuario.getCUIT())
                 .activo(usuario.getActivo())
+                .role(roleValue)  // Ej: "LIMPIEZA", "RECEPCIONISTA", "CONSERJE", etc.
                 .build();
     }
+
+
 }

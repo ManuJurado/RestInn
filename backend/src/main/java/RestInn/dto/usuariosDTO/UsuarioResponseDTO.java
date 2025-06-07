@@ -17,4 +17,7 @@ public class UsuarioResponseDTO {
     private String CUIT;
     private Boolean activo;
     // NO incluimos password en el response
+
+    // UsuarioResponseDTO.java
+    private String role;
 }

@@ -3,7 +3,6 @@ package RestInn.dto.habitacionesDTO;
 import RestInn.entities.Imagen;
 import lombok.Getter;
 import lombok.Setter;
-
 import java.util.Base64;
 
 @Getter

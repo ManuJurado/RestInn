@@ -14,150 +14,229 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class HabitacionService {
+
+    //region ATRIBUTOS Y CONSTRUCTOR
     private final HabitacionRepository habitacionRepository;
     private final ReservaService reservaService;
 
     @Autowired
-    public HabitacionService(HabitacionRepository habitacionRepository,@Lazy ReservaService reservaService) {
+    public HabitacionService(HabitacionRepository habitacionRepository,
+                             @Lazy ReservaService reservaService) {
         this.habitacionRepository = habitacionRepository;
         this.reservaService = reservaService;
     }
+    //endregion
 
-    public HabitacionResponseDTO crearHabitacion(HabitacionRequestDTO habReqDTO) {
-        Habitacion habitacion = convertirAEntidad(habReqDTO);
+
+    //region 1) CREAR HABITACIÓN (ADMIN)
+    public HabitacionResponseDTO crearHabitacion(HabitacionRequestDTO dto) {
+        Habitacion habitacion = convertirAEntidad(dto);
         if (habitacion.getActivo() == null) habitacion.setActivo(true);
         if (habitacion.getEstado() == null) habitacion.setEstado(H_Estado.DISPONIBLE);
-        Habitacion habitacionGuardada = habitacionRepository.save(habitacion);
-        return convertirAResponseDTO(habitacionGuardada);
+        Habitacion guardada = habitacionRepository.save(habitacion);
+        return convertirAResponseDTO(guardada);
     }
+    //endregion
 
-    private Habitacion convertirAEntidad(HabitacionRequestDTO dto) {
-        return Habitacion.builder()
-                .estado(dto.getEstado())
-                .tipo(dto.getTipo())
-                .numero(dto.getNumero())
-                .piso(dto.getPiso())
-                .capacidad(dto.getCapacidad())
-                .cantCamas(dto.getCantCamas())
-                .precioNoche(dto.getPrecioNoche())
-                .comentario(dto.getComentario())
-                .activo(dto.getActivo())
-                .build();
+
+    //region 2) MODIFICAR HABITACIÓN (ADMIN)
+    public HabitacionResponseDTO modificarHabitacion(Long id, HabitacionRequestDTO dto) {
+        Habitacion existente = habitacionRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Habitación no encontrada"));
+
+        existente.setTipo(dto.getTipo());
+        existente.setNumero(dto.getNumero());
+        existente.setPiso(dto.getPiso());
+        existente.setCapacidad(dto.getCapacidad());
+        existente.setCantCamas(dto.getCantCamas());
+        existente.setPrecioNoche(dto.getPrecioNoche());
+        existente.setComentario(dto.getComentario());
+        existente.setEstado(dto.getEstado());
+        // No tocamos “activo” acá
+
+        Habitacion guardada = habitacionRepository.save(existente);
+        return convertirAResponseDTO(guardada);
     }
+    //endregion
 
-    public Habitacion convertirAEntidad(HabitacionResponseDTO dto) {
-        return Habitacion.builder()
-                .estado(dto.getEstado())
-                .tipo(dto.getTipo())
-                .numero(dto.getNumero())
-                .piso(dto.getPiso())
-                .capacidad(dto.getCapacidad())
-                .cantCamas(dto.getCantCamas())
-                .precioNoche(dto.getPrecioNoche())
-                .comentario(dto.getComentario())
-                .activo(dto.getActivo())
-                .build();
+
+    //region 3) BORRADO LÓGICO (ADMIN)
+    public void borrarHabitacion(Long id) {
+        Habitacion existente = habitacionRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Habitación no encontrada"));
+
+        existente.setActivo(false);
+        habitacionRepository.save(existente);
     }
+    //endregion
 
-    public HabitacionResponseDTO modificarHabitacion(Long id, HabitacionRequestDTO habReqDTO){
 
-        return null;
-    }
+    //region 4) BUSCAR POR ID PARA PÚBLICO (solo activas)
+    public HabitacionResponseDTO buscarDTOPorIdPublic(Long id) {
+        Habitacion h = habitacionRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Habitación no encontrada"));
 
-    public void borrarHabitacion(Long id){
-
-    }
-
-    public Optional<Habitacion> buscarPorId(Long id) {
-        return habitacionRepository.findById(id);
-    }
-
-    public Optional<HabitacionResponseDTO> buscarDTOPorId(Long id) {
-        Optional<Habitacion> hab = habitacionRepository.findByIdConBloqueo(id);
-        if (hab.isPresent()) {
-            return Optional.ofNullable(convertirAResponseDTO(hab.get()));
-        } else {
-            throw new BadRequestException("El id de la habitación no existe.");
+        if (!Boolean.TRUE.equals(h.getActivo())) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Habitación no encontrada");
         }
+        return convertirAResponseDTO(h);
     }
+    //endregion
 
-    public Optional<Habitacion> buscarEntidadPorId(Long id) {
-        return habitacionRepository.findById(id);
+
+    //region 5) BUSCAR POR ID PARA ADMIN (incluso inactivas)
+    public HabitacionResponseDTO buscarDTOPorIdAdmin(Long id) {
+        Habitacion h = habitacionRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Habitación no encontrada"));
+        return convertirAResponseDTO(h);
     }
+    //endregion
 
-    public void cambiarEstadoHabitacion(Long id,  H_Estado nuevoEstado){
 
+    //region 6) LISTAR HABITACIONES ACTIVAS (público)
+    public List<HabitacionResponseDTO> listarActivas() {
+        return habitacionRepository.findByActivoTrue().stream()
+                .map(this::convertirAResponseDTO)
+                .collect(Collectors.toList());
     }
+    //endregion
 
-    public List<HabitacionResponseDTO> obtenerHabitacionesDisponibles(){
-        return List.of();
+
+    //region 7) LISTAR TODAS INCLUIDAS INACTIVAS (ADMIN)
+    public List<HabitacionResponseDTO> listarTodasIncluidasInactivas() {
+        return habitacionRepository.findAll().stream()
+                .map(this::convertirAResponseDTO)
+                .collect(Collectors.toList());
     }
+    //endregion
 
-    public List<HabitacionResponseDTO> listarTodas() {
-        return habitacionRepository.findAll()
-                .stream()
+
+    //region 8) CAMBIAR ESTADO DE HABITACIÓN (LIMPIEZA/MANTENIMIENTO)
+    public HabitacionResponseDTO cambiarEstadoHabitacion(Long id, H_Estado nuevoEstado) {
+        Habitacion existente = habitacionRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Habitación no encontrada"));
+
+        existente.setEstado(nuevoEstado);
+        Habitacion guardada = habitacionRepository.save(existente);
+        return convertirAResponseDTO(guardada);
+    }
+    //endregion
+
+
+    //region 9) FILTRAR HABITACIONES ACTIVAS (público)
+    public List<HabitacionResponseDTO> buscarHabitaciones(
+            H_Estado tipo, Integer capacidad, Double precioNoche, Integer cantCamas) {
+
+        Specification<Habitacion> spec = Specification
+                .where(HabitacionSprecification.tieneTipo(tipo))
+                .and(HabitacionSprecification.tieneCapacidad(capacidad))
+                .and(HabitacionSprecification.precioNocheMenorA(precioNoche))
+                .and(HabitacionSprecification.tieneCantCamas(cantCamas))
+                .and((root, query, cb) -> cb.isTrue(root.get("activo"))); // sólo activas
+
+        return habitacionRepository.findAll(spec).stream()
+                .map(this::convertirAResponseDTO)
+                .collect(Collectors.toList());
+    }
+    //endregion
+
+
+    //region 10) HABITACIONES RESERVABLES (público)
+    public List<HabitacionResponseDTO> habitacionesReservables() {
+        return habitacionRepository.findAll((root, query, cb) ->
+                        cb.and(
+                                cb.isTrue(root.get("activo")),
+                                cb.notEqual(root.get("estado"), H_Estado.MANTENIMIENTO)
+                        )
+                ).stream()
                 .map(this::convertirAResponseDTO)
                 .toList();
     }
+    //endregion
 
-    private HabitacionResponseDTO convertirAResponseDTO(Habitacion habitacion) {
-        return HabitacionResponseDTO.builder()
-                .id(habitacion.getId())
-                .numero(habitacion.getNumero())
-                .piso(habitacion.getPiso())
-                .capacidad(habitacion.getCapacidad())
-                .estado(habitacion.getEstado())
-                .tipo(habitacion.getTipo())
-                .precioNoche(habitacion.getPrecioNoche())
-                .comentario(habitacion.getComentario())
-                .cantCamas(habitacion.getCantCamas())
+
+    //region 11) HABITACIONES DISPONIBLES EN RANGO (autenticado)
+    public List<HabitacionResponseDTO> obtenerHabitacionesDisponibles(
+            LocalDate ingreso, LocalDate salida) {
+
+        Set<Long> ocupadasIds = reservaService.obtenerIdsHabitacionesOcupadas(ingreso, salida);
+
+        return habitacionRepository.findByActivoTrue().stream()
+                .filter(h -> !ocupadasIds.contains(h.getId()))
+                .map(this::convertirAResponseDTO)
+                .toList();
+    }
+    //endregion
+
+
+    //region 12) ELIMINAR HABITACION (BORRADO LOGICO)
+    public void eliminarHabitacion(Long id) {
+        Habitacion habitacion = habitacionRepository.findById(id)
+                .orElseThrow(() -> new BadRequestException("Habitación no encontrada con ID: " + id));
+        habitacion.setActivo(false);
+        habitacionRepository.save(habitacion);
+    }
+    //endregion
+
+
+    //region 13) BUSCAR ENTIDAD CON BLOQUEO (para reserva)
+    @Transactional(readOnly = true)
+    public Habitacion buscarConBloqueo(Long id) {
+        return habitacionRepository.findByIdConBloqueo(id)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Habitación no encontrada"));
+    }
+    //endregion
+
+
+    //region 14) BUSCAR ENTIDAD POR ID (para otros servicios, p.ej. ImagenService)
+    public Optional<Habitacion> buscarEntidadPorId(Long id) {
+        return habitacionRepository.findById(id);
+    }
+    //endregion
+
+
+    //region CONVERTIDORES ENTIDAD ↔ DTO
+    private Habitacion convertirAEntidad(HabitacionRequestDTO dto) {
+        return Habitacion.builder()
+                .tipo(dto.getTipo())
+                .numero(dto.getNumero())
+                .piso(dto.getPiso())
+                .capacidad(dto.getCapacidad())
+                .cantCamas(dto.getCantCamas())
+                .precioNoche(dto.getPrecioNoche())
+                .comentario(dto.getComentario())
+                .estado(dto.getEstado())
+                .activo(dto.getActivo() != null ? dto.getActivo() : true)
                 .build();
     }
 
-    public List<HabitacionResponseDTO> buscarHabitaciones (H_Estado tipo, Integer capacidad, Double precioNoche, Integer cantCamas) {
-        Specification<Habitacion> spec = Specification
-                .where (HabitacionSprecification.tieneTipo (tipo))
-                .and (HabitacionSprecification.tieneCapacidad (capacidad))
-                .and (HabitacionSprecification.precioNocheMenorA(precioNoche))
-                .and (HabitacionSprecification.tieneCantCamas(cantCamas));
-        // La consulta se ejecuta con los filtros aplicados
-        return habitacionRepository.findAll(spec).stream().map(this::convertirAResponseDTO).toList();
+    private HabitacionResponseDTO convertirAResponseDTO(Habitacion h) {
+        return HabitacionResponseDTO.builder()
+                .id(h.getId())
+                .numero(h.getNumero())
+                .piso(h.getPiso())
+                .capacidad(h.getCapacidad())
+                .cantCamas(h.getCantCamas())
+                .precioNoche(h.getPrecioNoche())
+                .comentario(h.getComentario())
+                .estado(h.getEstado())
+                .tipo(h.getTipo())
+                .activo(h.getActivo())
+                .build();
     }
-
-    void asignarImagen(Long idHabitacion){
-
-    }
-
-    //metodo agregado para obtener lista de habitaciones disponibles en un rango de fechas. Se usa reservaService
-    public List<HabitacionResponseDTO> obtenerHabitacionesDisponibles(LocalDate ingreso, LocalDate salida) {
-
-        // IDs ocupadas delegadas al service de reservas
-        Set<Long> ocupadasIds = reservaService.obtenerIdsHabitacionesOcupadas(ingreso, salida);
-
-        // Quedarnos sólo con las libres
-        return listarTodas().stream()
-                .filter(dto -> !ocupadasIds.contains(dto.getId()))
-                .toList();
-    }
-
-    public List<HabitacionResponseDTO> habitacionesReservables() {
-        return habitacionRepository.findByEstadoNot(H_Estado.MANTENIMIENTO)
-                .stream()
-                .map(this::convertirAResponseDTO).toList();
-    }
-
-    @Transactional( readOnly = true )
-    public Habitacion buscarConBloqueo(Long id) {
-        return habitacionRepository.findByIdConBloqueo(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Habitación no encontrada"));
-    }
-
+    //endregion
 }

@@ -49,4 +49,3 @@ public class AuthController {
 
     public static record AuthRequest(String username, String password) {}
 }
-

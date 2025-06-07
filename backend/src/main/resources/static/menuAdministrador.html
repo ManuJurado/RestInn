@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <title>RestInn - Menú Administrador</title>
+    <link rel="stylesheet" href="css/base.css" />
+    <link rel="stylesheet" href="css/layout.css" />
+    <link rel="stylesheet" href="css/buttons.css" />
+    <link rel="stylesheet" href="css/wrapper.css" />
+    <link rel="stylesheet" href="css/components.css" />
+</head>
+<body>
+
+<div class="wrapper">
+    <!-- Botones principales del administrador -->
+    <div class="button-container-left">
+        <button class="button-left" id="btnGestionHabitaciones">
+            Gestión de Habitaciones
+        </button>
+        <button class="button-left" id="btnGestionEmpleados">
+            Gestión de Empleados
+        </button>
+        <button class="button-left" id="btnGestionReservas">
+            Gestión de Reservas
+        </button>
+        <button class="button-left" id="btnListaClientes">
+            Ver Lista de Clientes
+        </button>
+    </div>
+
+    <!-- Botones de usuario (nombre y cerrar sesión) -->
+    <div class="button-container-right">
+        <span class="button-right" id="usernameDisplay"></span>
+        <button class="button-right" id="btnCerrarSesion">
+            Cerrar sesión
+        </button>
+    </div>
+</div>
+
+<!-- Sección para cargar contenido dinámico (p.ej. tablas) -->
+<div class="contenido-container" id="contenidoAdmin">
+    <h2 class="labels">Bienvenido, Administrador</h2>
+    <p>Seleccione una opción del menú para gestionar el sistema.</p>
+</div>
+
+<!-- Contenedor para mostrar alertas al usuario -->
+<div id="alerta" class="alert">
+    <span class="msg"></span>
+    <button class="close-btn" onclick="cerrarAlerta()">X</button>
+</div>
+
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+<script src="js/alertas.js"></script>
+<script src="js/adminMenu.js"></script>
+</body>
+</html>
