@@ -32,7 +32,4 @@ build/
 ### VS Code ###
 .vscode/
 
-# Ocultar configuración sensible
-backend/
-
 .env
