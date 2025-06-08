@@ -11,16 +11,16 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @Builder
 public class FacturaRequestDTO {
-    @NotNull(message = "El ID de la factura es obligatorio.")
-    private Long id;
+    private Long id;    // No obligatorio si es alta
+
+    @NotNull(message = "El ID de la reserva es obligatorio.")
+    private Long reservaId;
+
+    private Long clienteId;
 
     @NotNull(message = "El método de pago es obligatorio.")
     private MetodoPago metodoPago;
 
     @NotNull(message = "La cantidad de cuotas es obligatoria.")
     private Integer cuotas;
-
-    private BigDecimal descuento = BigDecimal.valueOf(0.00); // valor por defecto
-
-    private BigDecimal interes = BigDecimal.valueOf(0.00);   // valor por defecto
 }

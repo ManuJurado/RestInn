@@ -1,51 +1,77 @@
 package RestInn.controller.apiController;
 
+import RestInn.dto.cobranzasDTO.FacturaRequestDTO;
 import RestInn.dto.cobranzasDTO.FacturaResponseDTO;
 import RestInn.service.FacturaService;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/facturas")
-@RequiredArgsConstructor
+@PreAuthorize("hasAnyRole('ADMIN', 'RECEPCIONISTA')")
 public class  FacturaController {
-    private final FacturaService facturaService;
+    @Autowired
+    private FacturaService facturaService;
 
-    // Mostrar toda la facturacion del hotel
-    @GetMapping("/listaCompleta")
-    @PreAuthorize("hasAnyRole('ADMIN','RECEPCIONISTA')")
-    public ResponseEntity<List<FacturaResponseDTO>> listarFacturas() {
-        List<FacturaResponseDTO> facturas = facturaService.listarTodas();
-        return ResponseEntity.ok(facturas);
+    //region Crear una factura al crear reserva.
+    @PostMapping("/reserva/{reservaId}")
+    public ResponseEntity<FacturaResponseDTO> crearFacturaReserva(@PathVariable Long reservaId) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(facturaService.generarFacturaReserva(reservaId));
     }
+    //endregion
 
-    // Buscar una factura por ID
-    @GetMapping("/{id}")
-    @Transactional(readOnly = true)
-    public ResponseEntity<FacturaResponseDTO> getFacturaById(@PathVariable Long id) {
-        FacturaResponseDTO facturaDTO = facturaService
-                .buscarFacturaDTOPorId(id)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Factura no encontrada"
-                ));
-        return ResponseEntity.ok(facturaDTO);
+    //region Crear factura de consumos al realizar el check-in.
+    @PostMapping("/consumos/{reservaId}")
+    public ResponseEntity<FacturaResponseDTO> crearFacturaConsumos(@PathVariable Long reservaId) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(facturaService.generarFacturaConsumos(reservaId));
     }
+    //endregion
 
-    // Mostrar las 2 facturas relacionadas a una reserva
-    public ResponseEntity<List<FacturaResponseDTO>> listarFacturasXReserva() {
-        List<FacturaResponseDTO> facturas = facturaService.listarPorReserva();
-        return ResponseEntity.ok(facturas);
+    //region Emitir la factura de consumos al realizar el check-out.
+    @PostMapping("/emitir/{reservaId}")
+    public ResponseEntity<FacturaResponseDTO> emitirFacturaConsumos(
+            @PathVariable Long reservaId,
+            @RequestBody FacturaRequestDTO dto) {
+        return ResponseEntity.ok(
+                facturaService.emitirFacturaConsumos(reservaId, dto.getMetodoPago(), dto.getCuotas()));
     }
+    //endregion
 
+    //region Actualizar una factura.
+    @PutMapping("/{id}")
+    public ResponseEntity<FacturaResponseDTO> actualizarFactura(
+            @PathVariable Long id,
+            @RequestBody FacturaRequestDTO dto) {
+        return ResponseEntity.ok(facturaService.actualizarFactura(id, dto));
+    }
+    //endregion
 
+    //region Anular una factura.
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> anularFactura(@PathVariable Long id) {
+        facturaService.anularFactura(id);
+        return ResponseEntity.noContent().build();
+    }
+    //endregion
+
+    //region Listar todas las facturas.
+    @GetMapping
+    public ResponseEntity<List<FacturaResponseDTO>> listarTodas() {
+        return ResponseEntity.ok(facturaService.listarTodasDTO());
+    }
+    //endregion
+
+    //region Listar las facturas asociadas a una reserva.
+    @GetMapping("/reserva/{reservaId}")
+    public ResponseEntity<List<FacturaResponseDTO>> listarPorReserva(@PathVariable Long reservaId) {
+        return ResponseEntity.ok(facturaService.listarPorReservaDTO(reservaId));
+    }
+    //endregion
 }
