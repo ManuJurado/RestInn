@@ -98,6 +98,14 @@
   margin-bottom: 10px;
 }
 
+/* Contenedor con scroll */
+#tablaHabitaciones {
+  max-height: 600px;
+  overflow-y: auto;
+  border: 2px solid #4b2e19;
+  border-radius: 12px;
+}
+
 .tabla-habitaciones {
   width: 100%;
   border-collapse: collapse;
@@ -109,7 +117,6 @@
   box-shadow: 0 0 15px rgba(0,0,0,0.7);
   border: 6px solid #4b2e19;
   border-radius: 12px;
-  overflow: hidden;
 }
 
 .tabla-habitaciones th,
@@ -266,4 +273,10 @@ h1.labels {
 
 .contenedorReservas tbody tr:hover td {
   background: rgba(208,231,255,0.5);
+}
+
+
+/* fondo rojo suave para habitaciones inactivas */
+.fila-inactiva {
+  background-color: #f8d7da;      /* rojo Bootstrap-like */
 }

@@ -12,6 +12,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/imagenes")
@@ -28,19 +29,22 @@ public class ImagenController {
         try {
             imagenService.guardarImagen(archivo, habitacionId);
             return ResponseEntity.ok("Imagen guardada.");
+        } catch (ResponseStatusException e) {
+            // Captura las excepciones lanzadas con status HTTP y mensaje personalizado
+            return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
         } catch (Exception e) {
+            // Para otros errores inesperados
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al guardar imagen");
         }
     }
     //endregion
-
 
     //region Ver Todas las Imágenes de una habitacion
     @GetMapping("/ver/{habitacionId}")
     public ResponseEntity<List<String>> verImagenes(@PathVariable Long habitacionId) {
         List<Imagen> imagenes = imagenService.obtenerImagenesPorHabitacion(habitacionId);
         List<String> urls = imagenes.stream()
-                .map(imagen -> "/api/imagenes/ver/una/" + imagen.getId())
+                .map(imagen -> imagen.getId() + "::/api/imagenes/ver/una/" + imagen.getId())
                 .toList();
         return ResponseEntity.ok(urls);
     }
@@ -61,4 +65,22 @@ public class ImagenController {
         return new ResponseEntity<>(imagen.getDatos(), headers, HttpStatus.OK);
     }
     //endregion
+
+    //region Borrar una imagen de una habitacion existente por id de imagen
+    @DeleteMapping("/borrar/{habitacionId}/{imagenId}")
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    public ResponseEntity<String> borrarImagen(@PathVariable Long habitacionId,
+                                               @PathVariable Long imagenId) {
+        try {
+            imagenService.borrarImagen(imagenId, habitacionId);
+            return ResponseEntity.ok("Imagen borrada con éxito");
+        } catch (ResponseStatusException e) {
+            return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al borrar la imagen");
+        }
+    }
+    //endregion
+
+
 }

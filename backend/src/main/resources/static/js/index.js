@@ -26,14 +26,20 @@ async function cargarHabitacionesPublicas() {
         for (const h of habs) {
             let urlImagen = "/img/no-image.png";
             try {
-                const imgRes = await fetch(`/api/imagenes/ver/${h.id}`);
-                if (imgRes.ok) {
-                    const urls = await imgRes.json();
-                    if (urls.length > 0) urlImagen = urls[0];
+              const imgRes = await fetch(`/api/imagenes/ver/${h.id}`);
+              if (imgRes.ok) {
+                const urls = await imgRes.json();
+                if (urls.length > 0) {
+                  if (typeof urls[0] === "string") {
+                    const p = urls[0].split("::");
+                    urlImagen = p.length > 1 ? p[1] : urls[0];
+                  } else if (urls[0].url) {
+                    urlImagen = urls[0].url;
+                  }
                 }
-            } catch {
-                // si falla la llamada a imágenes, se deja el fallback
-            }
+              }
+            } catch {}
+
 
             html += `<tr>
                 <td style="text-align:left; line-height:1.6;">

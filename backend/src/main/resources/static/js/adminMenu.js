@@ -57,7 +57,7 @@ function configurarEventos() {
     const btnGH = document.getElementById("btnGestionHabitaciones");
     if (btnGH) {
         btnGH.addEventListener("click", () => {
-            window.location.href = "/admin/gestion-habitaciones/menuGestionHabitaciones.html";
+            window.location.href = "../admin/gestion-habitaciones/menuGestionHabitaciones.html";
         });
     }
 

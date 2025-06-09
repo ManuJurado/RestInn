@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <title>Gestión de Habitaciones</title>
+    <link rel="stylesheet" href="../../css/base.css" />
+    <link rel="stylesheet" href="../../css/layout.css" />
+    <link rel="stylesheet" href="../../css/buttons.css" />
+    <link rel="stylesheet" href="../../css/components.css" />
+</head>
+<body>
+<button class="return-button" onclick="history.back()">← Volver</button>
+
+<h1 class="labels">Gestión de Habitaciones</h1>
+
+<!-- Filtros -->
+<section class="filtros-grid">
+    <input id="filtroPiso"    type="number"  placeholder="Piso"      class="inputs" />
+    <input id="filtroNumero"  type="number"  placeholder="N° Hab"    class="inputs" />
+    <select id="filtroEstado"               class="inputs">
+        <option value="">Estado (todos)</option>
+        <option value="DISPONIBLE">DISPONIBLE</option>
+        <option value="LIMPIEZA">LIMPIEZA</option>
+        <option value="MANTENIMIENTO">MANTENIMIENTO</option>
+    </select>
+    <button id="btnAplicarFiltros" class="normal-button" style="display:none;">Filtrar</button>
+    <button id="btnLimpiarFiltros" class="normal-button">Limpiar</button>
+</section>
+
+<!-- Acciones -->
+<section style="margin: 1rem 0;">
+    <button id="btnNuevaHab"  class="action-button">Crear habitación</button>
+</section>
+
+<!-- Tabla -->
+<div id="tablaHabitaciones" class="tabla-habitaciones"></div>
+
+<!-- Input oculto para subir imagen -->
+<input type="file" id="inputFileImagen" accept="image/*" style="display:none" />
+
+<!-- Alertas -->
+<div id="alerta" class="alert"><span class="msg"></span><button class="close-btn" onclick="cerrarAlerta()">X</button></div>
+
+<script src="../../js/alertas.js"></script>
+<script src="../../js/admin/gestionHabitaciones.js"></script>
+</body>
+</html>

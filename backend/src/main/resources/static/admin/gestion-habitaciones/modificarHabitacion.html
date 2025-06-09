@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <title>Modificar Habitación</title>
+
+    <link rel="stylesheet" href="../../css/base.css"  />
+    <link rel="stylesheet" href="../../css/layout.css" />
+    <link rel="stylesheet" href="../../css/buttons.css" />
+</head>
+<body>
+
+<button onclick="history.back()">← Volver</button>
+<h1>Modificar Habitación</h1>
+
+<!-- ======== FORM DATOS HABITACIÓN ======== -->
+<form id="formModificarHab">
+    <!-- … (campos que ya tenías) … -->
+    <label>Número:<br /><input type="number" id="numero" required /></label><br />
+    <label>Tipo:<br /><input type="text" id="tipo" required /></label><br />
+    <label>Piso:<br /><input type="number" id="piso" required /></label><br />
+    <label>Capacidad:<br /><input type="number" id="capacidad" required min="1" /></label><br />
+    <label>Cantidad de camas:<br /><input type="number" id="cantCamas" required min="1" /></label><br />
+    <label>Precio por noche:<br /><input type="number" id="precioNoche" step="0.01" required min="0.01" /></label><br />
+
+    <label>Estado:<br />
+        <select id="estado" required>
+            <option value="">--Seleccionar--</option>
+            <option value="DISPONIBLE">DISPONIBLE</option>
+            <option value="LIMPIEZA">LIMPIEZA</option>
+            <option value="MANTENIMIENTO">MANTENIMIENTO</option>
+        </select>
+    </label><br />
+
+    <label>Activo:<br />
+        <select id="activo" required>
+            <option value="true">Sí</option>
+            <option value="false">No</option>
+        </select>
+    </label><br /><br />
+
+    <button type="submit" class="normal-button">Guardar cambios</button>
+</form>
+
+<hr />
+
+<!-- ======== GESTIÓN DE IMÁGENES ======== -->
+<h2>Imágenes (máx. 15)</h2>
+
+<input type="file" id="inputNuevaImg" accept="image/*" style="margin-bottom:1rem;" />
+<button id="btnSubirImg"  class="action-button">Agregar imagen</button>
+
+<div id="imagenesContainer"
+     style="display:flex; gap:1rem; flex-wrap:wrap; margin-top:1rem;"></div>
+
+<div id="mensaje" style="margin-top:1rem;"></div>
+
+<script src="../../js/admin/modificarHabitacion.js" defer></script>
+</body>
+</html>
