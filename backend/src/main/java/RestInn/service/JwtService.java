@@ -15,8 +15,8 @@ public class JwtService {
     @Value("${jwt.expiration}")
     private long expiration;
 
-    //@Value("${jwt.refreshExpiration}")
-    //private long refreshExpiration;
+    @Value("${jwt.refreshExpiration}")
+    private long refreshExpiration;
 
     // Genera token de acceso (válido por 10 min)
     public String generateToken(String username) {
@@ -25,7 +25,7 @@ public class JwtService {
 
     // Genera refresh token (válido por ejemplo 7 días)
     public String generateRefreshToken(String username) {
-        return buildToken(username, expiration);
+        return buildToken(username, refreshExpiration);
     }
 
     private String buildToken(String username, long expirationMillis) {
