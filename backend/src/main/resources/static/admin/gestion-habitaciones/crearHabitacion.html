@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <title>Crear Habitación</title>
+    <link rel="stylesheet" href="../../css/base.css" />
+    <link rel="stylesheet" href="../../css/layout.css" />
+    <link rel="stylesheet" href="../../css/buttons.css" />
+</head>
+<body>
+
+<button onclick="history.back()">← Volver</button>
+
+<h1>Crear Habitación</h1>
+
+<form id="formCrearHab">
+    <label>Número:<br /><input type="number" id="numero" required /></label><br />
+    <label>Tipo:<br /><input type="text" id="tipo" required /></label><br />
+    <label>Piso:<br /><input type="number" id="piso" required /></label><br />
+    <label>Capacidad:<br /><input type="number" id="capacidad" required min="1" /></label><br />
+    <label>Estado:<br />
+        <select id="estado" required>
+            <option value="">--Seleccionar--</option>
+            <option value="DISPONIBLE">DISPONIBLE</option>
+            <option value="LIMPIEZA">LIMPIEZA</option>
+            <option value="MANTENIMIENTO">MANTENIMIENTO</option>
+        </select>
+    </label><br />
+    <label>Activo:<br />
+        <select id="activo" required>
+            <option value="true">Sí</option>
+            <option value="false">No</option>
+        </select>
+    </label><br /><br />
+
+    <button type="submit" class="normal-button">Crear</button>
+</form>
+
+<div id="mensaje"></div>
+
+<script>
+    const form = document.getElementById('formCrearHab');
+    const mensaje = document.getElementById('mensaje');
+
+    form.addEventListener('submit', async e => {
+      e.preventDefault();
+
+      const data = {
+        numero: Number(document.getElementById('numero').value),
+        tipo: document.getElementById('tipo').value.trim(),
+        piso: Number(document.getElementById('piso').value),
+        capacidad: Number(document.getElementById('capacidad').value),
+        estado: document.getElementById('estado').value,
+        activo: document.getElementById('activo').value === "true"
+      };
+
+      try {
+        const res = await fetch('/api/habitaciones', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${sessionStorage.getItem('jwt')}`
+          },
+          body: JSON.stringify(data)
+        });
+
+        if (!res.ok) throw new Error('Error creando la habitación');
+
+        mensaje.textContent = 'Habitación creada con éxito';
+        mensaje.style.color = 'green';
+        form.reset();
+
+      } catch (err) {
+        mensaje.textContent = err.message;
+        mensaje.style.color = 'red';
+      }
+    });
+</script>
+
+</body>
+</html>

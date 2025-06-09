@@ -1,6 +1,5 @@
 package RestInn.service;
 
-import RestInn.dto.reservasDTO.HuespedRequestDTO;
 import RestInn.dto.reservasDTO.HuespedResponseDTO;
 import RestInn.dto.reservasDTO.ReservaRequestDTO;
 import RestInn.dto.reservasDTO.ReservaResponseDTO;
@@ -21,6 +20,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -336,6 +336,7 @@ public class ReservaService {
         Reserva actualizada = reservaRepository.save(reserva);
         return mapReservaAResponseDTO(actualizada);
     }
+
 
     public Reserva obtenerPorId(Long id) {
         return reservaRepository.findById(id)

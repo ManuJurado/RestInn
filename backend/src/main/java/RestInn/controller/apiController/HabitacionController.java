@@ -129,4 +129,14 @@ public class HabitacionController {
         return ResponseEntity.ok(disponibles);
     }
     //endregion
+
+    // region 11) REACTIVAR HABITACIÓN (solo ADMINISTRADOR)
+    @PutMapping("/{id}/activar")
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    public ResponseEntity<HabitacionResponseDTO> reactivarHabitacion(@PathVariable Long id) {
+        HabitacionResponseDTO dto = habitacionService.reactivarHabitacion(id);
+        return ResponseEntity.ok(dto);
+    }
+// endregion
+
 }

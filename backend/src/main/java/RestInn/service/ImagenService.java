@@ -20,7 +20,6 @@ public class ImagenService {
     @Autowired
     private ImagenRepository imagenRepository;
 
-    //Guarda una nueva imagen y la asocia a la habitación indicada. Lanza ResponseStatusException si la habitación no existe o está inactiva.
     public Imagen guardarImagen(MultipartFile archivo, Long idHabitacion) throws Exception {
         Habitacion habitacion = habitacionService.buscarEntidadPorId(idHabitacion)
                 .orElseThrow(() -> new ResponseStatusException(
@@ -29,6 +28,12 @@ public class ImagenService {
         if (!Boolean.TRUE.equals(habitacion.getActivo())) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST, "No puede asociar imagen a habitación inactiva");
+        }
+
+        int cantidadActual = contarImagenesPorHabitacion(idHabitacion);
+        if (cantidadActual >= 15) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "Límite máximo de 15 imágenes alcanzado para esta habitación");
         }
 
         Imagen imagen = new Imagen();
@@ -55,4 +60,21 @@ public class ImagenService {
     public Optional<Imagen> buscarPorId(Long id) {
         return imagenRepository.findById(id);
     }
+
+    public int contarImagenesPorHabitacion(Long idHabitacion) {
+        return obtenerImagenesPorHabitacion(idHabitacion).size();
+    }
+
+    // Borra una imagen por id para una habitacion existente
+    public void borrarImagen(Long imagenId, Long habitacionId) {
+        Imagen imagen = buscarPorId(imagenId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Imagen no encontrada"));
+
+        if (!imagen.getHabitacion().getId().equals(habitacionId)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La imagen no pertenece a la habitación indicada");
+        }
+
+        imagenRepository.delete(imagen);
+    }
+
 }
