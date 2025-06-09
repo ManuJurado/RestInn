@@ -26,22 +26,34 @@
             <p><strong>Comentario:</strong> ${h.comentario || '— sin comentario —'}</p>`;
     
         // Imagenes
+    // ──────────  IMÁGENES  ──────────
     try {
-            const resImgs = await fetch(`/api/imagenes/ver/${habitacionId}`);
-            if (resImgs.ok) {
-                currentUrls = await resImgs.json();
-                const gal = document.getElementById("galeria");
-                currentUrls.forEach((u, idx) => {
-                    const img = document.createElement("img");
-                    img.src = u;
-                    img.addEventListener("click", () => mostrarImagenGrande(idx));
-                    gal.appendChild(img);
-                });
-            }
-        } catch (e) {
-            console.error(e);
-        }
+        const resImgs = await fetch(`/api/imagenes/ver/${habitacionId}`);
+        if (!resImgs.ok) throw new Error("No se pudieron cargar las imágenes");
+
+        /**  lista = ["42::/api/imagenes/ver/una/42", …]   ó   ["/api/imagenes/ver/una/42", …]  */
+        currentUrls = (await resImgs.json()).map(item => {
+            return item.includes("::") ? item.split("::")[1] : item;   // siempre devuelvo la URL pura
+        });
+
+        const gal = document.getElementById("galeria");
+        gal.innerHTML = "";                       // limpio por si recargo
+        currentUrls.forEach((url, idx) => {
+            const img = document.createElement("img");
+            img.src = url;
+            img.addEventListener("click", () => mostrarImagenGrande(idx));
+            gal.appendChild(img);
+        });
+
+        // por si NO había imágenes
+        if (currentUrls.length === 0) gal.innerHTML = "<p>No hay imágenes para esta habitación.</p>";
+
+    } catch (e) {
+        console.error("Error cargando imágenes:", e);
+        document.getElementById("galeria").innerHTML =
+            `<p style="color:red;">No se pudieron cargar las imágenes.</p>`;
     }
+   }
     
     // Mostrar modal en índice dado
     function mostrarImagenGrande(idx) {
@@ -77,7 +89,29 @@
     });
     
     // Botón de reserva
-    document.getElementById("btnReservar").addEventListener("click", () => {
-        const token = sessionStorage.getItem("jwt");
-        window.location.href = token ? `/reservar.html?id=${habitacionId}` : "/login.html";
+    // ─── Botón de reserva ─────────────────────────────────────────────────────
+    document.getElementById("btnReservar").addEventListener("click", async () => {
+      // 1. ¿estoy autenticado?
+      const token = sessionStorage.getItem("jwt");
+      if (!token) {                       // ⇢ login si falta token
+        window.location.href = "/login.html";
+        return;
+      }
+      // 2. ¿soy cliente?
+      try {
+        const me = await fetch("/api/usuarios/current",
+          { headers: { Authorization: `Bearer ${token}` } });
+        if (!me.ok) throw new Error();
+        const usr = await me.json();
+        if (usr.role !== "CLIENTE") {
+          alert("Sólo los clientes pueden hacer reservas.");
+          return;
+        }
+      } catch {               // cualquier fallo ⇒ forzamos login
+        sessionStorage.clear();
+        window.location.href = "/login.html";
+        return;
+      }
+      // 3. ok ⇒ vamos a crearReserva.html pasando el id
+      window.location.href = `/clientes/crearReserva.html?id=${habitacionId}`;
     });

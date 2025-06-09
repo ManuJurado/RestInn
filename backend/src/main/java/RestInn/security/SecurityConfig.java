@@ -55,6 +55,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/reservas/**").authenticated()
                         // Solo administradores
                         .requestMatchers("/api/admin/**").hasRole("ADMINISTRADOR")
+                        .requestMatchers("/api/habitaciones/*/activar").hasRole("ADMINISTRADOR")
                         // Recepcionistas y admins
                         .requestMatchers("/api/empleados/**").hasAnyRole("ADMINISTRADOR", "EMPLEADO")
                         .anyRequest().permitAll()

@@ -30,7 +30,7 @@ public class Habitacion {
     @Column(name = "tipo", nullable = false)
     private H_Tipo tipo;
 
-        @Column(nullable = false)
+        @Column(nullable = false, unique = true)
     private Integer numero;
 
         @Column(nullable = false)

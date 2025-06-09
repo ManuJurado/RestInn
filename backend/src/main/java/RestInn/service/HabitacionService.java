@@ -35,7 +35,6 @@ public class HabitacionService {
     }
     //endregion
 
-
     //region 1) CREAR HABITACIÓN (ADMIN)
     public HabitacionResponseDTO crearHabitacion(HabitacionRequestDTO dto) {
         Habitacion habitacion = convertirAEntidad(dto);
@@ -45,7 +44,6 @@ public class HabitacionService {
         return convertirAResponseDTO(guardada);
     }
     //endregion
-
 
     //region 2) MODIFICAR HABITACIÓN (ADMIN)
     public HabitacionResponseDTO modificarHabitacion(Long id, HabitacionRequestDTO dto) {
@@ -68,7 +66,6 @@ public class HabitacionService {
     }
     //endregion
 
-
     //region 3) BORRADO LÓGICO (ADMIN)
     public void borrarHabitacion(Long id) {
         Habitacion existente = habitacionRepository.findById(id)
@@ -79,7 +76,6 @@ public class HabitacionService {
         habitacionRepository.save(existente);
     }
     //endregion
-
 
     //region 4) BUSCAR POR ID PARA PÚBLICO (solo activas)
     public HabitacionResponseDTO buscarDTOPorIdPublic(Long id) {
@@ -94,7 +90,6 @@ public class HabitacionService {
     }
     //endregion
 
-
     //region 5) BUSCAR POR ID PARA ADMIN (incluso inactivas)
     public HabitacionResponseDTO buscarDTOPorIdAdmin(Long id) {
         Habitacion h = habitacionRepository.findById(id)
@@ -104,7 +99,6 @@ public class HabitacionService {
     }
     //endregion
 
-
     //region 6) LISTAR HABITACIONES ACTIVAS (público)
     public List<HabitacionResponseDTO> listarActivas() {
         return habitacionRepository.findByActivoTrue().stream()
@@ -113,7 +107,6 @@ public class HabitacionService {
     }
     //endregion
 
-
     //region 7) LISTAR TODAS INCLUIDAS INACTIVAS (ADMIN)
     public List<HabitacionResponseDTO> listarTodasIncluidasInactivas() {
         return habitacionRepository.findAll().stream()
@@ -121,7 +114,6 @@ public class HabitacionService {
                 .collect(Collectors.toList());
     }
     //endregion
-
 
     //region 8) CAMBIAR ESTADO DE HABITACIÓN (LIMPIEZA/MANTENIMIENTO)
     public HabitacionResponseDTO cambiarEstadoHabitacion(Long id, H_Estado nuevoEstado) {
@@ -134,7 +126,6 @@ public class HabitacionService {
         return convertirAResponseDTO(guardada);
     }
     //endregion
-
 
     //region 9) FILTRAR HABITACIONES ACTIVAS (público)
     public List<HabitacionResponseDTO> buscarHabitaciones(
@@ -153,7 +144,6 @@ public class HabitacionService {
     }
     //endregion
 
-
     //region 10) HABITACIONES RESERVABLES (público)
     public List<HabitacionResponseDTO> habitacionesReservables() {
         return habitacionRepository.findAll((root, query, cb) ->
@@ -166,7 +156,6 @@ public class HabitacionService {
                 .toList();
     }
     //endregion
-
 
     //region 11) HABITACIONES DISPONIBLES EN RANGO (autenticado)
     public List<HabitacionResponseDTO> obtenerHabitacionesDisponibles(
@@ -181,7 +170,6 @@ public class HabitacionService {
     }
     //endregion
 
-
     //region 12) ELIMINAR HABITACION (BORRADO LOGICO)
     public void eliminarHabitacion(Long id) {
         Habitacion habitacion = habitacionRepository.findById(id)
@@ -190,7 +178,6 @@ public class HabitacionService {
         habitacionRepository.save(habitacion);
     }
     //endregion
-
 
     //region 13) BUSCAR ENTIDAD CON BLOQUEO (para reserva)
     @Transactional(readOnly = true)
@@ -201,13 +188,28 @@ public class HabitacionService {
     }
     //endregion
 
-
     //region 14) BUSCAR ENTIDAD POR ID (para otros servicios, p.ej. ImagenService)
     public Optional<Habitacion> buscarEntidadPorId(Long id) {
         return habitacionRepository.findById(id);
     }
     //endregion
 
+    //region 15) REACTIVAR (borrado lógico inverso)
+    public HabitacionResponseDTO reactivarHabitacion(Long id) {
+        Habitacion hab = habitacionRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Habitación no encontrada"));
+
+        if (Boolean.TRUE.equals(hab.getActivo())) {
+            // Ya estaba activa: no tocamos nada
+            return convertirAResponseDTO(hab);
+        }
+
+        hab.setActivo(true);
+        Habitacion guardada = habitacionRepository.save(hab);
+        return convertirAResponseDTO(guardada);
+    }
+    //endregion
 
     //region CONVERTIDORES ENTIDAD ↔ DTO
     private Habitacion convertirAEntidad(HabitacionRequestDTO dto) {
