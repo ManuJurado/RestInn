@@ -1,11 +1,26 @@
 package RestInn.dto.cobranzasDTO;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import RestInn.entities.enums.MetodoPago;
+import jakarta.validation.constraints.NotNull;
+import lombok.*;
 
-@Getter
-@Setter
+import java.math.BigDecimal;
+
+@Data
+@NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class FacturaRequestDTO {
+    private Long id;    // No obligatorio si es alta
+
+    @NotNull(message = "El ID de la reserva es obligatorio.")
+    private Long reservaId;
+
+    private Long clienteId;
+
+    @NotNull(message = "El método de pago es obligatorio.")
+    private MetodoPago metodoPago;
+
+    @NotNull(message = "La cantidad de cuotas es obligatoria.")
+    private Integer cuotas;
 }

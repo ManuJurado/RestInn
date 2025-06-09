@@ -48,7 +48,7 @@ public class Reserva {
     @Column(nullable = false, name = "fecha_salida")
     private LocalDate fechaSalida;
 
-    @OneToOne(mappedBy = "reserva", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    private Factura factura;
+    @OneToMany(mappedBy = "reserva", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    private List<Factura> factura;
     
 }
