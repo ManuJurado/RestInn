@@ -25,10 +25,15 @@ public class EnvironmentConfig {
             saveEnvVariable("JWT_EXPIRATION", jwtExpiration);
         }
 
-        // Otras variables
+        String jwtRefreshExpiration = dotenv.get("JWT_REFRESH_EXPIRATION");
+        if (jwtRefreshExpiration == null || jwtRefreshExpiration.isBlank()) {
+            jwtRefreshExpiration = "86400000"; // 1 día por defecto
+        }
+            // Otras variables
         System.out.println(jwtSecret);
         System.setProperty("JWT_SECRET", jwtSecret);
         System.setProperty("JWT_EXPIRATION", jwtExpiration);
+        System.setProperty("JWT_REFRESH_EXPIRATION", jwtRefreshExpiration);
         System.setProperty("DB_HOST", dotenv.get("DB_HOST"));
         System.setProperty("DB_PASSWORD", dotenv.get("DB_PASSWORD"));
     }

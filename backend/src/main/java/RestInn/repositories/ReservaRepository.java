@@ -33,4 +33,5 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
     //uso en situaciones críticas (check-in, check-out, concurrencia).
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     Optional<Reserva> findWithLockingById(Long id);
+    Optional<Reserva> findById(Long id);
 }

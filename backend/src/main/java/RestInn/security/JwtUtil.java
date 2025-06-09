@@ -16,6 +16,9 @@ public class JwtUtil {
     @Value("${JWT_EXPIRATION}")
     private long expiration;
 
+    @Value("${jwt.refreshExpiration}")
+    private long refreshExpiration;
+
     private Key getSigningKey() {
         return Keys.hmacShaKeyFor(secret.getBytes());
     }
@@ -23,6 +26,17 @@ public class JwtUtil {
     public String generateToken(String username) {
         Date now = new Date();
         Date exp = new Date(now.getTime() + expiration);
+        return Jwts.builder()
+                .setSubject(username)
+                .setIssuedAt(now)
+                .setExpiration(exp)
+                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+    public String generateRefreshToken(String username) {
+        Date now = new Date();
+        Date exp = new Date(now.getTime() + refreshExpiration);
         return Jwts.builder()
                 .setSubject(username)
                 .setIssuedAt(now)
@@ -40,6 +54,8 @@ public class JwtUtil {
                 .getSubject();
     }
 
+
+
     public boolean validateToken(String token, String userName) {
         try {
             String subj = extractUsername(token);
@@ -53,5 +69,22 @@ public class JwtUtil {
         } catch (JwtException | IllegalArgumentException e) {
             return false;
         }
+    }
+
+    // Verifica si el token es válido (firma y no expirado)
+    public boolean isValid(String token) {
+        try {
+            getClaims(token);
+            return true;
+        } catch (JwtException | IllegalArgumentException e) {
+            return false;
+        }
+    }
+
+    private Claims getClaims(String token) {
+        return Jwts.parser()
+                .setSigningKey(secret)
+                .parseClaimsJws(token)
+                .getBody();
     }
 }

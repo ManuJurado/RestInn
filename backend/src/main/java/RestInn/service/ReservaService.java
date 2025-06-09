@@ -336,4 +336,9 @@ public class ReservaService {
         Reserva actualizada = reservaRepository.save(reserva);
         return mapReservaAResponseDTO(actualizada);
     }
+
+    public Reserva obtenerPorId(Long id) {
+        return reservaRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Reserva no encontrada con ID: " + id));
+    }
 }
