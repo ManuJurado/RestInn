@@ -1,5 +1,6 @@
 package RestInn.security;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -33,20 +34,25 @@ public class JwtFilter extends OncePerRequestFilter {
             String token = header.substring(7);
             try {
                 String username = jwtUtil.extractUsername(token);
-                if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                    UserDetails ud = userDetailsService.loadUserByUsername(username);
-                    if (jwtUtil.validateToken(token, ud.getUsername())) {
-                        UsernamePasswordAuthenticationToken auth =
-                                new UsernamePasswordAuthenticationToken(ud, null, ud.getAuthorities());
-                        auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(req));
-                        SecurityContextHolder.getContext().setAuthentication(auth);
-                    }
+                UserDetails ud  = userDetailsService.loadUserByUsername(username);
+                Claims claims = jwtUtil.claims(token);
+
+                // Solo aceptar token de tipo "access"
+                if ("access".equals(claims.get("type")) &&
+                        SecurityContextHolder.getContext().getAuthentication() == null &&
+                        jwtUtil.isValid(token, ud.getUsername())) {
+
+                    UsernamePasswordAuthenticationToken auth =
+                            new UsernamePasswordAuthenticationToken(ud, null, ud.getAuthorities());
+                    auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(req));
+                    SecurityContextHolder.getContext().setAuthentication(auth);
                 }
             } catch (JwtException e) {
-                // token inválido o expirado
+                // Token inválido o expirado, podés loguear o agregar respuesta de error
+                // Por ahora dejamos pasar sin autenticar para que retorne 401 si es necesario
             }
         }
-
         chain.doFilter(req, res);
     }
+
 }

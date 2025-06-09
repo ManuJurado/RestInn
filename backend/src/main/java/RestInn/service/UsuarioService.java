@@ -31,6 +31,7 @@ public class UsuarioService {
     // CREAR USUARIOS SEGÚN TIPO
     // ----------------------------------------
     public UsuarioResponseDTO crearEmpleado(UsuarioRequestDTO dto) {
+        validarUnicidad(dto, null);
         Empleado empleado = new Empleado();
         mapDtoToUsuario(dto, empleado, true);
         usuarioRepository.save(empleado);
@@ -38,6 +39,7 @@ public class UsuarioService {
     }
 
     public UsuarioResponseDTO crearCliente(UsuarioRequestDTO dto) {
+        validarUnicidad(dto, null);
         Cliente cliente = new Cliente();
         mapDtoToUsuario(dto, cliente, true);
         usuarioRepository.save(cliente);
@@ -45,6 +47,7 @@ public class UsuarioService {
     }
 
     public UsuarioResponseDTO crearAdministrador(UsuarioRequestDTO dto) {
+        validarUnicidad(dto, null);
         Administrador admin = new Administrador();
         mapDtoToUsuario(dto, admin, true);
         usuarioRepository.save(admin);
@@ -58,6 +61,9 @@ public class UsuarioService {
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "Usuario no encontrado"));
+
+        validarUnicidad(dto, id);
+
         mapDtoToUsuario(dto, usuario, false);
         usuarioRepository.save(usuario);
         return mapToResponse(usuario);
@@ -127,6 +133,21 @@ public class UsuarioService {
     }
 
     // ----------------------------------------
+    // UTILIDAD: Validar unicidad de nombreLogin y email
+    // ----------------------------------------
+    private void validarUnicidad(UsuarioRequestDTO dto, Long idExistente) {
+        Optional<Usuario> existentePorLogin = usuarioRepository.findByNombreLogin(dto.getNombreLogin());
+        if (existentePorLogin.isPresent() && !existentePorLogin.get().getId().equals(idExistente)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "El nombre de usuario ya está en uso.");
+        }
+
+        Optional<Usuario> existentePorEmail = Optional.ofNullable(usuarioRepository.findByEmail(dto.getEmail()));
+        if (existentePorEmail.isPresent() && !existentePorEmail.get().getId().equals(idExistente)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "El email ya está registrado.");
+        }
+    }
+
+    // ----------------------------------------
     // UTILIDAD: mapear DTO → entidad
     // ----------------------------------------
     private void mapDtoToUsuario(UsuarioRequestDTO dto, Usuario usuario, boolean esNuevo) {
@@ -147,21 +168,16 @@ public class UsuarioService {
     // ----------------------------------------
     // DTO → Response
     // ----------------------------------------
-    // UsuarioService.java (o donde tengas el método mapToResponse)
     private UsuarioResponseDTO mapToResponse(Usuario usuario) {
         String roleValue;
 
         if (usuario instanceof Empleado) {
-            // Tomo el enum RolEmpleado directamente:
             roleValue = ((Empleado) usuario).getRolEmpleado().name();
-        }
-        else if (usuario instanceof Cliente) {
+        } else if (usuario instanceof Cliente) {
             roleValue = "CLIENTE";
-        }
-        else if (usuario instanceof Administrador) {
+        } else if (usuario instanceof Administrador) {
             roleValue = "ADMINISTRADOR";
-        }
-        else {
+        } else {
             roleValue = usuario.getClass().getSimpleName().toUpperCase();
         }
 
@@ -175,9 +191,7 @@ public class UsuarioService {
                 .email(usuario.getEmail())
                 .CUIT(usuario.getCUIT())
                 .activo(usuario.getActivo())
-                .role(roleValue)  // Ej: "LIMPIEZA", "RECEPCIONISTA", "CONSERJE", etc.
+                .role(roleValue)
                 .build();
     }
-
-
 }

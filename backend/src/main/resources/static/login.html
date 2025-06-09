@@ -10,30 +10,25 @@
     <link rel="stylesheet" href="css/components.css" />
 </head>
 <body>
-
-<div>
+<div class="login-container">
     <label for="usuario">Usuario:</label>
     <input type="text" id="usuario" name="usuario" placeholder="Ingrese su usuario" autocomplete="username" />
 
     <label for="clave">Contraseña:</label>
     <input type="password" id="clave" name="clave" placeholder="Ingrese su contraseña" autocomplete="current-password" />
 
-    <button class="next-button" onclick="login()">Ingresar</button>
+    <button type="button" id="btnIngresar" class="next-button">Ingresar</button>
     <button type="button" class="return-button" onclick="window.location.href='index.html'">← Volver</button>
 </div>
 
 <!-- Contenedor para la alerta -->
 <div id="alerta" class="alert">
+    <i class="fas fa-exclamation-circle"></i>
     <span class="msg"></span>
-    <button class="close-btn" onclick="cerrarAlerta()">X</button>
+    <button class="close-btn" onclick="cerrarAlerta()"><i class="fas fa-times"></i></button>
 </div>
 
-<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
-
-<!-- Primero el archivo con las funciones de alerta -->
 <script src="js/alertas.js"></script>
-<!-- Luego el login.js que usa esas funciones -->
 <script src="js/login.js"></script>
-
 </body>
 </html>

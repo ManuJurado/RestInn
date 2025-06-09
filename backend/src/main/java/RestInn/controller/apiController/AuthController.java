@@ -34,18 +34,41 @@ public class AuthController {
 
 
     @PostMapping("/login")
-    public Map<String, String> login(@RequestBody AuthRequest req) {
-        // 1) Autenticar credenciales
-        Authentication auth = authManager.authenticate(
-                new UsernamePasswordAuthenticationToken(req.username(), req.password())
-        );
-        // 2) Extraer UserDetails
-        UserDetails ud = (UserDetails) auth.getPrincipal();
-        // 3) Generar JWT usando el username
-        String token = jwtUtil.generateToken(ud.getUsername());
-        // 4) Devolver solo el token
-        return Map.of("token", token);
+    public ResponseEntity<?> login(@RequestBody AuthRequest req) {
+        try {
+            Authentication auth = authManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(req.username(), req.password())
+            );
+
+            UserDetails ud = (UserDetails) auth.getPrincipal();
+
+            String token = jwtUtil.generateAccessToken(ud.getUsername());
+
+            return ResponseEntity.ok(Map.of("token", token));
+        } catch (AuthenticationException e) {
+            return ResponseEntity
+                    .status(401)
+                    .body(Map.of("message", "Credenciales inválidas"));
+        } catch (Exception e) {
+            return ResponseEntity
+                    .status(500)
+                    .body(Map.of("message", "Error interno en el servidor"));
+        }
     }
+
+
+
+    @PostMapping("/refresh")
+    public Map<String, String> refresh(@RequestBody Map<String, String> body) {
+        String refreshToken = body.get("refreshToken");
+        if (refreshToken == null || !jwtUtil.isValid(refreshToken, jwtUtil.extractUsername(refreshToken))) {
+            throw new RuntimeException("Refresh token inválido");
+        }
+        String username = jwtUtil.extractUsername(refreshToken);
+        String newAccessToken = jwtUtil.generateAccessToken(username);
+        return Map.of("token", newAccessToken);
+    }
+
 
     public static record AuthRequest(String username, String password) {}
 }
