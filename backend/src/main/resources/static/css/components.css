@@ -171,6 +171,14 @@
 }
 
 
+.filtros-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr); /* ← antes tenías 3 o 4 seguro */
+  gap: 1rem;
+  align-items: end;
+  margin-bottom: 2rem;
+}
+
 /*--------------------------------------------------INPUTS--------------------------------------------------*/
 input[type="text"],
 input[type="email"],

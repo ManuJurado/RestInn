@@ -15,22 +15,21 @@
 
 <!-- Filtros -->
 <section class="filtros-grid">
-    <input id="filtroPiso"    type="number"  placeholder="Piso"      class="inputs" />
-    <input id="filtroNumero"  type="number"  placeholder="N° Hab"    class="inputs" />
-    <select id="filtroEstado"               class="inputs">
+    <input id="filtroPiso"   type="number" placeholder="Piso"    class="inputs" />
+    <input id="filtroNumero" type="number" placeholder="N° Hab"  class="inputs" />
+
+    <select id="filtroEstado" class="inputs">
         <option value="">Estado (todos)</option>
         <option value="DISPONIBLE">DISPONIBLE</option>
         <option value="LIMPIEZA">LIMPIEZA</option>
         <option value="MANTENIMIENTO">MANTENIMIENTO</option>
     </select>
-    <button id="btnAplicarFiltros" class="normal-button" style="display:none;">Filtrar</button>
+
+    <!-- Botones en la misma fila -->
     <button id="btnLimpiarFiltros" class="normal-button">Limpiar</button>
+    <button id="btnNuevaHab"      class="btn-detalle">Crear habitación</button>
 </section>
 
-<!-- Acciones -->
-<section style="margin: 1rem 0;">
-    <button id="btnNuevaHab"  class="action-button">Crear habitación</button>
-</section>
 
 <!-- Tabla -->
 <div id="tablaHabitaciones" class="tabla-habitaciones"></div>

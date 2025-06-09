@@ -5,18 +5,18 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Registro de cliente – RestInn</title>
 
-    <!-- 🚩 HOJAS DE ESTILO EXISTENTES -->
+    <!-- HOJAS DE ESTILO EXISTENTES -->
     <link rel="stylesheet" href="../css/base.css" />
     <link rel="stylesheet" href="../css/layout.css" />
     <link rel="stylesheet" href="../css/buttons.css" />
     <link rel="stylesheet" href="../css/wrapper.css" />
     <link rel="stylesheet" href="../css/components.css" />
 
-    <!-- Regla mínima solo para el grid -->
     <style>
-        .grid-2 {
+        /* Grid con 3 columnas */
+        .grid-3 {
           display: grid;
-          grid-template-columns: 1fr 1fr;
+          grid-template-columns: 1fr 1fr 1fr;
           gap: 1.25rem 2rem;
         }
     </style>
@@ -25,8 +25,7 @@
 <button type="button" class="return-button" onclick="history.back()">← Volver</button>
 <h1 class="labels" style="text-align:center;margin-top:2rem;">Crear cuenta de cliente</h1>
 
-<form id="formCliente" class="form-wrapper grid-2" style="max-width:860px;margin:2rem auto;">
-    <!-- Columna IZQ : datos de acceso -->
+<form id="formCliente" class="form-wrapper grid-3" style="max-width:900px;margin:2rem auto;">
     <div class="form-row">
         <label class="labels" for="nombreLogin">Usuario <span>*</span></label>
         <input class="inputs" id="nombreLogin" name="nombreLogin" type="text" required />
@@ -43,8 +42,6 @@
         <label class="labels" for="confirm">Repetir contraseña <span>*</span></label>
         <input class="inputs" id="confirm" name="confirm" type="password" minlength="6" required />
     </div>
-
-    <!-- Columna DER : datos personales -->
     <div class="form-row">
         <label class="labels" for="nombre">Nombre</label>
         <input class="inputs" id="nombre" name="nombre" type="text" required />
@@ -66,8 +63,8 @@
         <input class="inputs" id="cuit" name="cuit" type="text" />
     </div>
 
-    <!-- Botón ocupa ambas columnas -->
-    <div class="form-row" style="grid-column:1/-1;text-align:center;margin-top:1rem;">
+    <!-- Botón ocupa todas las columnas -->
+    <div class="form-row" style="grid-column:1 / -1; text-align:center; margin-top:1rem;">
         <button type="submit" class="normal-button">Registrarme</button>
     </div>
 </form>
@@ -75,7 +72,7 @@
 <!-- Alerta global -->
 <div id="alerta" class="alert">
     <span class="msg"></span>
-    <button class="close-btn" onclick="cerrarAlerta()">X</button>
+    <button class="close-btn" onclick="cerrarAlerta()">×</button>
 </div>
 
 <script src="../js/alertas.js"></script>
