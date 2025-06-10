@@ -29,7 +29,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         return data;
     }
 
-
     function mostrarFactura() {
         $('reservaId').textContent = reservaId;
         $('estadoFactura').textContent = factura.estado ?? '—';
