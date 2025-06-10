@@ -10,7 +10,6 @@ import java.util.Properties;
 @Configuration
 public class EnvironmentConfig {
     private static final String ENV_FILE_PATH = ".env";
-
     static {
         Dotenv dotenv = Dotenv.load();
 

@@ -15,6 +15,12 @@ import java.util.List;
 public class FacturaResponseDTO {
     private Long id;
     private String clienteNombre;
+
+    private LocalDate   ingreso;
+    private LocalDate   salida;
+    private String      habitacionNumero;
+
+
     private Long reservaId;
     private LocalDate fechaEmision;
     private TipoFactura tipoFactura;

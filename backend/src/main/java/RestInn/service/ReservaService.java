@@ -6,6 +6,9 @@ import RestInn.dto.reservasDTO.ReservaResponseDTO;
 import RestInn.entities.Huesped;
 import RestInn.entities.Reserva;
 import RestInn.entities.Habitacion;
+import RestInn.entities.cobranzas.Factura;
+import RestInn.entities.enums.EstadoFactura;
+import RestInn.entities.enums.MetodoPago;
 import RestInn.entities.usuarios.Usuario;
 import RestInn.entities.enums.EstadoReserva;
 import RestInn.exceptions.ReservaNoDisponibleException;
@@ -18,7 +21,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -29,21 +35,23 @@ public class ReservaService {
     private final ReservaRepository reservaRepository;
     private final UsuarioService usuarioService;
     private final HabitacionService habitacionService;
+    private final FacturaService facturaService;
 
     @Autowired
     public ReservaService(ReservaRepository reservaRepository,
                           UsuarioService usuarioService,
-                          HabitacionService habitacionService) {
+                          HabitacionService habitacionService, FacturaService facturaService) {
         this.reservaRepository = reservaRepository;
         this.usuarioService = usuarioService;
         this.habitacionService = habitacionService;
+        this.facturaService = facturaService;
     }
 
     // ====================================================
     // MÉTODOS AUXILIARES (internos)
     // ====================================================
 
-    //Lógica interna para crear reserva, asignada a cualquier Usuario (@Transactional). Bloquea la habitación, valida solapamientos y persiste la reserva.
+    //region Lógica interna para crear reserva, asignada a cualquier Usuario (@Transactional). Bloquea la habitación, valida solapamientos y persiste la reserva.
     @Transactional(rollbackFor = Exception.class)
     protected ReservaResponseDTO crearReservaDesdeDto(ReservaRequestDTO dto, Usuario usuario) {
         // 1) Validar existencia de usuario
@@ -58,14 +66,24 @@ public class ReservaService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Habitación no encontrada");
         }
 
-        // 3) Verificar solapamiento
-        boolean ocupado = reservaRepository.existsByHabitacionAndFechaIngresoLessThanAndFechaSalidaGreaterThan(
-                habitacion,
-                dto.getFechaSalida(),
-                dto.getFechaIngreso()
+        // 3) Verificar solapamiento SOLO con reservas “activas”
+        List<EstadoReserva> estadosActivos = List.of(
+                EstadoReserva.PENDIENTE,
+                EstadoReserva.CONFIRMADA,
+                EstadoReserva.EN_CURSO
         );
+
+        boolean ocupado = reservaRepository
+                .existsByHabitacionAndEstadoReservaInAndFechaIngresoLessThanAndFechaSalidaGreaterThan(
+                        habitacion,
+                        estadosActivos,
+                        dto.getFechaSalida(),
+                        dto.getFechaIngreso()
+                );
+
         if (ocupado) {
-            throw new ReservaNoDisponibleException("La habitación ya está reservada en esas fechas");
+            throw new ReservaNoDisponibleException(
+                    "La habitación ya está reservada en esas fechas");
         }
 
         // 4) Construir entidad Reserva
@@ -92,10 +110,16 @@ public class ReservaService {
 
         // 6) Guardar y devolver DTO
         Reserva guardada = reservaRepository.save(reserva);
+
+        // Generar la factura “RESERVA” automáticamente
+        // (efectivo, 1 cuota, sin interés/descuento):
+        facturaService.generarFacturaReserva(guardada.getId());
+
         return mapReservaAResponseDTO(guardada);
     }
+    //endregion
 
-    //Convierte una entidad Reserva a ReservaResponseDTO.
+    //region Convierte una entidad Reserva a ReservaResponseDTO.
     private ReservaResponseDTO mapReservaAResponseDTO(Reserva reserva) {
         List<HuespedResponseDTO> huespedes = reserva.getHuespedes() != null
                 ? reserva.getHuespedes().stream()
@@ -120,10 +144,9 @@ public class ReservaService {
                 huespedes
         );
     }
+    //endregion
 
-    // ====================================================
-    // 1) CREAR RESERVA (cliente, empleado o admin autenticado)
-    // ====================================================
+    //region CREAR RESERVA (cliente, empleado o admin autenticado)
     @Transactional
     public ReservaResponseDTO crearReservaComoUsuarioAutenticado(ReservaRequestDTO dto) {
         // Obtener usuario autenticado
@@ -137,10 +160,9 @@ public class ReservaService {
         // Delegar a la lógica interna
         return crearReservaDesdeDto(dto, usuario);
     }
+    //endregion
 
-    // ====================================================
-    // 2) LISTAR RESERVAS DEL USUARIO AUTENTICADO
-    // ====================================================
+    //region LISTAR RESERVAS DEL USUARIO AUTENTICADO
     public List<ReservaResponseDTO> listarReservasDeClienteActual() {
         // Obtener usuario autenticado
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -155,29 +177,9 @@ public class ReservaService {
                 .map(this::mapReservaAResponseDTO)
                 .collect(Collectors.toList());
     }
+    //endregion
 
-    // ====================================================
-    // 3) CANCELAR RESERVA (solo si está en PENDIENTE)
-    // ====================================================
-    @Transactional
-    public void cancelarReserva(Long reservaId) {
-        Reserva reserva = reservaRepository.findById(reservaId)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Reserva no encontrada"));
-
-        if (reserva.getEstadoReserva() != EstadoReserva.PENDIENTE) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "Solo se pueden cancelar reservas en estado PENDIENTE");
-        }
-
-        reserva.setEstadoReserva(EstadoReserva.CANCELADA);
-        reservaRepository.save(reserva);
-    }
-
-    // ====================================================
-    // 4) LISTAR RESERVAS CON FILTROS (para recepcionista/admin)
-    // ====================================================
+    //region LISTAR RESERVAS CON FILTROS (para recepcionista/admin)
     public List<ReservaResponseDTO> listarReservasConFiltros(String estado, Long reservaId) {
         // Si viene reservaId, devolver solo esa reserva
         if (reservaId != null) {
@@ -208,19 +210,17 @@ public class ReservaService {
                 .map(this::mapReservaAResponseDTO)
                 .collect(Collectors.toList());
     }
+    //endregion
 
-    // ====================================================
-    // 5) OBTENER TODAS LAS RESERVAS
-    // ====================================================
+    //region OBTENER TODAS LAS RESERVAS
     public List<ReservaResponseDTO> obtenerReservas() {
         return reservaRepository.findAll().stream()
                 .map(this::mapReservaAResponseDTO)
                 .collect(Collectors.toList());
     }
+    //endregion
 
-    // ====================================================
-    // 6) OBTENER RESERVA POR ID
-    // ====================================================
+    //region OBTENER RESERVA POR ID
     public ReservaResponseDTO obtenerReservaPorId(Long id) {
         Reserva reserva = reservaRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(
@@ -228,19 +228,17 @@ public class ReservaService {
                         "Reserva con ID " + id + " no encontrada."));
         return mapReservaAResponseDTO(reserva);
     }
+    //endregion
 
-    // ====================================================
-    // 7) OBTENER RESERVAS POR USUARIO
-    // ====================================================
+    //region OBTENER RESERVAS POR USUARIO
     public List<ReservaResponseDTO> obtenerReservasPorUsuarioId(Long usuarioId) {
         return reservaRepository.findByUsuarioId(usuarioId).stream()
                 .map(this::mapReservaAResponseDTO)
                 .collect(Collectors.toList());
     }
+    //endregion
 
-    // ====================================================
-    // 8) OBTENER RESERVAS ENTRE FECHAS
-    // ====================================================
+    //region OBTENER RESERVAS ENTRE FECHAS
     public List<ReservaResponseDTO> buscarReservasEntreFechas(Usuario usuario, LocalDate desde, LocalDate hasta) {
         return reservaRepository
                 .findByUsuarioAndFechaIngresoLessThanEqualAndFechaSalidaGreaterThanEqual(usuario, desde, hasta)
@@ -248,22 +246,22 @@ public class ReservaService {
                 .map(this::mapReservaAResponseDTO)
                 .collect(Collectors.toList());
     }
+    //endregion
 
-    // ====================================================
-    // 9) OBTENER IDS DE HABITACIONES OCUPADAS
-    // ====================================================
+    //region OBTENER IDS DE HABITACIONES OCUPADAS
     public Set<Long> obtenerIdsHabitacionesOcupadas(LocalDate ingreso, LocalDate salida) {
         return reservaRepository
                 .findByFechaIngresoLessThanAndFechaSalidaGreaterThan(salida, ingreso)
                 .stream()
-                .filter(r -> r.getEstadoReserva() != EstadoReserva.CONFIRMADA)
+                .filter(r -> r.getEstadoReserva() == EstadoReserva.PENDIENTE   ||
+                        r.getEstadoReserva() == EstadoReserva.CONFIRMADA ||
+                        r.getEstadoReserva() == EstadoReserva.EN_CURSO)
                 .map(r -> r.getHabitacion().getId())
                 .collect(Collectors.toSet());
     }
+    //endregion
 
-    // ====================================================
-    // 10) ACTUALIZAR RESERVA (fechas / huéspedes)
-    // ====================================================
+    //region ACTUALIZAR RESERVA (fechas / huéspedes)
     public ReservaResponseDTO actualizarReservaDesdeDto(Long id, ReservaRequestDTO dto) {
         Reserva reserva = reservaRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(
@@ -275,17 +273,59 @@ public class ReservaService {
         Reserva actualizada = reservaRepository.save(reserva);
         return mapReservaAResponseDTO(actualizada);
     }
+    //endregion
 
-    // ====================================================
-    // 11) ELIMINAR RESERVA
-    // ====================================================
+    //region ELIMINAR RESERVA
     public void eliminarReserva(Long id) {
         reservaRepository.deleteById(id);
     }
+    //endregion
 
-    // ====================================================
-    // 12) CHECK-IN (cambia de CONFIRMADA a EN_CURSO)
-    // ====================================================
+    //region CANCELAR RESERVA
+    @Transactional
+    public void cancelarReserva(Long reservaId) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String username = auth.getName();
+
+        Reserva reserva = reservaRepository.findById(reservaId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Reserva no encontrada"));
+
+        boolean esPropia = reserva.getUsuario().getNombreLogin().equals(username);
+        boolean esPrivilegiado = auth.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().matches("ROLE_ADMINISTRADOR|ROLE_RECEPCIONISTA"));
+
+        if (!esPropia && !esPrivilegiado)
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "No puedes cancelar reservas de otros usuarios");
+
+        if (reserva.getEstadoReserva() != EstadoReserva.PENDIENTE)
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Solo se pueden cancelar reservas en estado PENDIENTE");
+
+        long horasHastaIngreso = ChronoUnit.HOURS.between(
+                LocalDateTime.now(),
+                reserva.getFechaIngreso().atStartOfDay());
+
+        if (horasHastaIngreso < 48)
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "La reserva ya no puede cancelarse (menos de 48 h para el ingreso)");
+
+        // 3) Marcar reserva como CANCELADA
+        reserva.setEstadoReserva(EstadoReserva.CANCELADA);
+        reservaRepository.save(reserva);
+
+        // 4) Actualizar estado factura a ANULADA usando FacturaService
+        List<Factura> facturas = reserva.getFactura(); // o getFacturas()
+        if (facturas != null && !facturas.isEmpty()) {
+            Factura factura = facturas.get(0);  // por ejemplo la primera
+            factura.setEstado(EstadoFactura.ANULADA);
+            facturaService.actualizarFacturaEstado(factura);
+        }
+    }
+
+    //endregion
+
+    //region CHECK-IN (cambia de CONFIRMADA a EN_CURSO)
     @Transactional
     public ReservaResponseDTO realizarCheckIn(Long reservaId) {
         Reserva reserva = reservaRepository.findWithLockingById(reservaId)
@@ -309,10 +349,9 @@ public class ReservaService {
         Reserva actualizada = reservaRepository.save(reserva);
         return mapReservaAResponseDTO(actualizada);
     }
+    //endregion
 
-    // ====================================================
-    // 13) CHECK-OUT (cambia de EN_CURSO a FINALIZADA)
-    // ====================================================
+    //region  CHECK-OUT (cambia de EN_CURSO a FINALIZADA)
     @Transactional
     public ReservaResponseDTO realizarCheckOut(Long reservaId) {
         Reserva reserva = reservaRepository.findWithLockingById(reservaId)
@@ -336,10 +375,12 @@ public class ReservaService {
         Reserva actualizada = reservaRepository.save(reserva);
         return mapReservaAResponseDTO(actualizada);
     }
+    //endregion
 
-
+    //region OBTENER UNA RESERVA POR ID
     public Reserva obtenerPorId(Long id) {
         return reservaRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Reserva no encontrada con ID: " + id));
     }
+    //endregion
 }

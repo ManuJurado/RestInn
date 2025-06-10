@@ -4,16 +4,17 @@ import RestInn.dto.cobranzasDTO.FacturaRequestDTO;
 import RestInn.dto.cobranzasDTO.FacturaResponseDTO;
 import RestInn.service.FacturaService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.ByteArrayInputStream;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/facturas")
-@PreAuthorize("hasAnyRole('ADMIN', 'RECEPCIONISTA')")
+@PreAuthorize("hasAnyRole('ADMIN', 'RECEPCIONISTA', 'CLIENTE')")
 public class  FacturaController {
     @Autowired
     private FacturaService facturaService;
@@ -70,8 +71,34 @@ public class  FacturaController {
 
     //region Listar las facturas asociadas a una reserva.
     @GetMapping("/reserva/{reservaId}")
+    public ResponseEntity<FacturaResponseDTO> obtenerPorReserva(
+            @PathVariable Long reservaId) {
+        return ResponseEntity.ok(facturaService.buscarPorReservaId(reservaId));
+    }
+    //endregion
+
+    // GET /api/facturas/por-reserva/{reservaId}
+    @GetMapping("/listareservas/{reservaId}")
     public ResponseEntity<List<FacturaResponseDTO>> listarPorReserva(@PathVariable Long reservaId) {
         return ResponseEntity.ok(facturaService.listarPorReservaDTO(reservaId));
     }
-    //endregion
+
+    @GetMapping("/{facturaId}/pdf")
+    public ResponseEntity<InputStreamResource> descargarPdf(@PathVariable Long facturaId) {
+        byte[] pdfBytes = facturaService.generarPdf(facturaId);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentDisposition(
+                ContentDisposition.inline()
+                        .filename("factura_" + facturaId + ".pdf")
+                        .build());
+
+        return ResponseEntity
+                .ok()
+                .headers(headers)
+                .contentType(MediaType.APPLICATION_PDF)
+                .contentLength(pdfBytes.length)
+                .body(new InputStreamResource(new ByteArrayInputStream(pdfBytes)));
+    }
+
 }

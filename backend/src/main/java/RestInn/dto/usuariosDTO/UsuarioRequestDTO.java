@@ -13,6 +13,7 @@ public class UsuarioRequestDTO {
     private String dni;
     private String phoneNumber;
     private String email;
+    private String oldPassword;
     private String password;  // Aquí recibimos el password en texto plano para crear/modificar
     private String CUIT;
     private Boolean activo;

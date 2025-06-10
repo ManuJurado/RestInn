@@ -69,17 +69,37 @@ public class UsuarioService {
     // ----------------------------------------
     // MODIFICAR USUARIO (cualquier tipo)
     // ----------------------------------------
+    @Transactional
     public UsuarioResponseDTO modificarUsuario(Long id, UsuarioRequestDTO dto) {
         Usuario usuario = usuarioRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Usuario no encontrado"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
 
         validarUnicidad(dto, id);
 
-        mapDtoToUsuario(dto, usuario, false);
+        // —— Validar cambio de contraseña si se pidió ——
+        if (dto.getOldPassword() != null && !dto.getOldPassword().isBlank()) {
+            // debe venir también dto.password (nueva)
+            if (dto.getPassword() == null || dto.getPassword().isBlank()) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Debes indicar la nueva contraseña");
+            }
+            // validar que oldPassword coincida
+            if (!passwordEncoder.matches(dto.getOldPassword(), usuario.getPassword())) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La contraseña actual es incorrecta");
+            }
+            // todo OK → seteamos la nueva
+            usuario.setPassword(passwordEncoder.encode(dto.getPassword()));
+        }
+
+        // mapeo de otros campos
+        usuario.setNombre(dto.getNombre());
+        usuario.setApellido(dto.getApellido());
+        usuario.setPhoneNumber(dto.getPhoneNumber());
+        usuario.setCUIT(dto.getCUIT());
+
         usuarioRepository.save(usuario);
         return mapToResponse(usuario);
     }
+
 
     // ----------------------------------------
     // BORRAR USUARIO
