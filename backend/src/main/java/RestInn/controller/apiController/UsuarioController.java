@@ -51,13 +51,6 @@ public class UsuarioController {
         return new ResponseEntity<>(nuevoEmpleado, HttpStatus.CREATED);
     }
 
-    // Cualquiera puede registrarse como CLIENTE (sin login)
-    @PostMapping("/clientes")
-    public ResponseEntity<UsuarioResponseDTO> crearCliente(@RequestBody UsuarioRequestDTO dto) {
-        UsuarioResponseDTO nuevoCliente = usuarioService.crearCliente(dto);
-        return new ResponseEntity<>(nuevoCliente, HttpStatus.CREATED);
-    }
-
     @PostMapping("/admin")
     public ResponseEntity<UsuarioResponseDTO> crearAdmin(@RequestBody UsuarioRequestDTO dto) {
         UsuarioResponseDTO nuevoAdmin = usuarioService.crearAdministrador(dto);

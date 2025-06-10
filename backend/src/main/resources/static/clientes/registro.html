@@ -4,16 +4,12 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Registro de cliente – RestInn</title>
-
-    <!-- HOJAS DE ESTILO EXISTENTES -->
     <link rel="stylesheet" href="../css/base.css" />
     <link rel="stylesheet" href="../css/layout.css" />
     <link rel="stylesheet" href="../css/buttons.css" />
     <link rel="stylesheet" href="../css/wrapper.css" />
     <link rel="stylesheet" href="../css/components.css" />
-
     <style>
-        /* Grid con 3 columnas */
         .grid-3 {
           display: grid;
           grid-template-columns: 1fr 1fr 1fr;
@@ -22,10 +18,10 @@
     </style>
 </head>
 <body>
-<button type="button" class="return-button" onclick="history.back()">← Volver</button>
+<button class="return-button" onclick="history.back()">← Volver</button>
 <h1 class="labels" style="text-align:center;margin-top:2rem;">Crear cuenta de cliente</h1>
 
-<form id="formCliente" class="form-wrapper grid-3" style="max-width:900px;margin:2rem auto;">
+<form id="formRegistro" class="form-wrapper grid-3" style="max-width:900px;margin:2rem auto;">
     <div class="form-row">
         <label class="labels" for="nombreLogin">Usuario <span>*</span></label>
         <input class="inputs" id="nombreLogin" name="nombreLogin" type="text" required />
@@ -43,24 +39,24 @@
         <input class="inputs" id="confirm" name="confirm" type="password" minlength="6" required />
     </div>
     <div class="form-row">
-        <label class="labels" for="nombre">Nombre</label>
+        <label class="labels" for="nombre">Nombre <span>*</span></label>
         <input class="inputs" id="nombre" name="nombre" type="text" required />
     </div>
     <div class="form-row">
-        <label class="labels" for="apellido">Apellido</label>
+        <label class="labels" for="apellido">Apellido <span>*</span></label>
         <input class="inputs" id="apellido" name="apellido" type="text" required />
     </div>
     <div class="form-row">
-        <label class="labels" for="dni">DNI</label>
-        <input class="inputs" id="dni" name="dni" type="text" required />
+        <label class="labels" for="dni">DNI <span>*</span></label>
+        <input class="inputs" id="dni" name="dni" type="number" required />
     </div>
     <div class="form-row">
-        <label class="labels" for="phone">Teléfono</label>
-        <input class="inputs" id="phone" name="phone" type="tel" />
+        <label class="labels" for="phoneNumber">Teléfono <span>*</span></label>
+        <input class="inputs" id="phoneNumber" name="phoneNumber" type="tel" required />
     </div>
     <div class="form-row">
-        <label class="labels" for="cuit">CUIT (opcional)</label>
-        <input class="inputs" id="cuit" name="cuit" type="text" />
+        <label class="labels" for="CUIT">CUIT (opcional)</label>
+        <input class="inputs" id="CUIT" name="CUIT" type="text" />
     </div>
 
     <!-- Botón ocupa todas las columnas -->

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Verificar cuenta – RestInn</title>
+    <link rel="stylesheet" href="../css/base.css" />
+    <link rel="stylesheet" href="../css/layout.css" />
+    <link rel="stylesheet" href="../css/buttons.css" />
+</head>
+<body>
+<button class="return-button" onclick="history.back()">← Volver</button>
+<h1 class="labels" style="text-align:center;margin-top:2rem;">Verificación de correo</h1>
+
+<form id="formVerificar" style="max-width:400px;margin:2rem auto;">
+    <p>Introduce el código que te hemos enviado por email:</p>
+    <label class="labels">Código *
+        <input class="inputs" id="codigo" type="text" required>
+    </label><br><br>
+    <button type="submit" class="normal-button">Verificar</button>
+</form>
+
+<div id="alerta" class="alert">
+    <span class="msg"></span>
+    <button class="close-btn" onclick="cerrarAlerta()">×</button>
+</div>
+
+<script src="../js/alertas.js"></script>
+<script>
+    document.getElementById('formVerificar').addEventListener('submit', async e => {
+  e.preventDefault();
+
+  // Tomar exactamente 6 dígitos
+  let code = document.getElementById('codigo').value.trim();
+  if (!/^\d{6}$/.test(code)) {
+    mostrarAlerta('El código debe tener 6 dígitos numéricos.');
+    return;
+  }
+
+  try {
+    const res  = await fetch(`/api/auth/verify?code=${encodeURIComponent(code)}`);
+    const body = await res.json();
+    if (!res.ok) throw new Error(body.message);
+    alert(body.message);
+    window.location.href = '/login.html';
+  } catch (err) {
+    mostrarAlerta(err.message);
+  }
+});
+</script>
+</body>
+</html>

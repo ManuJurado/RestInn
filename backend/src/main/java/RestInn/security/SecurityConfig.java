@@ -41,7 +41,7 @@ public class SecurityConfig {
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         // público
-                        .requestMatchers("/api/auth/login").permitAll()
+                        .requestMatchers("/api/auth/login", "/api/auth/register", "/api/auth/verify").permitAll()
                         // (opcional) si prefieres no usar WebSecurityCustomizer
                         .requestMatchers("/css/**", "/js/**", "/img/**").permitAll()
                         // autenticados

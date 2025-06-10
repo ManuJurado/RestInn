@@ -2,6 +2,7 @@ package RestInn.security;
 
 import RestInn.entities.usuarios.Usuario;
 import RestInn.repositories.UsuarioRepository;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -18,8 +19,13 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Usuario usuario = usuarioRepository.findByNombreLogin(username)
+        Usuario u = usuarioRepository.findByNombreLogin(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
-        return new CustomUserDetails(usuario);
+
+        if (!Boolean.TRUE.equals(u.getActivo())) {
+            throw new DisabledException("Cuenta no verificada");
+        }
+
+        return CustomUserDetails.fromUsuario(u);
     }
 }
