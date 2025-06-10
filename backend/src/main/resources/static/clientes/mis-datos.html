@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Mis Datos – RestInn</title>
+    <link rel="stylesheet" href="../css/base.css" />
+    <link rel="stylesheet" href="../css/layout.css" />
+    <link rel="stylesheet" href="../css/buttons.css" />
+    <link rel="stylesheet" href="../css/formularios.css" />
+</head>
+<body>
+<button class="return-button" onclick="history.back()">← Volver</button>
+<h1 class="labels" style="text-align:center; margin:2rem 0;">Mis Datos Personales</h1>
+
+<form id="formDatos" class="form-wrapper" style="max-width:600px; margin:auto;">
+    <!-- Inalterables -->
+    <label class="labels">Usuario (no editable)
+        <input class="inputs" id="nombreLogin" disabled />
+    </label>
+    <label class="labels">Email (no editable)
+        <input class="inputs" id="email" disabled />
+    </label>
+    <label class="labels">DNI (no editable)
+        <input class="inputs" id="dni" disabled />
+    </label>
+
+    <!-- Editables -->
+    <label class="labels">Nombre
+        <input class="inputs" id="nombre" required />
+    </label>
+    <label class="labels">Apellido
+        <input class="inputs" id="apellido" required />
+    </label>
+    <label class="labels">Teléfono
+        <input class="inputs" id="phoneNumber" />
+    </label>
+    <label class="labels">CUIT
+        <input class="inputs" id="CUIT" />
+    </label>
+
+    <h2 class="labels" style="margin-top:1.5rem;">Cambiar contraseña</h2>
+
+    <label class="labels">Contraseña actual
+        <input class="inputs" id="oldPassword" type="password" minlength="6" />
+    </label>
+    <label class="labels">Nueva contraseña
+        <input class="inputs" id="newPassword" type="password" minlength="6" />
+    </label>
+    <label class="labels">Repetir contraseña
+        <input class="inputs" id="confirmPassword" type="password" minlength="6" />
+    </label>
+
+    <button type="submit" class="normal-button" style="margin-top:1rem;">
+        Guardar cambios
+    </button>
+</form>
+
+<!-- Alerta global -->
+<div id="alerta" class="alert">
+    <span class="msg"></span>
+    <button class="close-btn" onclick="cerrarAlerta()">×</button>
+</div>
+
+<script src="../js/alertas.js"></script>
+<script src="../js/misDatos.js"></script>
+</body>
+</html>

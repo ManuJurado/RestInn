@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Registro de cliente – RestInn</title>
+    <link rel="stylesheet" href="../css/base.css" />
+    <link rel="stylesheet" href="../css/layout.css" />
+    <link rel="stylesheet" href="../css/buttons.css" />
+    <link rel="stylesheet" href="../css/wrapper.css" />
+    <link rel="stylesheet" href="../css/components.css" />
+    <style>
+        .grid-3 {
+          display: grid;
+          grid-template-columns: 1fr 1fr 1fr;
+          gap: 1.25rem 2rem;
+        }
+    </style>
+</head>
+<body>
+<button class="return-button" onclick="history.back()">← Volver</button>
+<h1 class="labels" style="text-align:center;margin-top:2rem;">Crear cuenta de cliente</h1>
+
+<form id="formRegistro" class="form-wrapper grid-3" style="max-width:900px;margin:2rem auto;">
+    <div class="form-row">
+        <label class="labels" for="nombreLogin">Usuario <span>*</span></label>
+        <input class="inputs" id="nombreLogin" name="nombreLogin" type="text" required />
+    </div>
+    <div class="form-row">
+        <label class="labels" for="email">Email <span>*</span></label>
+        <input class="inputs" id="email" name="email" type="email" required />
+    </div>
+    <div class="form-row">
+        <label class="labels" for="password">Contraseña <span>*</span></label>
+        <input class="inputs" id="password" name="password" type="password" minlength="6" required />
+    </div>
+    <div class="form-row">
+        <label class="labels" for="confirm">Repetir contraseña <span>*</span></label>
+        <input class="inputs" id="confirm" name="confirm" type="password" minlength="6" required />
+    </div>
+    <div class="form-row">
+        <label class="labels" for="nombre">Nombre <span>*</span></label>
+        <input class="inputs" id="nombre" name="nombre" type="text" required />
+    </div>
+    <div class="form-row">
+        <label class="labels" for="apellido">Apellido <span>*</span></label>
+        <input class="inputs" id="apellido" name="apellido" type="text" required />
+    </div>
+    <div class="form-row">
+        <label class="labels" for="dni">DNI <span>*</span></label>
+        <input class="inputs" id="dni" name="dni" type="number" required />
+    </div>
+    <div class="form-row">
+        <label class="labels" for="phoneNumber">Teléfono <span>*</span></label>
+        <input class="inputs" id="phoneNumber" name="phoneNumber" type="tel" required />
+    </div>
+    <div class="form-row">
+        <label class="labels" for="CUIT">CUIT (opcional)</label>
+        <input class="inputs" id="CUIT" name="CUIT" type="text" />
+    </div>
+
+    <!-- Botón ocupa todas las columnas -->
+    <div class="form-row" style="grid-column:1 / -1; text-align:center; margin-top:1rem;">
+        <button type="submit" class="normal-button">Registrarme</button>
+    </div>
+</form>
+
+<!-- Alerta global -->
+<div id="alerta" class="alert">
+    <span class="msg"></span>
+    <button class="close-btn" onclick="cerrarAlerta()">×</button>
+</div>
+
+<script src="../js/alertas.js"></script>
+<script src="../js/crearCliente.js"></script>
+</body>
+</html>

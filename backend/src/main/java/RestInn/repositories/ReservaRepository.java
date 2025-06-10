@@ -21,8 +21,9 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
             Usuario usuario, LocalDate fechaFin, LocalDate fechaInicio
     );
 
-    boolean existsByHabitacionAndFechaIngresoLessThanAndFechaSalidaGreaterThan(
+    boolean existsByHabitacionAndEstadoReservaInAndFechaIngresoLessThanAndFechaSalidaGreaterThan(
             Habitacion habitacion,
+            List<EstadoReserva> estados,      // ← lista de estados A INCLUIR
             LocalDate fechaSalida,
             LocalDate fechaIngreso
     );

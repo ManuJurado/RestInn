@@ -1,12 +1,42 @@
 function mostrarAlerta(mensaje) {
-    const alerta = document.getElementById("alerta");
-    alerta.querySelector(".msg").textContent = mensaje;
-    alerta.classList.add("show");
+  const alerta = document.getElementById("alerta");
+  alerta.querySelector(".msg").textContent = mensaje;
+
+  alerta.classList.remove("hide");
+  alerta.classList.add("show", "showAlert");
+
+  alerta.style.pointerEvents = "auto";
+  alerta.style.opacity = "1";
+
+  // Limpiamos cualquier eventListener previo para evitar múltiples disparos
+  alerta.removeEventListener("animationend", handleAnimationEnd);
+
+  // Auto cerrar la alerta después de 5 segundos
+  setTimeout(() => {
+    cerrarAlerta();
+  }, 5000);
+}
+
+function handleAnimationEnd() {
+  const alerta = document.getElementById("alerta");
+  alerta.classList.remove("hide");
+  alerta.style.pointerEvents = "none";
+  alerta.style.opacity = "0";
 }
 
 function cerrarAlerta() {
-    document.getElementById("alerta").classList.remove("show");
+  const alerta = document.getElementById("alerta");
+
+  alerta.classList.remove("show");
+  alerta.classList.remove("showAlert");
+  alerta.classList.add("hide");
+
+  // Escuchamos que termine la animación de salida para resetear estilos
+  alerta.addEventListener("animationend", () => {
+    handleAnimationEnd();
+  }, { once: true });
 }
+
 
 async function login() {
     const user = document.getElementById("usuario").value;

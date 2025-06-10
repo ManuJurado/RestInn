@@ -7,7 +7,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     let userName;
 
-    // Reutilizamos obtenerUsuarioActual definida en home.js (o repetirla igual acá)
     async function obtenerUsuarioActual() {
         const token = sessionStorage.getItem('jwt');
         if (!token) throw new Error('No hay token guardado');
@@ -45,17 +44,15 @@ document.addEventListener("DOMContentLoaded", async () => {
             const reservas = await res.json();
             return reservas;
         } catch (err) {
-            contenedor.innerHTML = `<p class="erFror">Error al cargar reservas: ${err.message}</p>`;
+            contenedor.innerHTML = `<p class="error">Error al cargar reservas: ${err.message}</p>`;
             return null;
         }
     }
 
-    //Comportamiento del button para crear reservas en cliente
     document.getElementById('btnCrearReserva').addEventListener('click', () => {
         window.location.href = '/clientes/crearReserva.html';
     });
 
-    // Ejemplo simple para renderizar las reservas en HTML:
     function renderTabla(reservas) {
         if (!reservas || reservas.length === 0) {
             contenedor.innerHTML = '<p>No hay reservas para mostrar.</p>';
@@ -65,10 +62,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         const table = document.createElement('table');
         table.classList.add('tabla-reservas');
 
-        // Crear encabezado
         const thead = document.createElement('thead');
         const trHead = document.createElement('tr');
-        const headers = ['ID', 'Ingreso', 'Salida', 'Reserva', 'Estado', 'Habitación', 'Huéspedes'];
+        const headers = [
+            'ID', 'Ingreso', 'Salida', 'Reserva', 'Estado',
+            'Habitación', 'Huéspedes', 'Acciones'
+        ];
         headers.forEach(txt => {
             const th = document.createElement('th');
             th.textContent = txt;
@@ -77,7 +76,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         thead.appendChild(trHead);
         table.appendChild(thead);
 
-        // Crear cuerpo de tabla
         const tbody = document.createElement('tbody');
         reservas.forEach(r => {
             const tr = document.createElement('tr');
@@ -110,15 +108,51 @@ document.addEventListener("DOMContentLoaded", async () => {
             tdHuespedes.textContent = r.huespedes.map(h => `${h.nombre} ${h.apellido}, ${h.dni}`).join(', ');
             tr.appendChild(tdHuespedes);
 
+            const tdAcciones = document.createElement('td');
+
+            // Botón Ver Factura
+            const btnVerFac = document.createElement('button');
+            btnVerFac.textContent = 'Ver factura';
+            btnVerFac.className = 'small-button';
+            btnVerFac.onclick = () => {
+                window.location.href = `/clientes/factura.html?reserva=${r.id}`;
+            };
+            tdAcciones.appendChild(btnVerFac);
+
+            // Botón Cancelar (si aplica)
+            if (r.estado === 'CONFIRMADA' || r.estado === 'PENDIENTE') {
+                const btnCancelar = document.createElement('button');
+                btnCancelar.textContent = 'Cancelar';
+                btnCancelar.className = 'small-button cancelar-btn';
+                btnCancelar.style.marginLeft = '10px';
+                btnCancelar.onclick = async () => {
+                    if (!confirm('¿Estás seguro de que querés cancelar esta reserva?')) return;
+                    try {
+                        const token = sessionStorage.getItem('jwt');
+                        const res = await fetch(`/api/reservas/${r.id}`, {
+                            method: 'DELETE',
+                            headers: { 'Authorization': `Bearer ${token}` }
+                        });
+                        if (!res.ok) throw new Error('No se pudo cancelar la reserva');
+                        mostrarAlerta('Reserva cancelada correctamente');
+                        const actualizadas = await fetchReservas();
+                        renderTabla(actualizadas);
+                    } catch (err) {
+                        mostrarAlerta(`Error al cancelar: ${err.message}`);
+                    }
+                };
+                tdAcciones.appendChild(btnCancelar);
+            }
+
+            tr.appendChild(tdAcciones);
             tbody.appendChild(tr);
         });
 
         table.appendChild(tbody);
-        contenedor.innerHTML = ''; // Limpiar el contenedor
+        contenedor.innerHTML = '';
         contenedor.appendChild(table);
     }
 
-    // Carga inicial de reservas
     const inicial = await fetchReservas();
     renderTabla(inicial);
 

@@ -1,0 +1,113 @@
+/* formularios.css */
+
+/* Contenedor general de formularios */
+.form-wrapper, .form-container {
+display: grid;
+grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+gap: 1.5rem;
+max-width: 900px;
+margin: 2rem auto;
+padding: 1rem;
+}
+
+/* Form rows: etiqueta + input en bloque */
+.form-row, .form .form-row {
+display: flex;
+flex-direction: column;
+}
+
+/* Labels dentro de formularios */
+.form-wrapper label,
+.form-container label {
+font-family: 'Pirata One', cursive;
+font-size: 1.2rem;
+margin-bottom: 0.5rem;
+color: #3e2b1f;
+}
+
+/* Inputs de formularios */
+.form-wrapper input,
+.form-container input,
+.form-wrapper select,
+.form-container select {
+padding: 0.75rem 1rem;
+font-size: 1rem;
+border: 2px solid #4b2e19;
+border-radius: 8px;
+box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+outline: none;
+transition: box-shadow 0.3s ease;
+}
+
+.form-wrapper input:focus,
+.form-container input:focus,
+.form-wrapper select:focus,
+.form-container select:focus {
+box-shadow: 0 0 8px rgba(75,46,25,0.6);
+}
+
+/* Botones de envío */
+.form-wrapper button[type="submit"],
+.form-container button[type="submit"],
+.form button {
+grid-column: 1 / -1;
+padding: 0.8rem 2rem;
+font-size: 1.2rem;
+background-color: #4b2e19;
+color: #f9e0b3;
+border: none;
+border-radius: 8px;
+cursor: pointer;
+box-shadow: 0 3px 6px rgba(0,0,0,0.3);
+transition: background-color 0.3s ease;
+}
+.form-wrapper button[type="submit"]:hover,
+.form-container button[type="submit"]:hover,
+.form button:hover {
+background-color: #3b2416;
+}
+
+/* Errores debajo de inputs */
+.form-wrapper .error-msg,
+.form-container .error-msg {
+grid-column: 1 / -1;
+color: #c0392b;
+font-size: 0.9rem;
+margin-top: -0.5rem;
+}
+
+/* Adaptación para pasos (recuperar-password) */
+.form-container .form {
+grid-column: 1 / -1;
+background: rgba(255,255,255,0.9);
+padding: 1rem;
+border-radius: 8px;
+box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Titulares dentro de formularios */
+.form-wrapper h2,
+.form-container h2 {
+grid-column: 1 / -1;
+font-family: 'Pirata One', cursive;
+font-size: 1.8rem;
+margin-bottom: 1rem;
+color: #4b2e19;
+}
+
+.card-2cols{
+color:#3e2b1f;          /* marrón oscuro, el mismo que usas en labels */
+  max-width:900px;
+  margin:2rem auto;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:1.5rem;
+  padding:1.5rem;
+  background:#faf9f4;
+  border-radius:12px;
+  box-shadow:0 4px 12px rgba(0,0,0,.15);
+}
+
+.card-2cols section p{
+  margin:.25rem 0;
+}

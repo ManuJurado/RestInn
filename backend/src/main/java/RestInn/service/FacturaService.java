@@ -10,11 +10,19 @@ import RestInn.entities.enums.EstadoFactura;
 import RestInn.entities.enums.MetodoPago;
 import RestInn.entities.enums.TipoFactura;
 import RestInn.entities.usuarios.Cliente;
-import RestInn.exceptions.BadRequestException;
 import RestInn.repositories.FacturaRepository;
+import RestInn.repositories.ReservaRepository;
+import com.lowagie.text.*;
+import com.lowagie.text.Font;
+import com.lowagie.text.pdf.PdfPCell;
+import com.lowagie.text.pdf.PdfPTable;
+import com.lowagie.text.pdf.PdfWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.awt.*;
+import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -26,7 +34,7 @@ public class FacturaService {
     @Autowired
     private  FacturaRepository facturaRepository;
     @Autowired
-    private ReservaService reservaService;
+    private ReservaRepository reservaRepository;
 
     //region Mapear una entidad Factura a una FacturaResponseDTO.
     public FacturaResponseDTO mapearAResponseDTO(Factura factura) {
@@ -45,6 +53,11 @@ public class FacturaService {
         return FacturaResponseDTO.builder()
                 .id(factura.getId())
                 .clienteNombre(factura.getCliente().getNombre())
+
+                .ingreso(factura.getReserva().getFechaIngreso())
+                .salida (factura.getReserva().getFechaSalida())
+                .habitacionNumero(String.valueOf(factura.getReserva().getHabitacion().getNumero()))
+
                 .reservaId(factura.getReserva().getId())
                 .fechaEmision(factura.getFechaEmision())
                 .tipoFactura(factura.getTipoFactura())
@@ -62,12 +75,16 @@ public class FacturaService {
 
     //region Genera una factura de tipo RESERVA cuando se crea una reserva.
     public FacturaResponseDTO generarFacturaReserva(Long reservaId) {
-        Reserva reserva = reservaService.obtenerPorId(reservaId);
+
+        Reserva reserva = reservaRepository.findById(reservaId)
+                .orElseThrow(() ->
+                        new RuntimeException("Reserva no encontrada: " + reservaId));
+
         BigDecimal subtotal = calcularSubtotalReserva(reserva);
 
         Factura factura = Factura.builder()
-                .cliente((Cliente) reserva.getUsuario())
-                .reserva(reserva)
+                .cliente( (Cliente) reserva.getUsuario() )
+                .reserva(reserva)          // ← objeto real, no Optional
                 .fechaEmision(LocalDate.now())
                 .tipoFactura(TipoFactura.RESERVA)
                 .estado(EstadoFactura.EMITIDA)
@@ -80,17 +97,19 @@ public class FacturaService {
                 .build();
 
         facturaRepository.save(factura);
-
         return mapearAResponseDTO(factura);
     }
     //endregion
 
     //region Genera una factura de tipo CONSUMOS vacía al hacer check-in.
     public FacturaResponseDTO generarFacturaConsumos(Long reservaId) {
-        Reserva reserva = reservaService.obtenerPorId(reservaId);
+
+        Reserva reserva = reservaRepository.findById(reservaId)
+                .orElseThrow(() ->
+                        new RuntimeException("Reserva no encontrada: " + reservaId));
 
         Factura factura = Factura.builder()
-                .cliente((Cliente) reserva.getUsuario())
+                .cliente( (Cliente) reserva.getUsuario() )
                 .reserva(reserva)
                 .fechaEmision(LocalDate.now())
                 .tipoFactura(TipoFactura.CONSUMOS)
@@ -100,7 +119,6 @@ public class FacturaService {
                 .build();
 
         facturaRepository.save(factura);
-
         return mapearAResponseDTO(factura);
     }
     //endregion
@@ -153,6 +171,16 @@ public class FacturaService {
         Factura factura = obtenerFacturaPorId(id);
         factura.setEstado(EstadoFactura.ANULADA);
         facturaRepository.save(factura);
+    }
+    //endregion
+
+    //region BUSCA UNA FACTURA POR RESERVA ID
+    public FacturaResponseDTO buscarPorReservaId(Long reservaId){
+        Factura f = facturaRepository
+                .findByReservaIdAndTipoFactura(reservaId, TipoFactura.RESERVA)
+                .orElseThrow(() ->
+                        new RuntimeException("No existe factura para la reserva"));
+        return mapearAResponseDTO(f);
     }
     //endregion
 
@@ -231,4 +259,137 @@ public class FacturaService {
         else return BigDecimal.valueOf(15);
     }
     //endregion
+
+    //region Generar un pdf en bytes para guardar la factura.
+    public byte[] generarPdf(Long facturaId) {
+
+        Factura factura = obtenerFacturaPorId(facturaId);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+        try {
+            Document doc = new Document(PageSize.A4, 40, 40, 60, 40);
+            PdfWriter.getInstance(doc, baos);
+            doc.open();
+
+            Font h1      = new Font(Font.HELVETICA, 18, Font.BOLD);
+            Font normal  = new Font(Font.HELVETICA, 12);
+            Font bold    = new Font(Font.HELVETICA, 12, Font.BOLD);
+
+            /* ───────── encabezado ───────── */
+            doc.add(new Paragraph("RestInn – Factura Nº " + factura.getId(), h1));
+            doc.add(new Paragraph("Fecha de emisión: " + factura.getFechaEmision(), normal));
+
+            // ← NUEVO: mostrar estado factura
+            doc.add(new Paragraph("Estado: " + factura.getEstado().name(), normal));
+
+            doc.add(Chunk.NEWLINE);
+
+            /* ───────── datos del cliente ───────── */
+            Cliente c = factura.getCliente();
+            doc.add(new Paragraph("Cliente: " + c.getNombre() + " " + c.getApellido()
+                    + "  (usuario: " + c.getNombreLogin() + ")", normal));
+            doc.add(new Paragraph("E-mail: " + c.getEmail(), normal));
+            doc.add(Chunk.NEWLINE);
+
+            /* ───────── datos de la reserva ───────── */
+            Reserva r = factura.getReserva();
+            doc.add(new Paragraph("Reserva # " + r.getId()
+                    + " – Habitación " + r.getHabitacion().getNumero(), bold));
+            doc.add(new Paragraph("Ingreso: " + r.getFechaIngreso()
+                    + "    |    Salida: " + r.getFechaSalida(), normal));
+            doc.add(Chunk.NEWLINE);
+
+            /* ───────── detalle si es factura de CONSUMOS ───────── */
+            if (factura.getTipoFactura() == TipoFactura.CONSUMOS) {
+
+                PdfPTable tbl = new PdfPTable(4);
+                tbl.setWidths(new int[]{45, 10, 20, 25});
+                tbl.setWidthPercentage(100f);
+
+                // cabeceras
+                headerCell(tbl,"Descripción");
+                headerCell(tbl,"Cant.");
+                headerCell(tbl,"P. unit");
+                headerCell(tbl,"Subtotal");
+
+                for (Consumo con : factura.getConsumos()) {
+                    bodyCell(tbl, con.getDescripcion());
+                    bodyCell(tbl, con.getCantidad().toString());
+                    bodyCell(tbl, "$ " + con.getPrecioUnitario());
+                    bodyCell(tbl, "$ " + con.getSubtotal());
+                }
+                doc.add(tbl);
+                doc.add(Chunk.NEWLINE);
+            }
+
+            /* ───────── totales ───────── */
+            PdfPTable tot = new PdfPTable(2);
+            tot.setHorizontalAlignment(Element.ALIGN_RIGHT);
+            tot.setWidths(new int[]{70, 30});
+            tot.setTotalWidth(200);
+            tot.setLockedWidth(true);
+
+            bodyCell(tot,"Subtotal");
+            bodyCell(tot,"$ " + factura.getSubtotal());
+
+            if (factura.getDescuento()!=null && factura.getDescuento().signum()>0) {
+                bodyCell(tot,"Descuento ("+factura.getDescuento()+"%)");
+                BigDecimal desc = factura.getSubtotal()
+                        .multiply(factura.getDescuento())
+                        .divide(BigDecimal.valueOf(100));
+                bodyCell(tot,"- $ " + desc);
+            }
+            if (factura.getInteres()!=null && factura.getInteres().signum()>0) {
+                bodyCell(tot,"Interés ("+factura.getInteres()+"%)");
+                BigDecimal intes = factura.getSubtotal()
+                        .multiply(factura.getInteres())
+                        .divide(BigDecimal.valueOf(100));
+                bodyCell(tot,"+ $ " + intes);
+            }
+
+            bodyCell(tot,"TOTAL", bold, Color.LIGHT_GRAY);
+            bodyCell(tot,"$ " + factura.getTotalFinal(), bold, Color.LIGHT_GRAY);
+
+            doc.add(tot);
+            doc.add(Chunk.NEWLINE);
+
+            doc.add(new Paragraph("Método de pago: "
+                    + factura.getMetodoPago()
+                    + (factura.getCuotas()!=null && factura.getCuotas()>1
+                    ? " – " + factura.getCuotas() + " cuotas" : ""),
+                    normal));
+
+            doc.close();
+        } catch (Exception e) {
+            throw new RuntimeException("Error generando PDF", e);
+        }
+
+        return baos.toByteArray();
+    }
+
+
+    /* helpers internos para celdas */
+    private void headerCell(PdfPTable t, String txt){
+        PdfPCell c = new PdfPCell(new Phrase(txt, new Font(Font.HELVETICA, 11, Font.BOLD, Color.WHITE)));
+        c.setBackgroundColor(new Color(60, 60, 60));
+        t.addCell(c);
+    }
+    private void bodyCell(PdfPTable t, String txt){
+        bodyCell(t, txt, new Font(Font.HELVETICA, 11), null);
+    }
+    private void bodyCell(PdfPTable t, String txt, Font f, Color bg){
+        PdfPCell c = new PdfPCell(new Phrase(txt, f));
+        if (bg!=null) c.setBackgroundColor(bg);
+        c.setHorizontalAlignment(Element.ALIGN_RIGHT);
+        t.addCell(c);
+    }
+    //endregion
+
+    //region ACTUALIZA EL ESTADO DE LA FACTURA
+    @Transactional
+    public void actualizarFacturaEstado(Factura factura) {
+        facturaRepository.save(factura);
+    }
+    //endregion
+
 }

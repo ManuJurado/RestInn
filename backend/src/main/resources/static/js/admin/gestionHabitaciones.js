@@ -217,7 +217,4 @@ document.addEventListener("DOMContentLoaded", () => {
 
   document.getElementById("btnLimpiarFiltros").addEventListener("click", limpiarFiltros);
 
-  // Ocultar botón Aplicar
-  const btnAplicar = document.getElementById("btnAplicarFiltros");
-  if (btnAplicar) btnAplicar.style.display = "none";
 });
