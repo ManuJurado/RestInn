@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <title>Gestión de reservas – Admin</title>
+    <link rel="stylesheet" href="../../css/base.css"/>
+    <link rel="stylesheet" href="../../css/layout.css"/>
+    <link rel="stylesheet" href="../../css/buttons.css"/>
+    <link rel="stylesheet" href="../../css/wrapper.css"/>
+    <link rel="stylesheet" href="../../css/components.css"/>
+    <link rel="stylesheet" href="../../css/formularios.css"/>
+</head>
+<body>
+<button class="return-button" onclick="history.back()">← Volver</button>
+<h1 class="labels" style="text-align:center;margin:2rem 0">Gestión de reservas</h1>
+
+<div class="wrapper" style="gap:20px; display:flex">
+    <aside style="min-width:220px">
+        <!-- Buscar por usuario -->
+        <label class="labels">Nombre
+            <input type="text" id="filtroUsuario" class="inputs" placeholder="Nombre a buscar"/>
+        </label>
+        <!-- Filtrar por estado -->
+        <label class="labels">Estado
+            <select id="filtroEstado" class="inputs">
+                <option value="">— Todos —</option>
+                <option value="PENDIENTE">Pendiente</option>
+                <option value="CONFIRMADA">Confirmada</option>
+                <option value="EN_CURSO">En curso</option>
+                <option value="FINALIZADA">Finalizada</option>
+                <option value="CANCELADA">Cancelada</option>
+            </select>
+        </label>
+        <!-- Fechas -->
+        <label class="labels">Desde
+            <input type="date" id="fechaDesde" class="inputs"/>
+        </label>
+        <label class="labels">Hasta
+            <input type="date" id="fechaHasta" class="inputs"/>
+        </label>
+        <button id="btnFiltrar" class="normal-button">Aplicar filtros</button>
+        <button id="btnLimpiar" class="normal-button">Limpiar</button>
+        <button id="btnCrearReserva" class="normal-button" style="margin-top:1rem">
+            Nueva reserva
+        </button>
+    </aside>
+
+    <main style="flex:1;overflow-x:auto">
+        <div id="contenedorReservas"></div>
+    </main>
+</div>
+
+<div id="alerta" class="alert">
+    <span class="msg"></span>
+    <button class="close-btn" onclick="cerrarAlerta()">×</button>
+</div>
+
+<script src="../../js/alertas.js"></script>
+<script src="../../js/admin/gestionReservas.js"></script>
+</body>
+</html>

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Crear Reserva</title>
+    <link rel="stylesheet" href="../../css/base.css" />
+    <link rel="stylesheet" href="../../css/layout.css" />
+    <link rel="stylesheet" href="../../css/buttons.css" />
+    <link rel="stylesheet" href="../../css/wrapper.css" />
+    <link rel="stylesheet" href="../../css/components.css" />
+    <link rel="stylesheet" href="../../css/formularios.css" />
+</head>
+<body>
+<h1 class="labels">Nueva Reserva</h1>
+
+<button type="button" class="return-button" onclick="history.back()">← Volver</button>
+
+<form id="formReserva" class="formulario">
+    <label class="labels">Fecha de ingreso:
+        <input type="date" id="fechaIngreso" class="inputs" required>
+    </label>
+    <label class="labels">Fecha de salida:
+        <input type="date" id="fechaSalida" class="inputs" required>
+    </label>
+    <label class="labels">Cantidad de huéspedes (máximo 5):
+        <input type="number" id="cantidadHuespedes" class="inputs" min="1" max="5" value="1" required>
+    </label>
+    <label class="labels">Habitación disponible:
+        <select id="habitacionSelect" class="inputs" required>
+            <option value="" disabled selected>— Seleccioná fechas y cantidad —</option>
+        </select>
+    </label>
+    <fieldset>
+        <legend class="labels">Huéspedes</legend>
+        <div id="huespedesContainer"></div>
+    </fieldset>
+    <button type="submit" class="normal-button">Confirmar Reserva</button>
+</form>
+
+<!-- Contenedor para la alerta -->
+<div id="alerta" class="alert">
+    <span class="msg"></span>
+    <button class="close-btn" onclick="cerrarAlerta()">X</button>
+</div>
+
+<script src="../../js/alertas.js"></script>
+<script src="../../js/crearReserva.js"></script>
+
+</body>
+</html>

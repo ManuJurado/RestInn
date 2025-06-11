@@ -22,40 +22,35 @@ public class ReservaController {
         this.reservaService = reservaService;
     }
 
-    // ====================================================
-    // 1) CREAR RESERVA (CLIENTE, EMPLEADO O ADMIN AUTENTICADO)
-    // ====================================================
+    //region CREAR RESERVA (CLIENTE, RECEPCIONISTA O ADMIN AUTENTICADO)
     @PostMapping
-    @PreAuthorize("hasAnyRole('CLIENTE','RECEPCIONISTA','CONSERJE','LIMPIEZA','ADMINISTRADOR')")
+    @PreAuthorize("hasAnyRole('CLIENTE','RECEPCIONISTA','ADMINISTRADOR')")
     public ResponseEntity<ReservaResponseDTO> crearReserva(
             @Valid @RequestBody ReservaRequestDTO dto) {
         ReservaResponseDTO nueva = reservaService.crearReservaComoUsuarioAutenticado(dto);
         return new ResponseEntity<>(nueva, HttpStatus.CREATED);
     }
+    //endregion
 
-    // ====================================================
-    // 2) LISTAR MIS RESERVAS (solo CLIENTE)
-    // ====================================================
+    //region LISTAR MIS RESERVAS (solo autenticados)
     @GetMapping("/mis-reservas")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<ReservaResponseDTO>> listarMisReservas() {
         List<ReservaResponseDTO> lista = reservaService.listarReservasDeClienteActual();
         return ResponseEntity.ok(lista);
     }
+    //endregion
 
-    // ====================================================
-    // 3) CANCELAR RESERVA (solo CLIENTE, estado PENDIENTE)
-    // ====================================================
+    //region CANCELAR RESERVA (solo CLIENTE, estado PENDIENTE)
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('CLIENTE')")
     public ResponseEntity<Void> cancelarReserva(@PathVariable Long id) {
         reservaService.cancelarReserva(id);
         return ResponseEntity.noContent().build();
     }
+    //endregion
 
-    // ====================================================
-    // 4) LISTAR RESERVAS CON FILTROS (RECEPCIONISTA, ADMINISTRADOR)
-    // ====================================================
+    //region LISTAR RESERVAS CON FILTROS (RECEPCIONISTA, ADMINISTRADOR)
     @GetMapping
     @PreAuthorize("hasAnyRole('RECEPCIONISTA','ADMINISTRADOR')")
     public ResponseEntity<List<ReservaResponseDTO>> listarReservas(
@@ -64,10 +59,9 @@ public class ReservaController {
         List<ReservaResponseDTO> lista = reservaService.listarReservasConFiltros(estado, reservaId);
         return ResponseEntity.ok(lista);
     }
+    //endregion
 
-    // ====================================================
-    // 5) CHECK-IN (solo RECEPCIONISTA, ADMINISTRADOR)
-    // ====================================================
+    //region CHECK-IN (solo RECEPCIONISTA, ADMINISTRADOR)
     @PostMapping("/checkin/{reservaId}")
     @PreAuthorize("hasAnyRole('RECEPCIONISTA','ADMINISTRADOR')")
     public ResponseEntity<ReservaResponseDTO> realizarCheckIn(
@@ -75,10 +69,9 @@ public class ReservaController {
         ReservaResponseDTO dto = reservaService.realizarCheckIn(reservaId);
         return ResponseEntity.ok(dto);
     }
+    //endregion
 
-    // ====================================================
-    // 6) CHECK-OUT (solo RECEPCIONISTA, ADMINISTRADOR)
-    // ====================================================
+    //region CHECK-OUT (solo RECEPCIONISTA, ADMINISTRADOR)
     @PostMapping("/checkout/{reservaId}")
     @PreAuthorize("hasAnyRole('RECEPCIONISTA','ADMINISTRADOR')")
     public ResponseEntity<ReservaResponseDTO> realizarCheckOut(
@@ -86,10 +79,9 @@ public class ReservaController {
         ReservaResponseDTO dto = reservaService.realizarCheckOut(reservaId);
         return ResponseEntity.ok(dto);
     }
+    //endregion
 
-    // ====================================================
-    // 7) ACTUALIZAR RESERVA (cualquier usuario autenticado que pase validación interna)
-    // ====================================================
+    //region ACTUALIZAR RESERVA (cualquier usuario autenticado que pase validación interna)
     @PutMapping("/{id}")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ReservaResponseDTO> updateReserva(
@@ -98,14 +90,24 @@ public class ReservaController {
         ReservaResponseDTO updated = reservaService.actualizarReservaDesdeDto(id, dto);
         return ResponseEntity.ok(updated);
     }
+    //endregion
 
-    // ====================================================
-    // 8) ELIMINAR RESERVA (cualquier usuario autenticado que pase validación interna)
-    // ====================================================
+    //region ELIMINAR RESERVA (cualquier usuario autenticado que pase validación interna)
     @DeleteMapping("/administrador/{id}")
     @PreAuthorize("hasRole('ADMINISTRADOR')")
     public ResponseEntity<Void> deleteReservaPorAdministrador(@PathVariable Long id) {
         reservaService.eliminarReserva(id);
         return ResponseEntity.noContent().build();
     }
+    //endregion
+
+    //region CONFIRMA LA RESERVA PARA PODER HACER UN CHECKIN POSTERIORMENTE. (EXCLUSIVO RECEPCIONISTA Y ADMIN)
+    @PostMapping("/confirmar/{reservaId}")
+    @PreAuthorize("hasAnyRole('RECEPCIONISTA','ADMINISTRADOR')")
+    public ResponseEntity<ReservaResponseDTO> confirmarReserva(@PathVariable Long reservaId) {
+        ReservaResponseDTO dto = reservaService.confirmarReserva(reservaId);
+        return ResponseEntity.ok(dto);
+    }
+    //endregion
+
 }

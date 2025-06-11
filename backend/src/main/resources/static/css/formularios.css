@@ -111,3 +111,21 @@ color:#3e2b1f;          /* marrón oscuro, el mismo que usas en labels */
 .card-2cols section p{
   margin:.25rem 0;
 }
+
+/* Contenedor con scroll y cabecera sticky */
+.tabla-wrapper {
+  max-height: 60vh;      /* o el alto que quieras */
+  overflow-y: auto;
+}
+
+.tabla-wrapper table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.tabla-wrapper th {
+  position: sticky;
+  top: 0;
+  background-color: #f5f5f5;
+  z-index: 1;
+}

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Detalle de usuario</title>
+    <link rel="stylesheet" href="../css/base.css" />
+    <link rel="stylesheet" href="../css/layout.css" />
+    <link rel="stylesheet" href="../css/buttons.css" />
+    <link rel="stylesheet" href="../css/wrapper.css" />
+    <link rel="stylesheet" href="../css/components.css" />
+    <link rel="stylesheet" href="../css/formularios.css" />
+</head>
+<body>
+<button class="return-button" onclick="history.back()">← Volver</button>
+<h1 class="labels" style="text-align:center;margin:2rem 0">Datos del Usuario</h1>
+
+<div class="wrapper" style="max-width:600px; margin:auto">
+    <div id="infoUsuario" class="formulario" style="gap:1rem"></div>
+</div>
+
+<div id="alerta" class="alert">
+    <span class="msg"></span>
+    <button class="close-btn" onclick="cerrarAlerta()">×</button>
+</div>
+
+<script src="../js/alertas.js"></script>
+<script src="../js/admin/usuario.js"></script>
+</body>
+</html>

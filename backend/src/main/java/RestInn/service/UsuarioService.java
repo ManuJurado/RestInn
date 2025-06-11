@@ -200,7 +200,7 @@ public class UsuarioService {
     // ----------------------------------------
     // DTO → Response
     // ----------------------------------------
-    private UsuarioResponseDTO mapToResponse(Usuario usuario) {
+    public UsuarioResponseDTO mapToResponse(Usuario usuario) {
         String roleValue;
 
         if (usuario instanceof Empleado) {
