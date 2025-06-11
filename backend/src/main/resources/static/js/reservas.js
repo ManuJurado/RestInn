@@ -50,7 +50,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     document.getElementById('btnCrearReserva').addEventListener('click', () => {
-        window.location.href = '/clientes/crearReserva.html';
+        window.location.href = '/crearReserva.html';
     });
 
     function renderTabla(reservas) {
@@ -115,7 +115,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             btnVerFac.textContent = 'Ver factura';
             btnVerFac.className = 'small-button';
             btnVerFac.onclick = () => {
-                window.location.href = `/clientes/factura.html?reserva=${r.id}`;
+                window.location.href = `/factura.html?reserva=${r.id}`;
             };
             tdAcciones.appendChild(btnVerFac);
 

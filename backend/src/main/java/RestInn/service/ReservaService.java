@@ -3,6 +3,7 @@ package RestInn.service;
 import RestInn.dto.reservasDTO.HuespedResponseDTO;
 import RestInn.dto.reservasDTO.ReservaRequestDTO;
 import RestInn.dto.reservasDTO.ReservaResponseDTO;
+import RestInn.dto.usuariosDTO.UsuarioResponseDTO;
 import RestInn.entities.Huesped;
 import RestInn.entities.Reserva;
 import RestInn.entities.Habitacion;
@@ -132,17 +133,19 @@ public class ReservaService {
                 }).collect(Collectors.toList())
                 : List.of();
 
-        return new ReservaResponseDTO(
-                reserva.getId(),
-                reserva.getFechaIngreso(),
-                reserva.getFechaSalida(),
-                reserva.getFechaReserva(),
-                reserva.getUsuario().getId(),
-                reserva.getHabitacion().getId(),
-                reserva.getEstadoReserva().name(),
-                reserva.getHabitacion().getNumero(),
-                huespedes
-        );
+        UsuarioResponseDTO usrDto = usuarioService.mapToResponse(reserva.getUsuario());
+
+        return ReservaResponseDTO.builder()
+                .id(reserva.getId())
+                .fechaIngreso(reserva.getFechaIngreso())
+                .fechaSalida(reserva.getFechaSalida())
+                .fechaReserva(reserva.getFechaReserva())
+                .usuario(usrDto)                           // ← aquí
+                .habitacionId(reserva.getHabitacion().getId())
+                .estado(reserva.getEstadoReserva().name())
+                .habitacionNumero(reserva.getHabitacion().getNumero())
+                .huespedes(huespedes)
+                .build();
     }
     //endregion
 
@@ -332,6 +335,7 @@ public class ReservaService {
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "Reserva no encontrada"));
 
+        // Solo si está confirmada
         if (reserva.getEstadoReserva() != EstadoReserva.CONFIRMADA) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
@@ -339,12 +343,23 @@ public class ReservaService {
         }
 
         LocalDate hoy = LocalDate.now();
-        if (hoy.isBefore(reserva.getFechaIngreso())) {
+        LocalDate ingreso = reserva.getFechaIngreso();
+        LocalDate salida  = reserva.getFechaSalida();
+
+        // No antes de la fecha de ingreso
+        if (hoy.isBefore(ingreso)) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
                     "No se puede hacer check-in antes de la fecha de ingreso.");
         }
+        // Ni después de la fecha de salida
+        if (hoy.isAfter(salida)) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "No se puede hacer check-in después de la fecha de salida.");
+        }
 
+        // Cambio de estado y persistencia
         reserva.setEstadoReserva(EstadoReserva.EN_CURSO);
         Reserva actualizada = reservaRepository.save(reserva);
         return mapReservaAResponseDTO(actualizada);
@@ -365,10 +380,10 @@ public class ReservaService {
         }
 
         LocalDate hoy = LocalDate.now();
-        if (!hoy.equals(reserva.getFechaSalida())) {
+        if (hoy.isBefore(reserva.getFechaSalida())) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
-                    "El check-out solo puede hacerse en la fecha de salida.");
+                    "No se puede hacer check-out antes de la fecha de salida.");
         }
 
         reserva.setEstadoReserva(EstadoReserva.FINALIZADA);
@@ -383,4 +398,22 @@ public class ReservaService {
                 .orElseThrow(() -> new RuntimeException("Reserva no encontrada con ID: " + id));
     }
     //endregion
+
+    //region CONFIRMAR UNA RESERVA (SE MARCA COMO CONFIRMADA CUANDO FUE PAGADA PARA PODER HACER EL CHECKIN)
+    @Transactional
+    public ReservaResponseDTO confirmarReserva(Long reservaId) {
+        Reserva reserva = reservaRepository.findById(reservaId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Reserva no encontrada"));
+
+        if (reserva.getEstadoReserva() != EstadoReserva.PENDIENTE) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Solo se pueden confirmar reservas en estado PENDIENTE");
+        }
+
+        reserva.setEstadoReserva(EstadoReserva.CONFIRMADA);
+        Reserva updated = reservaRepository.save(reserva);
+        return mapReservaAResponseDTO(updated);
+    }
+    //endregion
+
 }

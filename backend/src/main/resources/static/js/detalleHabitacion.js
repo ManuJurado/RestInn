@@ -113,5 +113,5 @@
         return;
       }
       // 3. ok ⇒ vamos a crearReserva.html pasando el id
-      window.location.href = `/clientes/crearReserva.html?id=${habitacionId}`;
+      window.location.href = `/crearReserva.html?id=${habitacionId}`;
     });

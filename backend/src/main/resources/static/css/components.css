@@ -87,6 +87,7 @@
 /*--------------------------------------------------TABLAS--------------------------------------------------*/
 @import url('https://fonts.googleapis.com/css2?family=Pirata+One&display=swap');
 .tabla-container {
+  max-height: 70vh;        /* alto visible → lo que exceda scrollea */
   margin-top: calc(100px + 5vh);
 }
 
@@ -155,17 +156,26 @@
 .tabla-reservas {
   width: 100%;
   border-collapse: collapse;
+  min-width: 950px;        /* para que no se comprima demasiado en móvil */
   margin-top: 1em;
+  color: #222;
 }
+
 .tabla-reservas th,
 .tabla-reservas td {
   border: 1px solid #ccc;
   padding: 8px 12px;
 }
+
 .tabla-reservas th {
   background-color: #f5f5f5;
   font-weight: bold;
+  position: sticky; /* 👈 mantiene visible */
+  top: 0;
+  z-index: 2;       /* por encima de las filas */
 }
+
+/* filas impares en gris claro */
 .tabla-reservas tr:nth-child(even) {
   background-color: #fafafa;
 }
