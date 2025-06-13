@@ -16,7 +16,7 @@ async function initMisDatos() {
     document.getElementById('nombre').value        = u.nombre;
     document.getElementById('apellido').value      = u.apellido;
     document.getElementById('phoneNumber').value   = u.phoneNumber || '';
-    document.getElementById('CUIT').value          = u.cuit || '';
+    document.getElementById('cuit').value          = u.cuit || '';
 
     // 3) Capturo el id para el PUT
     misDatos.usuarioId = u.id;
@@ -38,7 +38,7 @@ document.getElementById('formDatos')
       nombre     : document.getElementById('nombre').value.trim(),
       apellido   : document.getElementById('apellido').value.trim(),
       phoneNumber: document.getElementById('phoneNumber').value.trim() || null,
-      CUIT       : document.getElementById('CUIT').value.trim() || null,
+      cuit: document.getElementById('cuit').value.trim() || null,
       // nuevos de contraseña:
       oldPassword: document.getElementById('oldPassword').value || null,
       password   : document.getElementById('newPassword').value || null
@@ -73,4 +73,3 @@ document.getElementById('formDatos')
       mostrarAlerta(err.message);
     }
 });
-

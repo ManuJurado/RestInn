@@ -2,6 +2,7 @@ package RestInn.dto.habitacionesDTO;
 
 import RestInn.entities.enums.H_Estado;
 import RestInn.entities.enums.H_Tipo;
+import RestInn.validation.HabitacionValida;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -12,6 +13,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@HabitacionValida
 public class HabitacionRequestDTO { //Recibe del front para la creacion o edicion de la entidad
 
     @NotNull(message = "El estado es obligatorio")

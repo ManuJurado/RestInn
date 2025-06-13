@@ -31,7 +31,7 @@ public abstract class Usuario implements Serializable {
     @Column(unique = true)
     private String email;
     private String password;
-    private String CUIT;
+    private String cuit;
 
 
     @JsonProperty("role")

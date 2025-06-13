@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <title>Detalle de factura</title>
+    <link rel="stylesheet" href="../css/base.css" />
+    <link rel="stylesheet" href="../css/layout.css" />
+    <link rel="stylesheet" href="../css/buttons.css" />
+    <link rel="stylesheet" href="../css/formularios.css" />
+</head>
+<body>
+
+<button class="return-button" onclick="history.back()">← Volver</button>
+<h1 class="labels">Detalle de factura</h1>
+
+<div id="facturaWrapper" class="card-2cols">
+    <section>
+        <h2 class="labels">Datos de la reserva</h2>
+        <p><strong>Factura #</strong> <span id="facturaId"></span></p>
+        <p><strong>Reserva #</strong> <span id="reservaId"></span></p>
+        <p><strong>Estado:</strong> <span id="estadoFactura"></span></p>
+        <p><strong>Ingreso:</strong> <span id="ingreso"></span></p>
+        <p><strong>Salida:</strong> <span id="salida"></span></p>
+        <p><strong>Cliente:</strong> <span id="cliente"></span></p>
+        <p><strong>Habitación:</strong> <span id="habitacion"></span></p>
+    </section>
+
+    <section>
+        <h2 class="labels">Importes</h2>
+        <p><strong>Subtotal:</strong> $<span id="subtotal"></span></p>
+        <div id="detalleConsumos"></div>
+        <p id="descuentoRow" style="display:none;"><strong>Descuento:</strong> -<span id="descuento"></span>%</p>
+        <p id="interesRow"   style="display:none;"><strong>Interés:</strong> +<span id="interes"></span>%</p>
+        <p><strong>Total:</strong> $<span id="total"></span></p>
+    </section>
+
+    <section id="seccionMetodo" style="grid-column:1 / -1; display:none;">
+        <h2 class="labels">Forma de pago</h2>
+        <label class="labels">Método:
+            <select id="metodo" class="inputs">
+                <option value="EFECTIVO">Efectivo (10% off)</option>
+                <option value="TARJETA_CREDITO">Tarjeta de crédito</option>
+            </select>
+        </label>
+        <label class="labels">Cuotas:
+            <input id="cuotas" type="number" min="1" max="12" value="1" class="inputs"/>
+        </label>
+        <button id="btnActualizar" class="normal-button">Aplicar</button>
+    </section>
+
+    <button id="btnDescargar" class="normal-button" style="grid-column:1 / -1;">Descargar PDF</button>
+</div>
+
+<div id="alerta" class="alert" style="display:none;">
+    <span class="msg"></span>
+    <button class="close-btn" onclick="cerrarAlerta()">X</button>
+</div>
+
+<script src="../js/alertas.js"></script>
+<script src="../js/admin/factura-detalle.js"></script>
+</body>
+</html>

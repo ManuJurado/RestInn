@@ -26,6 +26,11 @@ public class AdminUsuarioController {
         return ResponseEntity.ok(usuarioService.verUsuarios());
     }
 
+    @GetMapping("/clientes")
+    public ResponseEntity<List<UsuarioResponseDTO>> listarClientes() {
+        return ResponseEntity.ok(usuarioService.verClientes());
+    }
+
     // Buscar usuario por ID
     @GetMapping("/{id}")
     public ResponseEntity<UsuarioResponseDTO> buscarPorId(@PathVariable Long id) {
