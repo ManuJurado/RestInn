@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <title>Facturas del cliente</title>
+    <link rel="stylesheet" href="../css/base.css" />
+    <link rel="stylesheet" href="../css/layout.css" />
+    <link rel="stylesheet" href="../css/buttons.css" />
+    <link rel="stylesheet" href="../css/wrapper.css" />
+    <link rel="stylesheet" href="../css/formularios.css" />
+</head>
+<body>
+
+<button class="return-button" onclick="history.back()">← Volver</button>
+<h1 class="labels">Mis facturas</h1>
+
+<table class="tabla-habitaciones">
+    <thead>
+    <tr>
+        <th>Fecha de emisión</th>
+        <th>Importe total</th>
+        <th>Reserva #</th>
+        <th>Estado</th>
+        <th>Acciones</th>
+    </tr>
+    </thead>
+    <tbody id="tablaFacturas" class="tabla-habitaciones">
+    </tbody>
+</table>
+
+<div id="alerta" class="alert" style="display:none;">
+    <span class="msg"></span>
+    <button class="close-btn" onclick="cerrarAlerta()">X</button>
+</div>
+
+<script src="../js/alertas.js"></script>
+<script src="../js/facturas-cliente.js"></script>
+
+</body>
+</html>

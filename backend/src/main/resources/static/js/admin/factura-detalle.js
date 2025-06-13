@@ -8,12 +8,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
     }
 
-    // Obtener ID reserva desde query params
     const params = new URLSearchParams(location.search);
-    const reservaId = params.get('reserva');
+    const facturaId = params.get('factura');
 
-    if (!reservaId) {
-        mostrarAlerta('No se especificó el ID de reserva.');
+    if (!facturaId) {
+        mostrarAlerta('No se especificó el ID de factura.');
         history.back();
         return;
     }
@@ -21,7 +20,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     let factura;
 
     async function cargarFactura() {
-        const res = await fetch(`/api/facturas/reserva/${reservaId}`, {
+        const res = await fetch(`/api/facturas/${facturaId}`, {
             headers: { Authorization: `Bearer ${token}` }
         });
         const data = await res.json();
@@ -30,52 +29,48 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function mostrarFactura() {
-        $('reservaId').textContent = reservaId;
+        $('facturaId').textContent = factura.id;
+        $('reservaId').textContent = factura.reservaId ?? '—';
         $('estadoFactura').textContent = factura.estado ?? '—';
-        $('ingreso').textContent = factura.ingreso ?? '';
-        $('salida').textContent = factura.salida ?? '';
-        $('cliente').textContent = factura.clienteNombre ?? '';
-        $('habitacion').textContent = factura.habitacionNumero ?? '';
+        $('ingreso').textContent = factura.ingreso ?? '—';
+        $('salida').textContent = factura.salida ?? '—';
+        $('cliente').textContent = factura.clienteNombre ?? '—';
+        $('habitacion').textContent = factura.habitacionNumero ?? '—';
 
         $('subtotal').textContent = factura.subtotal.toFixed(2);
         $('total').textContent = factura.totalFinal.toFixed(2);
 
-        // Mostrar descuento e interés
-        if (factura.descuento && factura.descuento > 0) {
+        if (factura.descuento > 0) {
             $('descuento').textContent = factura.descuento;
             $('descuentoRow').style.display = 'block';
         } else {
             $('descuentoRow').style.display = 'none';
         }
-        if (factura.interes && factura.interes > 0) {
+
+        if (factura.interes > 0) {
             $('interes').textContent = factura.interes;
             $('interesRow').style.display = 'block';
         } else {
             $('interesRow').style.display = 'none';
         }
 
-        // Consumibles
         const detalle = $('detalleConsumos');
         detalle.innerHTML = '';
-        if (factura.consumos?.length > 0) {
-            factura.consumos.forEach(c => {
-                const p = document.createElement('p');
-                p.textContent = `• ${c.descripcion} x${c.cantidad} - $${c.subtotal.toFixed(2)}`;
-                detalle.appendChild(p);
-            });
-        }
+        factura.consumos?.forEach(c => {
+            const p = document.createElement('p');
+            p.textContent = `• ${c.descripcion} x${c.cantidad} - $${c.subtotal.toFixed(2)}`;
+            detalle.appendChild(p);
+        });
 
-        // Si la factura está en proceso, habilitar cambios en metodo y cuotas
         if (factura.estado === 'EN_PROCESO') {
             $('seccionMetodo').style.display = 'block';
-            $('metodo').value = factura.metodoPago || 'EFECTIVO';
-            $('cuotas').value = factura.cuotas || 1;
+            $('metodo').value = factura.metodoPago ?? 'EFECTIVO';
+            $('cuotas').value = factura.cuotas ?? 1;
         } else {
             $('seccionMetodo').style.display = 'none';
         }
     }
 
-    // Botón actualizar metodo y cuotas
     $('btnActualizar').addEventListener('click', async () => {
         const body = {
             metodoPago: $('metodo').value,
@@ -100,7 +95,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    // Botón descargar PDF
     $('btnDescargar').addEventListener('click', async () => {
         try {
             const res = await fetch(`/api/facturas/${factura.id}/pdf`, {

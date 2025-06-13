@@ -20,21 +20,23 @@ public class UsuarioController {
         this.usuarioService = usuarioService;
     }
 
-    //ENDPOINTS GET----------------------------------------------------------------------------------------------
-    // Cualquier autenticado puede buscar por ID (pero en el servicio validás si es su propia cuenta o si tiene permisos)
+    // region Buscar usuarios por id. Cualquier autenticado puede buscar por ID (pero en el servicio validás si es su propia cuenta o si tiene permisos)
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/{id}")
     public ResponseEntity<UsuarioResponseDTO> buscarUsuarioPorId(@PathVariable Long id) {
         return ResponseEntity.ok(usuarioService.buscarPorId(id));
     }
+    //endregion
 
-    // Solo ADMIN y EMPLEADO pueden ver todos los usuarios(sin su informacion sensible)
-    @PreAuthorize("isAuthenticated()")
+    //region Listar Usuarios. Solo ADMINISTRADOR y RECEPCIONISTA pueden ver todos los usuarios(sin su informacion sensible)
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR','RECEPCIONISTA')")
     @GetMapping
     public ResponseEntity<List<UsuarioResponseDTO>> listarUsuarios() {
         return ResponseEntity.ok(usuarioService.verUsuarios());
     }
+    //endregion
 
+    //region Trae al usuario actual
     @GetMapping("/current")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<UsuarioResponseDTO> getUsuarioActual(Authentication authentication) {
@@ -42,34 +44,40 @@ public class UsuarioController {
         UsuarioResponseDTO usuario = usuarioService.buscarPorNombreLogin(nombreLogin);
         return ResponseEntity.ok(usuario);
     }
+    //endregion
 
-    // Solo ADMIN puede crear EMPLEADOS
+    //region Creacion de un empleado. Solo ADMIN puede crear EMPLEADOS
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/empleados")
     public ResponseEntity<UsuarioResponseDTO> crearEmpleado(@RequestBody UsuarioRequestDTO dto) {
         UsuarioResponseDTO nuevoEmpleado = usuarioService.crearEmpleado(dto);
         return new ResponseEntity<>(nuevoEmpleado, HttpStatus.CREATED);
     }
+    //endregion
 
+    //region Creacion de un administrador (muy ocasional)
     @PostMapping("/admin")
     public ResponseEntity<UsuarioResponseDTO> crearAdmin(@RequestBody UsuarioRequestDTO dto) {
         UsuarioResponseDTO nuevoAdmin = usuarioService.crearAdministrador(dto);
         return new ResponseEntity<>(nuevoAdmin, HttpStatus.CREATED);
     }
+    //endregion
 
-    // Solo ADMIN o el MISMO USUARIO puede modificar (lo validás en el servicio)
+    //region Modifica un usuario por id. Solo ADMIN o el MISMO USUARIO puede modificar (lo validás en el servicio)
     @PreAuthorize("isAuthenticated()")
     @PutMapping("/{id}")
     public ResponseEntity<UsuarioResponseDTO> modificarUsuario(@PathVariable Long id, @RequestBody UsuarioRequestDTO dto) {
         UsuarioResponseDTO actualizado = usuarioService.modificarUsuario(id, dto);
         return ResponseEntity.ok(actualizado);
     }
+    //endregion
 
-    // Solo ADMIN puede borrar usuarios o un cliente puede borrar su propio usuario
+    //region Borra un usuario. Solo ADMIN puede borrar usuarios o un cliente puede borrar su propio usuario. Contempla el "derecho de adminisión" Ahora mismo solo lo usa el cliente...
     @PreAuthorize("isAuthenticated()")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> borrarUsuario(@PathVariable Long id) {
         usuarioService.borrarUsuario(id);
         return ResponseEntity.noContent().build();
     }
+    //endregion
 }

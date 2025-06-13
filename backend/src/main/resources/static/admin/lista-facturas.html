@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <title>RestInn - Listado de Facturas</title>
+    <link rel="stylesheet" href="../css/base.css" />
+    <link rel="stylesheet" href="../css/layout.css" />
+    <link rel="stylesheet" href="../css/buttons.css" />
+    <link rel="stylesheet" href="../css/components.css" />
+</head>
+<body>
+
+<button class="return-button" onclick="history.back()">← Volver</button>
+<h1 class="labels">Listado de Facturas</h1>
+
+<!-- Filtros -->
+<div class="tabla-habitaciones">
+    <label class="labels">
+        Estado:
+        <select id="filtroEstado" class="inputs">
+            <option value="">Todos</option>
+            <option value="EN_PROCESO">En proceso</option>
+            <option value="EMITIDA">Emitida</option>
+            <option value="ANULADA">Anulada</option>
+        </select>
+    </label>
+    <label class="labels">
+        Tipo:
+        <select id="filtroTipo" class="inputs">
+            <option value="">Todos</option>
+            <option value="RESERVA">Reserva</option>
+            <option value="CONSUMOS">Consumos</option>
+        </select>
+    </label>
+    <button id="btnAplicarFiltros" class="normal-button">Aplicar</button>
+</div>
+
+<!-- Tabla de facturas -->
+<table class="tabla-habitaciones" id="tablaFacturas">
+    <thead>
+    <tr>
+        <th>Fecha de emisión</th>
+        <th>Importe</th>
+        <th>Tipo</th>
+        <th>Estado</th>
+        <th>Cliente</th>
+        <th>Reserva #</th>
+        <th>Descargar</th>
+    </tr>
+    </thead>
+    <tbody>
+    <!-- Filas generadas dinámicamente -->
+    </tbody>
+</table>
+
+<div id="alerta" class="alert" style="display:none;">
+    <span class="msg"></span>
+    <button class="close-btn" onclick="cerrarAlerta()">X</button>
+</div>
+
+<script src="../js/alertas.js"></script>
+<script src="../js/facturaList.js"></script>
+</body>
+</html>

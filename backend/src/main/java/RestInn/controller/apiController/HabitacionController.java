@@ -31,7 +31,6 @@ public class HabitacionController {
     }
     //endregion
 
-
     //region 2) LISTAR TODAS INCLUYENDO INACTIVAS (ADMIN)
     @GetMapping("/admin/todas")
     @PreAuthorize("hasRole('ADMINISTRADOR')")
@@ -40,7 +39,6 @@ public class HabitacionController {
     }
     //endregion
 
-
     //region 3) OBTENER HABITACIÓN POR ID PÚBLICO (solo activas)
     @GetMapping("/{id}")
     public ResponseEntity<HabitacionResponseDTO> getHabitacionByIdPublic(@PathVariable Long id) {
@@ -48,7 +46,6 @@ public class HabitacionController {
         return ResponseEntity.ok(dto);
     }
     //endregion
-
 
     //region 4) OBTENER HABITACIÓN POR ID ADMIN (incluye inactivas)
     @GetMapping("/admin/{id}")
@@ -59,7 +56,6 @@ public class HabitacionController {
     }
     //endregion
 
-
     //region 5) CREAR NUEVA HABITACIÓN (solo ADMINISTRADOR)
     @PostMapping
     @PreAuthorize("hasRole('ADMINISTRADOR')")
@@ -69,7 +65,6 @@ public class HabitacionController {
         return new ResponseEntity<>(creada, HttpStatus.CREATED);
     }
     //endregion
-
 
     //region 6) MODIFICAR HABITACIÓN (solo ADMINISTRADOR)
     @PutMapping("/{id}")
@@ -82,7 +77,6 @@ public class HabitacionController {
     }
     //endregion
 
-
     //region 7) ELIMINAR HABITACIÓN (borrado lógico - solo ADMINISTRADOR)
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMINISTRADOR')")
@@ -91,7 +85,6 @@ public class HabitacionController {
         return ResponseEntity.noContent().build();
     }
     //endregion
-
 
     //region 8) FILTRAR HABITACIONES ACTIVAS (público)
     @GetMapping("/filtrar")
@@ -104,14 +97,12 @@ public class HabitacionController {
     }
     //endregion
 
-
     //region 9) HABITACIONES RESERVABLES (público)
     @GetMapping("/reservables")
     public List<HabitacionResponseDTO> mostrarHabitacionesReservables() {
         return habitacionService.habitacionesReservables();
     }
     //endregion
-
 
     //region 10) HABITACIONES DISPONIBLES EN RANGO (autenticado)
     @GetMapping("/disponibles")

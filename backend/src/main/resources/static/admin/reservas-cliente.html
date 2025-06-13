@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Reservas del Cliente</title>
+    <link rel="stylesheet" href="../css/base.css" />
+    <link rel="stylesheet" href="../css/layout.css" />
+    <link rel="stylesheet" href="../css/buttons.css" />
+    <link rel="stylesheet" href="../css/wrapper.css" />
+    <link rel="stylesheet" href="../css/components.css" />
+    <link rel="stylesheet" href="../css/formularios.css" />
+</head>
+<body>
+<h1 class="labels">Reservas del Cliente</h1>
+<button type="button" class="return-button" onclick="history.back()">← Volver</button>
+
+<div id="contenedorReservas" class="tabla-habitaciones" style="margin-top: 1em;"></div>
+
+<div id="alerta" class="alert">
+    <span class="msg"></span>
+    <button class="close-btn" onclick="cerrarAlerta()">X</button>
+</div>
+
+<script src="../js/alertas.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", async () => {
+        const contenedor = document.getElementById('contenedorReservas');
+        const params = new URLSearchParams(window.location.search);
+        const idCliente = params.get('id');
+        if (!idCliente) {
+            contenedor.innerHTML = "<p class='error'>No se indicó el cliente.</p>";
+            return;
+        }
+
+        async function fetchReservasPorCliente(idCliente) {
+            contenedor.innerHTML = 'Cargando...';
+            try {
+                const token = sessionStorage.getItem('jwt');
+                const res = await fetch(`/api/reservas/${idCliente}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!res.ok) {
+                    const txt = await res.text();
+                    throw new Error(`${res.status} – ${txt}`);
+                }
+                return await res.json();
+            } catch (err) {
+                contenedor.innerHTML = `<p class="error">Error al cargar reservas: ${err.message}</p>`;
+                return null;
+            }
+        }
+
+        function renderTabla(reservas) {
+            if (!reservas || reservas.length === 0) {
+                contenedor.innerHTML = '<p>No hay reservas para mostrar.</p>';
+                return;
+            }
+
+            const table = document.createElement('table');
+            table.classList.add('tabla-reservas');
+
+            const thead = document.createElement('thead');
+            const trHead = document.createElement('tr');
+            const headers = [
+                'ID', 'Ingreso', 'Salida', 'Reserva', 'Estado',
+                'Habitación', 'Huéspedes', 'Acciones'
+            ];
+            headers.forEach(txt => {
+                const th = document.createElement('th');
+                th.textContent = txt;
+                trHead.appendChild(th);
+            });
+            thead.appendChild(trHead);
+            table.appendChild(thead);
+
+            const tbody = document.createElement('tbody');
+            reservas.forEach(r => {
+                const tr = document.createElement('tr');
+
+                const tdId = document.createElement('td');
+                tdId.textContent = r.id;
+                tr.appendChild(tdId);
+
+                const tdIngreso = document.createElement('td');
+                tdIngreso.textContent = r.fechaIngreso;
+                tr.appendChild(tdIngreso);
+
+                const tdSalida = document.createElement('td');
+                tdSalida.textContent = r.fechaSalida;
+                tr.appendChild(tdSalida);
+
+                const tdReserva = document.createElement('td');
+                tdReserva.textContent = r.fechaReserva;
+                tr.appendChild(tdReserva);
+
+                const tdEstado = document.createElement('td');
+                tdEstado.textContent = r.estado;
+                tr.appendChild(tdEstado);
+
+                const tdHabitacion = document.createElement('td');
+                tdHabitacion.textContent = r.habitacionNumero;
+                tr.appendChild(tdHabitacion);
+
+                const tdHuespedes = document.createElement('td');
+                tdHuespedes.textContent = r.huespedes.map(h => `${h.nombre} ${h.apellido}, ${h.dni}`).join(', ');
+                tr.appendChild(tdHuespedes);
+
+                const tdAcciones = document.createElement('td');
+
+                // Botón Ver Factura
+                const btnVerFac = document.createElement('button');
+                btnVerFac.textContent = 'Ver factura';
+                btnVerFac.className = 'small-button';
+                btnVerFac.onclick = () => {
+                    window.location.href = `/factura.html?reserva=${r.id}`;
+                };
+                tdAcciones.appendChild(btnVerFac);
+
+                // Botón Cancelar (si aplica)
+                if (r.estado === 'CONFIRMADA' || r.estado === 'PENDIENTE') {
+                    const btnCancelar = document.createElement('button');
+                    btnCancelar.textContent = 'Cancelar';
+                    btnCancelar.className = 'small-button cancelar-btn';
+                    btnCancelar.style.marginLeft = '10px';
+                    btnCancelar.onclick = async () => {
+                        if (!confirm('¿Estás seguro de que querés cancelar esta reserva?')) return;
+                        try {
+                            const token = sessionStorage.getItem('jwt');
+                            const res = await fetch(`/api/reservas/${r.id}`, {
+                                method: 'DELETE',
+                                headers: { 'Authorization': `Bearer ${token}` }
+                            });
+                            if (!res.ok) throw new Error('No se pudo cancelar la reserva');
+                            alert('Reserva cancelada correctamente');
+                            // refrescar la tabla
+                            const actualizadas = await fetchReservasPorCliente(idCliente);
+                            renderTabla(actualizadas);
+                        } catch (err) {
+                            alert(`Error al cancelar: ${err.message}`);
+                        }
+                    };
+                    tdAcciones.appendChild(btnCancelar);
+                }
+
+                tr.appendChild(tdAcciones);
+                tbody.appendChild(tr);
+            });
+
+            table.appendChild(tbody);
+            contenedor.innerHTML = '';
+            contenedor.appendChild(table);
+        }
+
+        const reservas = await fetchReservasPorCliente(idCliente);
+        renderTabla(reservas);
+    });
+</script>
+
+</body>
+</html>

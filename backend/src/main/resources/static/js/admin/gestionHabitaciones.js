@@ -15,6 +15,9 @@ async function cargarHabitacionesTodas() {
 
     habitacionesTodas = await res.json();
 
+    // ─── ORDENAR AQUÍ MISMO ────────────────────────────────────────────────
+    habitacionesTodas.sort((a, b) => Number(a.numero) - Number(b.numero));
+
     if (!habitacionesTodas.length) {
       cont.innerHTML = "<p>No hay habitaciones registradas.</p>";
       return;
@@ -27,6 +30,7 @@ async function cargarHabitacionesTodas() {
     console.error(err);
   }
 }
+
 
 async function aplicarFiltros() {
   const pisoFilter = document.getElementById("filtroPiso").value.trim();

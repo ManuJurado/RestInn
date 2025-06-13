@@ -4,9 +4,12 @@ import RestInn.dto.usuariosDTO.UsuarioRequestDTO;
 import RestInn.dto.usuariosDTO.UsuarioResponseDTO;
 import RestInn.entities.VerificationToken;
 import RestInn.entities.enums.RolEmpleado;
+import RestInn.entities.enums.TokenType;
 import RestInn.entities.usuarios.*;
 import RestInn.repositories.UsuarioRepository;
 import RestInn.repositories.VerificationTokenRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -14,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.IOException;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -24,6 +28,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class UsuarioService {
+
 
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
@@ -39,9 +44,7 @@ public class UsuarioService {
         this.tokenRepo = tokenRepo;
     }
 
-    // ----------------------------------------
-    // CREAR USUARIOS SEGÚN TIPO
-    // ----------------------------------------
+    //region CREAR USUARIOS SEGÚN TIPO
     public UsuarioResponseDTO crearEmpleado(UsuarioRequestDTO dto) {
         validarUnicidad(dto, null);
         Empleado empleado = new Empleado();
@@ -65,10 +68,9 @@ public class UsuarioService {
         usuarioRepository.save(admin);
         return mapToResponse(admin);
     }
+    //endregion
 
-    // ----------------------------------------
-    // MODIFICAR USUARIO (cualquier tipo)
-    // ----------------------------------------
+    //region MODIFICAR USUARIO (cualquier tipo)
     @Transactional
     public UsuarioResponseDTO modificarUsuario(Long id, UsuarioRequestDTO dto) {
         Usuario usuario = usuarioRepository.findById(id)
@@ -94,79 +96,79 @@ public class UsuarioService {
         usuario.setNombre(dto.getNombre());
         usuario.setApellido(dto.getApellido());
         usuario.setPhoneNumber(dto.getPhoneNumber());
-        usuario.setCUIT(dto.getCUIT());
+        usuario.setCuit(dto.getCuit());
 
         usuarioRepository.save(usuario);
         return mapToResponse(usuario);
     }
+    //endregion
 
-
-    // ----------------------------------------
-    // BORRAR USUARIO
-    // ----------------------------------------
+    //region BORRAR USUARIO
     public void borrarUsuario(Long id) {
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "Usuario no encontrado"));
         usuarioRepository.delete(usuario);
     }
+    //endregion
 
-    // ----------------------------------------
-    // VER TODOS LOS USUARIOS
-    // ----------------------------------------
+    //region VER TODOS LOS USUARIOS
     public List<UsuarioResponseDTO> verUsuarios() {
         return usuarioRepository.findAll().stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
+    //endregion
 
-    // ----------------------------------------
-    // VER SOLO EMPLEADOS
-    // ----------------------------------------
+    //region VER SOLO EMPLEADOS
     public List<UsuarioResponseDTO> verEmpleados() {
         return usuarioRepository.findAll().stream()
                 .filter(u -> u instanceof Empleado)
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
+    //endregion
 
-    // ----------------------------------------
-    // BUSCAR POR ID (DTO)
-    // ----------------------------------------
+    //region VER SOLO CLIENTES
+    public List<UsuarioResponseDTO> verClientes() {
+        return usuarioRepository.findAll().stream()
+                .filter(u -> u instanceof Cliente)
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
+    //endregion
+
+    //region BUSCAR POR ID (DTO)
     public UsuarioResponseDTO buscarPorId(Long id) {
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "Usuario no encontrado"));
         return mapToResponse(usuario);
     }
+    //endregion
 
-    // ----------------------------------------
-    // BUSCAR POR NOMBRE_LOGIN (DTO)
-    // ----------------------------------------
+    //region BUSCAR POR NOMBRE_LOGIN (DTO)
     public UsuarioResponseDTO buscarPorNombreLogin(String nombreLogin) {
         Usuario usuario = usuarioRepository.findByNombreLogin(nombreLogin)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "Usuario no encontrado"));
         return mapToResponse(usuario);
     }
+    //endregion
 
-    // ----------------------------------------
-    // BUSCAR ENTIDAD POR ID (para otros servicios)
-    // ----------------------------------------
+    //region BUSCAR ENTIDAD POR ID (para otros servicios)
     public Optional<Usuario> buscarEntidadPorId(Long id) {
         return usuarioRepository.findById(id);
     }
+    //endregion
 
-    // ----------------------------------------
-    // BUSCAR ENTIDAD POR NOMBRE_LOGIN (para otros servicios)
-    // ----------------------------------------
+    //region BUSCAR ENTIDAD POR NOMBRE_LOGIN (para otros servicios)
     public Optional<Usuario> buscarEntidadPorNombreLogin(String nombreLogin) {
         return usuarioRepository.findByNombreLogin(nombreLogin);
     }
+    //endregion
 
-    // ----------------------------------------
-    // UTILIDAD: Validar unicidad de nombreLogin y email
-    // ----------------------------------------
+    //region UTILIDAD: Validar unicidad de nombreLogin y email
     private void validarUnicidad(UsuarioRequestDTO dto, Long idExistente) {
         Optional<Usuario> existentePorLogin = usuarioRepository.findByNombreLogin(dto.getNombreLogin());
         if (existentePorLogin.isPresent() && !existentePorLogin.get().getId().equals(idExistente)) {
@@ -178,10 +180,9 @@ public class UsuarioService {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "El email ya está registrado.");
         }
     }
+    //endregion
 
-    // ----------------------------------------
-    // UTILIDAD: mapear DTO → entidad
-    // ----------------------------------------
+    //region DTO → entidad
     private void mapDtoToUsuario(UsuarioRequestDTO dto, Usuario usuario, boolean esNuevo) {
         usuario.setNombre(dto.getNombre());
         usuario.setApellido(dto.getApellido());
@@ -189,17 +190,16 @@ public class UsuarioService {
         usuario.setDni(dto.getDni());
         usuario.setPhoneNumber(dto.getPhoneNumber());
         usuario.setEmail(dto.getEmail());
-        usuario.setCUIT(dto.getCUIT());
+        usuario.setCuit(dto.getCuit());
         usuario.setActivo(dto.getActivo() != null ? dto.getActivo() : true);
 
         if (esNuevo || (dto.getPassword() != null && !dto.getPassword().isBlank())) {
             usuario.setPassword(passwordEncoder.encode(dto.getPassword()));
         }
     }
+    //endregion
 
-    // ----------------------------------------
-    // DTO → Response
-    // ----------------------------------------
+    //region DTO → Response
     public UsuarioResponseDTO mapToResponse(Usuario usuario) {
         String roleValue;
 
@@ -221,169 +221,140 @@ public class UsuarioService {
                 .dni(usuario.getDni())
                 .phoneNumber(usuario.getPhoneNumber())
                 .email(usuario.getEmail())
-                .CUIT(usuario.getCUIT())
+                .cuit(usuario.getCuit())
                 .activo(usuario.getActivo())
                 .role(roleValue)
                 .build();
     }
+    //endregion
 
-    @Transactional
-    public String registrarClienteConVerificacion(UsuarioRequestDTO dto) {
-        // 1) validar unicidad estricta de nombreLogin (sólo exactos)
-        Optional<Usuario> porLogin = usuarioRepository.findByNombreLogin(dto.getNombreLogin());
-        if (porLogin.isPresent() && Boolean.TRUE.equals(porLogin.get().getActivo())) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "El nombre de usuario ya está en uso.");
-        }
-
-        // 2) Buscar o crear cliente inactivo
-        Usuario cliente = usuarioRepository.findByEmail(dto.getEmail());
-        if (cliente != null) {
-            if (Boolean.TRUE.equals(cliente.getActivo())) {
-                throw new ResponseStatusException(HttpStatus.CONFLICT, "El email ya está registrado y activo.");
-            }
-            mapDtoToUsuario(dto, cliente, false);
-            usuarioRepository.save(cliente);
-        } else {
-            validarUnicidad(dto, null);
-            cliente = new Cliente();
-            mapDtoToUsuario(dto, cliente, true);
-            cliente.setActivo(false);
-            usuarioRepository.save(cliente);
-        }
-
-        // 3) borrar cualquier token viejo para este usuario
-        tokenRepo.deleteByUsuario(cliente);
-
-        // 4) generar y guardar nuevo token
-        int codeInt = new SecureRandom().nextInt(900_000) + 100_000; // 100000..999999
-        String code = String.valueOf(codeInt);
-
-        VerificationToken t = new VerificationToken();
-        t.setCode(code);
-        t.setExpiresAt(LocalDateTime.now().plusMinutes(3));
-        t.setUsuario(cliente);
-        tokenRepo.save(t);
-
-        // 5) enviar email con código destacado
-        String link = "http://restinn.sytes.net/clientes/verificar.html?code=" + code;
-        String body = """
-        ¡Bienvenido a RestInn!
-
-        Tu código de verificación es: \n
-
-       %s\n
-
-        (cópialo y pégalo en la página de verificación)
-
-        O bien haz clic aquí para verificar automáticamente:
-        %s
-
-        Este código expira en 3 minutos.
-        """.formatted(code, link);
-        emailService.sendVerificationHtml(
-                cliente.getEmail(),
-                "Verifica tu cuenta RestInn",
-                body
-        );
-
-        return code;
-    }
-
-    public void verifyAccount(String code) {
-        tokenRepo.findByCode(code).ifPresentOrElse(t -> {
-            if (t.getExpiresAt().isBefore(LocalDateTime.now())) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Token expirado");
-            }
-            Usuario u = t.getUsuario();
-            u.setActivo(true);
-            usuarioRepository.save(u);
-            tokenRepo.delete(t);
-        }, () -> {
-            // <— AÑADE ESTE LOG PARA DEPURAR
-            System.out.println("Tokens en BD:");
-            tokenRepo.findAll().forEach(tt ->
-                    System.out.printf("  %s (expira %s)%n", tt.getCode(), tt.getExpiresAt())
-            );
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Token inválido");
-        });
-    }
-
-    /* --- 1) Enviar código --- */
+    //region Enviar código de verificacion
     @Transactional
     public void enviarCodigoRecuperacion(String email) {
         Usuario u = Optional.ofNullable(usuarioRepository.findByEmail(email))
                 .filter(Usuario::getActivo)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "No existe un usuario activo con ese correo"));
 
-        // 1) borrar token viejo
-        tokenRepo.deleteByUsuario(u);
-        tokenRepo.flush();
+        tokenRepo.deleteByUsuarioAndType(u, TokenType.PASSWORD_RESET);
 
-        // 2) generar nuevo token de 6 dígitos
         String code = String.format("%06d", new SecureRandom().nextInt(1_000_000));
-
         VerificationToken t = new VerificationToken();
         t.setCode(code);
         t.setExpiresAt(LocalDateTime.now().plusMinutes(10));
+        t.setType(TokenType.PASSWORD_RESET);
         t.setUsuario(u);
         tokenRepo.save(t);
 
-        // 3) construir email incluyendo el nombre de usuario
-        String username = u.getNombreLogin();
-        String link = "http://restinn.sytes.net/clientes/recuperar-password.html";
-        String body = """
-        ¡Hola %s!
-
-        Hemos recibido una solicitud para restablecer la contraseña de tu cuenta.
-
-        Tu código de recuperación es:
-
-        <h2 style="margin:12px 0;font-size:32px;">%s</h2>
-
-        Si lo prefieres, haz clic en el siguiente enlace e ingresa tu código allí:
-        <a href="%s">Restablecer contraseña</a>
-
-        Este código expirará en 10 minutos.
-
-        Si no solicitaste este correo, puedes ignorarlo.
-        """
-                .formatted(username, code, link);
-
         emailService.sendVerificationHtml(
                 u.getEmail(),
-                "Restablecimiento de contraseña – RestInn",
-                body
+                "Código de recuperación RestInn",
+                "Tu código es: " + code
         );
     }
 
+    //endregion
 
-    /* --- 2) Verificar código (si querés un paso previo) --- */
+    //region Verificar código (si querés un paso previo)
     @Transactional
     public Usuario validarCodigoRecuperacion(String code) {
-        VerificationToken t = tokenRepo.findByCode(code)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Código inválido"));
+        VerificationToken t = tokenRepo
+                .findByCodeAndType(code, TokenType.PASSWORD_RESET)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,"Código inválido"));
         if (t.getExpiresAt().isBefore(LocalDateTime.now()))
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Código expirado");
-        // no activamos aquí, solo devolvemos el usuario
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Código expirado");
         return t.getUsuario();
     }
 
+    //endregion
 
-    /* --- 3) Resetear contraseña --- */
+    //region Resetear contraseña
     @Transactional
     public void resetearPassword(PasswordResetRequest dto) {
-        VerificationToken t = tokenRepo.findByCode(dto.getCode())
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.BAD_REQUEST, "Código inválido"));
+        VerificationToken t = tokenRepo
+                .findByCodeAndType(dto.getCode(), TokenType.PASSWORD_RESET)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,"Código inválido"));
         if (t.getExpiresAt().isBefore(LocalDateTime.now()))
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Código expirado");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Código expirado");
 
         Usuario u = t.getUsuario();
         u.setPassword(passwordEncoder.encode(dto.getNewPassword()));
         usuarioRepository.save(u);
-        tokenRepo.delete(t);                   // token consumido
+        tokenRepo.delete(t);
     }
+    //endregion
+
+    //region Inicia el registro de un usuario
+    @Transactional
+    public String iniciarRegistro(UsuarioRequestDTO dto) {
+        // 1) unicidad…
+        if (usuarioRepository.existsByEmail(dto.getEmail()))
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Email ya en uso");
+        if (usuarioRepository.existsByNombreLogin(dto.getNombreLogin()))
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Login ya en uso");
+
+        // 2) generar código
+        String code = String.format("%06d", new SecureRandom().nextInt(1_000_000));
+
+        // 3) serializar DTO
+        String json;
+        try {
+            json = new ObjectMapper().writeValueAsString(dto);
+        } catch (JsonProcessingException e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error interno");
+        }
+
+        // 4) guardar token REGISTRATION
+        VerificationToken t = new VerificationToken();
+        t.setCode(code);
+        t.setExpiresAt(LocalDateTime.now().plusMinutes(10));
+        t.setType(TokenType.REGISTRATION);
+        t.setUserDtoJson(json);
+        tokenRepo.save(t);
+
+        // 5) enviar email con el código…
+        String link = "http://restinn.sytes.net/clientes/verificar.html?code=" + code;
+        emailService.sendVerificationHtml(
+                dto.getEmail(),
+                "Verifica tu cuenta RestInn",
+                "Tu código es: " + code + "\nO haz clic: " + link
+        );
+
+        return code;
+    }
+    //endregion
+
+    //region Verificar el registro
+    @Transactional
+    public void verificarRegistro(String code) {
+        VerificationToken t = tokenRepo
+                .findByCodeAndType(code, TokenType.REGISTRATION)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Código inválido"));
+
+        if (t.getExpiresAt().isBefore(LocalDateTime.now())) {
+            tokenRepo.delete(t);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Código expirado");
+        }
+
+        // deserializar DTO
+        UsuarioRequestDTO dto;
+        try {
+            dto = new ObjectMapper().readValue(t.getUserDtoJson(), UsuarioRequestDTO.class);
+        } catch (IOException e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error interno");
+        }
+
+        // crear el Cliente definitivo
+        Cliente c = new Cliente();
+        mapDtoToUsuario(dto, c, true);
+        c.setActivo(true);
+        usuarioRepository.save(c);
+
+        // borrar el token
+        tokenRepo.delete(t);
+    }
+    //endregion
+
+
 
 }
