@@ -6,69 +6,139 @@
     <link rel="stylesheet" href="../../css/base.css" />
     <link rel="stylesheet" href="../../css/layout.css" />
     <link rel="stylesheet" href="../../css/buttons.css" />
+    <link rel="stylesheet" href="../../css/wrapper.css" />
+    <link rel="stylesheet" href="../../css/components.css" />
+
+    <!-- ESTILOS LOCALES: anula el body flex y centra el form -->
+    <style>
+        /* 1) Dejar al body en flujo normal */
+        body {
+          display: block !important;
+          padding: 2rem;
+          text-align: center;
+        }
+        /* 2) Envolver todo en un main centrado */
+        main {
+          max-width: 700px;
+          margin: 0 auto;
+        }
+        /* 3) Poner el form en grid por filas y labels bloque */
+        #formCrearHab {
+          display: grid;
+          gap: 1.25rem;
+          background: #faf9f4;
+          padding: 2rem;
+          border-radius: 8px;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        #formCrearHab label {
+          display: block;
+          text-align: left;
+        }
+        #mensaje {
+          margin-top: 1rem;
+          font-weight: bold;
+        }
+    </style>
 </head>
 <body>
 
 <button onclick="history.back()">← Volver</button>
+<h1 class="labels" style="margin:1rem 0">Crear Habitación</h1>
 
-<h1>Crear Habitación</h1>
+<main>
+    <form id="formCrearHab">
+        <label>Número:
+            <input type="number" id="numero" required />
+        </label>
 
-<form id="formCrearHab">
-    <label>Número:<br /><input type="number" id="numero" required /></label><br />
-    <label>Tipo:<br /><input type="text" id="tipo" required /></label><br />
-    <label>Piso:<br /><input type="number" id="piso" required /></label><br />
-    <label>Capacidad:<br /><input type="number" id="capacidad" required min="1" /></label><br />
-    <label>Estado:<br />
-        <select id="estado" required>
-            <option value="">--Seleccionar--</option>
-            <option value="DISPONIBLE">DISPONIBLE</option>
-            <option value="LIMPIEZA">LIMPIEZA</option>
-            <option value="MANTENIMIENTO">MANTENIMIENTO</option>
-        </select>
-    </label><br />
-    <label>Activo:<br />
-        <select id="activo" required>
-            <option value="true">Sí</option>
-            <option value="false">No</option>
-        </select>
-    </label><br /><br />
+        <label>Tipo:
+            <select id="tipo" required>
+                <option value="">--Seleccionar--</option>
+                <option value="SIMPLE">SIMPLE</option>
+                <option value="DOBLE">DOBLE</option>
+                <option value="SUITE">SUITE</option>
+            </select>
+        </label>
 
-    <button type="submit" class="normal-button">Crear</button>
-</form>
+        <label>Piso:
+            <input type="number" id="piso" required />
+        </label>
 
-<div id="mensaje"></div>
+        <label>Capacidad:
+            <input type="number" id="capacidad" required min="1" />
+        </label>
+
+        <label>Cantidad de camas:
+            <input type="number" id="cantCamas" required min="1" />
+        </label>
+
+        <label>Precio por noche:
+            <input type="number" id="precioNoche" required step="0.01" min="0.01" />
+        </label>
+
+        <label>Estado:
+            <select id="estado" required>
+                <option value="">--Seleccionar--</option>
+                <option value="DISPONIBLE">DISPONIBLE</option>
+                <option value="LIMPIEZA">LIMPIEZA</option>
+                <option value="MANTENIMIENTO">MANTENIMIENTO</option>
+            </select>
+        </label>
+
+        <label>Activo:
+            <select id="activo" required>
+                <option value="true">Sí</option>
+                <option value="false">No</option>
+            </select>
+        </label>
+
+        <label>Comentario (opcional):
+            <textarea id="comentario" rows="3" placeholder="Ej: Vista al mar, sin alfombra..."></textarea>
+        </label>
+
+        <button type="submit" class="normal-button">Crear</button>
+    </form>
+
+    <div id="mensaje"></div>
+</main>
 
 <script>
-    const form = document.getElementById('formCrearHab');
-    const mensaje = document.getElementById('mensaje');
-
-    form.addEventListener('submit', async e => {
+    document.getElementById('formCrearHab').addEventListener('submit', async e => {
       e.preventDefault();
+      const mensaje = document.getElementById('mensaje');
+      mensaje.textContent = '';
 
       const data = {
-        numero: Number(document.getElementById('numero').value),
-        tipo: document.getElementById('tipo').value.trim(),
-        piso: Number(document.getElementById('piso').value),
-        capacidad: Number(document.getElementById('capacidad').value),
-        estado: document.getElementById('estado').value,
-        activo: document.getElementById('activo').value === "true"
+        numero:      Number(document.getElementById('numero').value),
+        tipo:        document.getElementById('tipo').value,
+        piso:        Number(document.getElementById('piso').value),
+        capacidad:   Number(document.getElementById('capacidad').value),
+        cantCamas:   Number(document.getElementById('cantCamas').value),
+        precioNoche: Number(document.getElementById('precioNoche').value),
+        estado:      document.getElementById('estado').value,
+        activo:      document.getElementById('activo').value === 'true',
+        comentario:  document.getElementById('comentario').value.trim() || null
       };
 
       try {
         const res = await fetch('/api/habitaciones', {
-          method: 'POST',
+          method:  'POST',
           headers: {
-            'Content-Type': 'application/json',
+            'Content-Type':  'application/json',
             'Authorization': `Bearer ${sessionStorage.getItem('jwt')}`
           },
           body: JSON.stringify(data)
         });
 
-        if (!res.ok) throw new Error('Error creando la habitación');
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(err.message || 'Error creando la habitación');
+        }
 
         mensaje.textContent = 'Habitación creada con éxito';
-        mensaje.style.color = 'green';
-        form.reset();
+        mensaje.style.color   = 'green';
+        e.target.reset();
 
       } catch (err) {
         mensaje.textContent = err.message;
@@ -76,6 +146,5 @@
       }
     });
 </script>
-
 </body>
 </html>

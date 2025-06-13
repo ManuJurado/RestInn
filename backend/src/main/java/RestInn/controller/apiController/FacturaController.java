@@ -68,7 +68,7 @@ public class  FacturaController {
 
     //region Listar todas las facturas.
     @GetMapping
-    @PreAuthorize("hasRole('RECEPCIONISTA')")
+    @PreAuthorize("hasAnyRole('RECEPCIONISTA', 'ADMINISTRADOR')")
     public ResponseEntity<List<FacturaResponseDTO>> listarTodas() {
         return ResponseEntity.ok(facturaService.listarTodasDTO());
     }
