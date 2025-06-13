@@ -18,24 +18,27 @@ public class ClienteController {
         this.usuarioService = usuarioService;
     }
 
-    // Ver datos del cliente actual
+    //region Ver datos del cliente actual
     @GetMapping("/me")
     public ResponseEntity<UsuarioResponseDTO> getDatosPersonales(Authentication authentication) {
         String nombreLogin = authentication.getName();
         return ResponseEntity.ok(usuarioService.buscarPorNombreLogin(nombreLogin));
     }
+    //endregion
 
-    // Modificar propios datos
+    //region Modificar propios datos
     @PutMapping("/{id}")
     public ResponseEntity<UsuarioResponseDTO> modificarDatos(@PathVariable Long id, @RequestBody UsuarioRequestDTO dto) {
         UsuarioResponseDTO actualizado = usuarioService.modificarUsuario(id, dto);
         return ResponseEntity.ok(actualizado);
     }
+    //endregion
 
-    // Eliminar su propia cuenta
+    //region Eliminar su propia cuenta
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> borrarMiCuenta(@PathVariable Long id) {
         usuarioService.borrarUsuario(id);
         return ResponseEntity.noContent().build();
     }
+    //endregion
 }

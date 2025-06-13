@@ -1,6 +1,5 @@
 package RestInn.controller.apiController;
 
-import RestInn.dto.habitacionesDTO.ImagenBase64DTO;
 import RestInn.entities.Imagen;
 import RestInn.service.ImagenService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,9 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/imagenes")
@@ -49,7 +46,6 @@ public class ImagenController {
         return ResponseEntity.ok(urls);
     }
     //endregion
-
 
     //region Ver imagen de muestra de una Habitación
     @GetMapping("/ver/una/{id}")

@@ -14,6 +14,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/empleados")
+@PreAuthorize("hasAnyRole('ADMINISTRADOR', 'RECEPCIONISTA', 'LIMPIEZA', 'CONSERJE')")// endpoints escalables preparados para la inclusion de mas empleados y metodos exclusivos para los mismos en el futuro
 public class EmpleadosController {
 
     private final UsuarioService usuarioService;
@@ -22,15 +23,13 @@ public class EmpleadosController {
         this.usuarioService = usuarioService;
     }
 
-    // ============================
-    // 1) CONSULTA DE EMPLEADOS (ADMIN)
-    // ============================
-
-    //Solo el administrador puede listar todos los empleados (solo datos NO sensibles).
+    //region CONSULTA DE EMPLEADOS (ADMIN). Solo el administrador puede listar todos los empleados (solo datos NO sensibles).
     @GetMapping("/lista")
     @PreAuthorize("hasRole('ADMINISTRADOR')")
     public ResponseEntity<List<UsuarioResponseDTO>> listarEmpleados() {
         List<UsuarioResponseDTO> lista = usuarioService.verEmpleados();
         return ResponseEntity.ok(lista);
     }
+    //endregion
+
 }

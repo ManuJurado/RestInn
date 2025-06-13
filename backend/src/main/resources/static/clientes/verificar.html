@@ -10,7 +10,9 @@
 </head>
 <body>
 <button class="return-button" onclick="history.back()">← Volver</button>
-<h1 class="labels" style="text-align:center;margin-top:2rem;">Verificación de correo</h1>
+<h1 class="labels" style="text-align:center;margin-top:2rem;">
+    Verificación de correo
+</h1>
 
 <form id="formVerificar" style="max-width:400px;margin:2rem auto;">
     <p>Introduce el código que te hemos enviado por email:</p>
@@ -27,26 +29,26 @@
 
 <script src="../js/alertas.js"></script>
 <script>
-    document.getElementById('formVerificar').addEventListener('submit', async e => {
-  e.preventDefault();
-
-  // Tomar exactamente 6 dígitos
-  let code = document.getElementById('codigo').value.trim();
-  if (!/^\d{6}$/.test(code)) {
-    mostrarAlerta('El código debe tener 6 dígitos numéricos.');
-    return;
-  }
-
-  try {
-    const res  = await fetch(`/api/auth/verify?code=${encodeURIComponent(code)}`);
-    const body = await res.json();
-    if (!res.ok) throw new Error(body.message);
-    alert(body.message);
-    window.location.href = '/login.html';
-  } catch (err) {
-    mostrarAlerta(err.message);
-  }
-});
+    document.getElementById('formVerificar')
+      .addEventListener('submit', async e => {
+        e.preventDefault();
+        const code = document.getElementById('codigo').value.trim();
+        if (!/^\d{6}$/.test(code)) {
+          mostrarAlerta('El código debe tener 6 dígitos numéricos.');
+          return;
+        }
+        try {
+          const res = await fetch(
+            `/api/auth/register/verify?code=${encodeURIComponent(code)}`
+          );
+          const body = await res.json();
+          if (!res.ok) throw new Error(body.message);
+          alert(body.message);
+          window.location.href = '/login.html';
+        } catch (err) {
+          mostrarAlerta(err.message);
+        }
+      });
 </script>
 </body>
 </html>

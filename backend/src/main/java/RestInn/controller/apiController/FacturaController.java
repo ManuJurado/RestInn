@@ -77,12 +77,14 @@ public class  FacturaController {
     }
     //endregion
 
-    // GET /api/facturas/por-reserva/{reservaId}
+    //region Trae un listado de facturas por reserva id.
     @GetMapping("/listareservas/{reservaId}")
     public ResponseEntity<List<FacturaResponseDTO>> listarPorReserva(@PathVariable Long reservaId) {
         return ResponseEntity.ok(facturaService.listarPorReservaDTO(reservaId));
     }
+    //endregion
 
+    //region Descarga el pdf de la factura
     @GetMapping("/{facturaId}/pdf")
     public ResponseEntity<InputStreamResource> descargarPdf(@PathVariable Long facturaId) {
         byte[] pdfBytes = facturaService.generarPdf(facturaId);
@@ -100,5 +102,6 @@ public class  FacturaController {
                 .contentLength(pdfBytes.length)
                 .body(new InputStreamResource(new ByteArrayInputStream(pdfBytes)));
     }
+    //endregion
 
 }

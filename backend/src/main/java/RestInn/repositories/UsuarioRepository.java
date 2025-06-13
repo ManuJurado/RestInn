@@ -15,4 +15,8 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
     Usuario findByDni(String dni);
     Usuario findByEmail(String email);
 
+    // ← Estos dos te harán falta para validar unicidad sin tener que cargar toda la entidad
+    boolean existsByEmail(String email);
+    boolean existsByNombreLogin(String nombreLogin);
+
 }
