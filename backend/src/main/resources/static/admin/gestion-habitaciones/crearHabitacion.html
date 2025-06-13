@@ -56,25 +56,34 @@
             <select id="tipo" required>
                 <option value="">--Seleccionar--</option>
                 <option value="SIMPLE">SIMPLE</option>
+                <option value="INDIVIDUAL">INDIVIDUAL</option>
                 <option value="DOBLE">DOBLE</option>
+                <option value="TRIPLE">TRIPLE</option>
+                <option value="CUADRUPLE">CUADRUPLE</option>
                 <option value="SUITE">SUITE</option>
+                <option value="DELUXE">DELUXE</option>
+                <option value="ESTUDIO">ESTUDIO</option>
             </select>
         </label>
 
         <label>Piso:
-            <input type="number" id="piso" required />
+            <input type="number" id="piso" required min="0" max="3"
+                   oninput="this.value = this.value.slice(0, 1)" />
         </label>
 
         <label>Capacidad:
-            <input type="number" id="capacidad" required min="1" />
+            <input type="number" id="capacidad" required min="1" max="5"
+                   oninput="this.value = this.value.slice(0, 1)" />
         </label>
 
         <label>Cantidad de camas:
-            <input type="number" id="cantCamas" required min="1" />
+            <input type="number" id="cantCamas" required min="1" max="4"
+                   oninput="this.value = this.value.slice(0, 1)" />
         </label>
 
         <label>Precio por noche:
-            <input type="number" id="precioNoche" required step="0.01" min="0.01" />
+            <input type="number" id="precioNoche" required min="0.01" step="0.01"
+                   oninput="this.value = this.value.slice(0, 6)" />
         </label>
 
         <label>Estado:

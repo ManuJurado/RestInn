@@ -1,13 +1,14 @@
 package RestInn.validation;
 
+import RestInn.dto.usuariosDTO.UsuarioRequestDTO;
 import RestInn.entities.usuarios.Usuario;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
-public class UsuarioValidator implements ConstraintValidator<UsuarioValido, Usuario> {
+public class UsuarioValidator implements ConstraintValidator<UsuarioValido, UsuarioRequestDTO> {
 
     @Override
-    public boolean isValid(Usuario usuario, ConstraintValidatorContext context) {
+    public boolean isValid(UsuarioRequestDTO usuario, ConstraintValidatorContext context) {
         boolean valido = true;
         context.disableDefaultConstraintViolation();
 
