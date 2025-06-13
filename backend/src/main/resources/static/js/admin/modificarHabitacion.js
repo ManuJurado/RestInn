@@ -35,7 +35,6 @@ async function cargarHabitacion() {
     cantCamas.value    = h.cantCamas;
     precioNoche.value  = h.precioNoche;
     estado.value       = h.estado;
-    activo.value       = h.activo ? 'true' : 'false';
   } catch (err) {
     mensaje.textContent = err.message;
     mensaje.style.color = 'red';
@@ -55,7 +54,6 @@ form.addEventListener('submit', async e => {
     cantCamas   : Number(cantCamas.value),
     precioNoche : Number(precioNoche.value),
     estado      : estado.value,
-    activo      : activo.value === 'true'
   };
 
   try {

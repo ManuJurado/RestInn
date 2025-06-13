@@ -1,6 +1,7 @@
 package RestInn.controller.apiController;
 
 import RestInn.dto.usuariosDTO.UsuarioRequestDTO;
+import RestInn.dto.usuariosDTO.UsuarioResponseDTO;
 import RestInn.entities.usuarios.PasswordResetRequest;
 import RestInn.entities.usuarios.Usuario;
 import RestInn.security.JwtUtil;
@@ -54,12 +55,23 @@ public class AuthController {
     public ResponseEntity<?> login(@RequestBody AuthRequest req) {
         try {
             Authentication auth = authManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(req.username(),req.password())
+                    new UsernamePasswordAuthenticationToken(req.username(), req.password())
             );
-            String token = jwtUtil.generateAccessToken(((UserDetails)auth.getPrincipal()).getUsername());
-            return ResponseEntity.ok(Map.of("token",token));
+
+            UserDetails ud = (UserDetails) auth.getPrincipal();
+
+            // Obtener el usuario completo desde servicio para recuperar rol
+            UsuarioResponseDTO usuarioDTO = usuarioService.buscarPorNombreLogin(ud.getUsername());
+
+            // Suponiendo que usuario.getRolEmpleado() devuelve un enum o string rol
+            String rol = usuarioDTO.getRole();
+
+            // Generar token pasando username + rol
+            String token = jwtUtil.generateAccessToken(ud.getUsername(), rol);
+
+            return ResponseEntity.ok(Map.of("token", token));
         } catch (AuthenticationException e) {
-            return ResponseEntity.status(401).body(Map.of("message","Credenciales inválidas"));
+            return ResponseEntity.status(401).body(Map.of("message", "Credenciales inválidas"));
         }
     }
     //endregion
@@ -68,11 +80,16 @@ public class AuthController {
     @PostMapping("/refresh")
     public Map<String, String> refresh(@RequestBody Map<String, String> body) {
         String refreshToken = body.get("refreshToken");
-        if (refreshToken == null || !jwtUtil.isValid(refreshToken, jwtUtil.extractUsername(refreshToken))) {
+        if (refreshToken == null || !jwtUtil.isValidRefreshToken(refreshToken, jwtUtil.extractUsername(refreshToken))) {
             throw new RuntimeException("Refresh token inválido");
         }
         String username = jwtUtil.extractUsername(refreshToken);
-        String newAccessToken = jwtUtil.generateAccessToken(username);
+
+        // Obtener el rol del usuario
+        UsuarioResponseDTO usuario = usuarioService.buscarPorNombreLogin(username);  // o como tengas para buscar usuario
+        String role = usuario.getRole();
+
+        String newAccessToken = jwtUtil.generateAccessToken(username, role);
         return Map.of("token", newAccessToken);
     }
     //endregion

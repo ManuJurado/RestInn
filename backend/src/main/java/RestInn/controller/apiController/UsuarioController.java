@@ -46,15 +46,6 @@ public class UsuarioController {
     }
     //endregion
 
-    //region Creacion de un empleado. Solo ADMIN puede crear EMPLEADOS
-    @PreAuthorize("isAuthenticated()")
-    @PostMapping("/empleados")
-    public ResponseEntity<UsuarioResponseDTO> crearEmpleado(@RequestBody UsuarioRequestDTO dto) {
-        UsuarioResponseDTO nuevoEmpleado = usuarioService.crearEmpleado(dto);
-        return new ResponseEntity<>(nuevoEmpleado, HttpStatus.CREATED);
-    }
-    //endregion
-
     //region Creacion de un administrador (muy ocasional)
     @PostMapping("/admin")
     public ResponseEntity<UsuarioResponseDTO> crearAdmin(@RequestBody UsuarioRequestDTO dto) {

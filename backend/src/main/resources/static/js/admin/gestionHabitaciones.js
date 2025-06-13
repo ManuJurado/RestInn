@@ -191,7 +191,12 @@ async function borrarLogico(id) {
         "Authorization": `Bearer ${token}`
       }
     });
-    if (!res.ok) throw new Error("No se pudo borrar la habitación");
+
+    if (!res.ok) {
+      const mensaje = await res.text();
+      mostrarAlerta(`No se pudo borrar: ${mensaje}`);
+      return;
+    }
 
     mostrarAlerta("Habitación borrada (desactivada) correctamente.");
     await cargarHabitacionesTodas();

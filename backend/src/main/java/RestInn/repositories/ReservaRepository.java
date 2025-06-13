@@ -36,4 +36,10 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
     Optional<Reserva> findWithLockingById(Long id);
 
 
+    boolean existsByHabitacion_IdAndEstadoReservaNotAndFechaSalidaGreaterThanEqual(
+            Long habitacionId,
+            EstadoReserva estadoExcluido,
+            LocalDate fecha
+    );
+
 }

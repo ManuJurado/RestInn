@@ -9,7 +9,6 @@ import RestInn.entities.Reserva;
 import RestInn.entities.Habitacion;
 import RestInn.entities.cobranzas.Factura;
 import RestInn.entities.enums.EstadoFactura;
-import RestInn.entities.enums.MetodoPago;
 import RestInn.entities.usuarios.Usuario;
 import RestInn.entities.enums.EstadoReserva;
 import RestInn.exceptions.ReservaNoDisponibleException;
@@ -22,12 +21,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -416,4 +413,11 @@ public class ReservaService {
     }
     //endregion
 
+    public boolean habitacionTieneReservasVigentesOFuturas(Long habitacionId) {
+        return reservaRepository.existsByHabitacion_IdAndEstadoReservaNotAndFechaSalidaGreaterThanEqual(
+                habitacionId,
+                EstadoReserva.CANCELADA,
+                LocalDate.now()
+        );
+    }
 }

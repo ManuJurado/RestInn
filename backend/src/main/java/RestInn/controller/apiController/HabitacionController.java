@@ -128,6 +128,16 @@ public class HabitacionController {
         HabitacionResponseDTO dto = habitacionService.reactivarHabitacion(id);
         return ResponseEntity.ok(dto);
     }
-// endregion
+    // endregion
+
+    //region 12) BORRADO LÓGICO CON VALIDACIÓN DE RESERVAS (solo ADMINISTRADOR)
+    @PutMapping("/{id}/borrar")
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    public ResponseEntity<Void> borrarLogicoHabitacion(@PathVariable Long id) {
+        habitacionService.borrarHabitacion(id); // contiene la validación de reservas
+        return ResponseEntity.noContent().build();
+    }
+    //endregion
+
 
 }

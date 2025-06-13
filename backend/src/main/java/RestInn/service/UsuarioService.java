@@ -47,7 +47,11 @@ public class UsuarioService {
     //region CREAR USUARIOS SEGÚN TIPO
     public UsuarioResponseDTO crearEmpleado(UsuarioRequestDTO dto) {
         validarUnicidad(dto, null);
+
         Empleado empleado = new Empleado();
+        // Asigna el rol específico
+        empleado.setRolEmpleado(dto.getRolEmpleado());
+
         mapDtoToUsuario(dto, empleado, true);
         usuarioRepository.save(empleado);
         return mapToResponse(empleado);
@@ -201,19 +205,7 @@ public class UsuarioService {
 
     //region DTO → Response
     public UsuarioResponseDTO mapToResponse(Usuario usuario) {
-        String roleValue;
-
-        if (usuario instanceof Empleado) {
-            roleValue = ((Empleado) usuario).getRolEmpleado().name();
-        } else if (usuario instanceof Cliente) {
-            roleValue = "CLIENTE";
-        } else if (usuario instanceof Administrador) {
-            roleValue = "ADMINISTRADOR";
-        } else {
-            roleValue = usuario.getClass().getSimpleName().toUpperCase();
-        }
-
-        return UsuarioResponseDTO.builder()
+        UsuarioResponseDTO.UsuarioResponseDTOBuilder builder = UsuarioResponseDTO.builder()
                 .id(usuario.getId())
                 .nombre(usuario.getNombre())
                 .apellido(usuario.getApellido())
@@ -222,9 +214,18 @@ public class UsuarioService {
                 .phoneNumber(usuario.getPhoneNumber())
                 .email(usuario.getEmail())
                 .cuit(usuario.getCuit())
-                .activo(usuario.getActivo())
-                .role(roleValue)
-                .build();
+                .activo(usuario.getActivo());
+
+        if (usuario instanceof Empleado) {
+            // Para empleados, usamos el enum RolEmpleado
+            String rolEmp = ((Empleado) usuario).getRolEmpleado().name();
+            builder.role(rolEmp);
+        } else {
+            // Para cliente o admin, el metodo getRole() ya devuelve CLIENTE o ADMINISTRADOR
+            builder.role(usuario.getRole());
+        }
+
+        return builder.build();
     }
     //endregion
 

@@ -21,8 +21,8 @@ public class HabitacionValidator implements ConstraintValidator<HabitacionValida
             valido = false;
         }
 
-        if (dto.getPiso() == null || dto.getPiso() < 0 || dto.getPiso() > 3) {
-            context.buildConstraintViolationWithTemplate("El piso debe estar entre 0 y 3")
+        if (dto.getPiso() == null || dto.getPiso() < 1 || dto.getPiso() > 4) {
+            context.buildConstraintViolationWithTemplate("El piso debe estar entre 1 y 4")
                     .addPropertyNode("piso")
                     .addConstraintViolation();
             valido = false;

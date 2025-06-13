@@ -25,12 +25,13 @@ public class JwtUtil {
         return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     }
 
-    public String generateAccessToken(String username) {
-        return buildToken(username, expiration, "access");
+    // Generar access token con rol incluido
+    public String generateAccessToken(String username, String role) {
+        return buildToken(username, role, expiration, "access");
     }
 
     public String generateRefreshToken(String username) {
-        return buildToken(username, refreshExpiration, "refresh");
+        return buildToken(username, null, refreshExpiration, "refresh");
     }
 
     public Claims claims(String token) {
@@ -56,14 +57,30 @@ public class JwtUtil {
         }
     }
 
-    private String buildToken(String user, long ttl, String type) {
+    private String buildToken(String user, String role, long ttl, String type) {
         Date now = new Date();
-        return Jwts.builder()
+        JwtBuilder builder = Jwts.builder()
                 .setSubject(user)
                 .claim("type", type)
                 .setIssuedAt(now)
                 .setExpiration(new Date(now.getTime() + ttl))
-                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
-                .compact();
+                .signWith(getSigningKey(), SignatureAlgorithm.HS256);
+
+        if (role != null) {
+            builder.claim("role", "ROLE_" + role);
+        }
+
+        return builder.compact();
+    }
+
+    public boolean isValidRefreshToken(String token, String username) {
+        try {
+            Claims c = claims(token);
+            return c.getSubject().equals(username)
+                    && c.getExpiration().after(new Date())
+                    && "refresh".equals(c.get("type"));
+        } catch (JwtException | IllegalArgumentException e) {
+            return false;
+        }
     }
 }

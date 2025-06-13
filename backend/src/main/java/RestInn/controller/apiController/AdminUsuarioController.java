@@ -20,16 +20,19 @@ public class AdminUsuarioController {
         this.usuarioService = usuarioService;
     }
 
-    // Listar todos los usuarios
+    //region Listar todos los usuarios
     @GetMapping
     public ResponseEntity<List<UsuarioResponseDTO>> listarUsuarios() {
         return ResponseEntity.ok(usuarioService.verUsuarios());
     }
+    //endregion
 
+    //region Listar todos los clientes
     @GetMapping("/clientes")
     public ResponseEntity<List<UsuarioResponseDTO>> listarClientes() {
         return ResponseEntity.ok(usuarioService.verClientes());
     }
+    //endregion
 
     // Buscar usuario por ID
     @GetMapping("/{id}")

@@ -49,7 +49,18 @@
 <main>
     <form id="formCrearHab">
         <label>Número:
-            <input type="number" id="numero" required />
+            <input
+                    type="number"
+                    id="numero"
+                    required
+                    min="1"
+                    max="400"
+                    oninput="
+        // Limita la longitud a 3 caracteres y el valor máximo a 400
+        if (this.value.length > 3) this.value = this.value.slice(0,3);
+        if (Number(this.value) > 400) this.value = '400';
+      "
+            />
         </label>
 
         <label>Tipo:
@@ -67,7 +78,7 @@
         </label>
 
         <label>Piso:
-            <input type="number" id="piso" required min="0" max="3"
+            <input type="number" id="piso" required min="0" max="4"
                    oninput="this.value = this.value.slice(0, 1)" />
         </label>
 

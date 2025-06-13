@@ -17,7 +17,21 @@
 <form id="formModificarHab">
     <!-- … (campos que ya tenías) … -->
     <label>Número:<br /><input type="number" id="numero" required /></label><br />
-    <label>Tipo:<br /><input type="text" id="tipo" required /></label><br />
+    <!-- Tipo (modificado a menú desplegable) -->
+    <label>Tipo:<br />
+        <select id="tipo" required>
+            <option value="">--Seleccionar--</option>
+            <option value="SIMPLE">SIMPLE</option>
+            <option value="INDIVIDUAL">INDIVIDUAL</option>
+            <option value="DOBLE">DOBLE</option>
+            <option value="TRIPLE">TRIPLE</option>
+            <option value="CUADRUPLE">CUADRUPLE</option>
+            <option value="SUITE">SUITE</option>
+            <option value="DELUXE">DELUXE</option>
+            <option value="ESTUDIO">ESTUDIO</option>
+        </select>
+    </label><br />
+
     <label>Piso:<br /><input type="number" id="piso" required /></label><br />
     <label>Capacidad:<br /><input type="number" id="capacidad" required min="1" /></label><br />
     <label>Cantidad de camas:<br /><input type="number" id="cantCamas" required min="1" /></label><br />
@@ -31,13 +45,6 @@
             <option value="MANTENIMIENTO">MANTENIMIENTO</option>
         </select>
     </label><br />
-
-    <label>Activo:<br />
-        <select id="activo" required>
-            <option value="true">Sí</option>
-            <option value="false">No</option>
-        </select>
-    </label><br /><br />
 
     <button type="submit" class="normal-button">Guardar cambios</button>
 </form>

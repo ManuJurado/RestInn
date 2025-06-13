@@ -3,6 +3,7 @@ package RestInn.service;
 import RestInn.dto.habitacionesDTO.HabitacionRequestDTO;
 import RestInn.dto.habitacionesDTO.HabitacionResponseDTO;
 import RestInn.entities.Habitacion;
+import RestInn.entities.Reserva;
 import RestInn.entities.enums.H_Estado;
 import RestInn.exceptions.BadRequestException;
 import RestInn.repositories.HabitacionRepository;
@@ -16,8 +17,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Service
@@ -34,6 +37,9 @@ public class HabitacionService {
         this.reservaService = reservaService;
     }
     //endregion
+
+    // Guarda el estado anterior para limpieza
+    private final Map<Long, H_Estado> estadoPrevio = new ConcurrentHashMap<>();
 
     //region 1) CREAR HABITACIÓN (ADMIN)
     public HabitacionResponseDTO crearHabitacion(HabitacionRequestDTO dto) {
@@ -72,10 +78,17 @@ public class HabitacionService {
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "Habitación no encontrada"));
 
+        if (reservaService.habitacionTieneReservasVigentesOFuturas(id)) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "La habitación no puede ser desactivada porque tiene reservas activas o futuras.");
+        }
+
         existente.setActivo(false);
         habitacionRepository.save(existente);
     }
     //endregion
+
 
     //region 4) BUSCAR POR ID PARA PÚBLICO (solo activas)
     public HabitacionResponseDTO buscarDTOPorIdPublic(Long id) {
@@ -241,4 +254,74 @@ public class HabitacionService {
                 .build();
     }
     //endregion
+
+    //region Conserje pone en mantenimiento: solo si activo==true y estado != OCUPADA
+    @Transactional
+    public HabitacionResponseDTO conserjePonerMantenimiento(Long id) {
+        Habitacion h = buscarEntidadActiva(id);
+
+        if (h.getEstado() == H_Estado.OCUPADA) {
+            throw new BadRequestException("No se puede poner en mantenimiento una habitación ocupada");
+        }
+        h.setEstado(H_Estado.MANTENIMIENTO);
+        return convertirAResponseDTO(habitacionRepository.save(h));
+    }
+    //endregion
+
+    //region Conserje pone disponible: solo si activo==true y estaba en mantenimiento
+    @Transactional
+    public HabitacionResponseDTO conserjePonerDisponible(Long id) {
+        Habitacion h = buscarEntidadActiva(id);
+
+        if (h.getEstado() != H_Estado.MANTENIMIENTO) {
+            throw new BadRequestException("Solo se puede volver a disponible desde mantenimiento");
+        }
+        h.setEstado(H_Estado.DISPONIBLE);
+        return convertirAResponseDTO(habitacionRepository.save(h));
+    }
+    //endregion
+
+    //region Limpieza pone limpieza: solo si activo==true y estado ∈ {DISPONIBLE,OCUPADA}Guarda estado anterior para poder restaurarlo
+    @Transactional
+    public HabitacionResponseDTO limpiezaPonerLimpieza(Long id) {
+        Habitacion h = buscarEntidadActiva(id);
+
+        H_Estado actual = h.getEstado();
+        if (actual != H_Estado.DISPONIBLE && actual != H_Estado.OCUPADA) {
+            throw new BadRequestException("Solo se puede poner en limpieza desde ocupada o disponible");
+        }
+        estadoPrevio.put(id, actual);
+        h.setEstado(H_Estado.LIMPIEZA);
+        return convertirAResponseDTO(habitacionRepository.save(h));
+    }
+    //endregion
+
+    //region Limpieza restaura estado previo guardado
+    @Transactional
+    public HabitacionResponseDTO limpiezaRestaurarEstado(Long id) {
+        Habitacion h = buscarEntidadActiva(id);
+
+        H_Estado previo = estadoPrevio.get(id);
+        if (previo == null) {
+            throw new BadRequestException("No hay estado previo registrado para restaurar");
+        }
+        h.setEstado(previo);
+        estadoPrevio.remove(id);
+        return convertirAResponseDTO(habitacionRepository.save(h));
+    }
+    //endregion
+
+    //region Helper: buscar habitación activa o tirar excepción
+    private Habitacion buscarEntidadActiva(Long id) {
+        Habitacion h = habitacionRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Habitación no encontrada"));
+        if (!Boolean.TRUE.equals(h.getActivo())) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "La habitación no está activa");
+        }
+        return h;
+    }
+    //endregion
+
 }
