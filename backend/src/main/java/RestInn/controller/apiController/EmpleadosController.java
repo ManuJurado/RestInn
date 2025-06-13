@@ -19,13 +19,14 @@ public class EmpleadosController {
         this.habitacionService = habitacionService;
     }
 
-    // Listar todas activas (cualquier empleado autorizado)
+    //region Listar todas activas (cualquier empleado autorizado)
     @GetMapping("/habitaciones")
     public ResponseEntity<List<HabitacionResponseDTO>> listarActivas() {
         return ResponseEntity.ok(habitacionService.listarActivas());
     }
+    //endregion
 
-    // Conserje: poner mantenimiento / volver disponible
+    //region Conserje: poner mantenimiento / volver disponible
     @PutMapping("/habitaciones/{id}/estado-mantenimiento")
     @PreAuthorize("hasRole('CONSERJE')")
     public ResponseEntity<HabitacionResponseDTO> ponerMantenimiento(
@@ -34,7 +35,9 @@ public class EmpleadosController {
                 habitacionService.conserjePonerMantenimiento(id)
         );
     }
+    //endregion
 
+    //region Cambia el estado de una habitacion de mantenimiento a disponible. Solo para conserje
     @PutMapping("/habitaciones/{id}/estado-disponible")
     @PreAuthorize("hasRole('CONSERJE')")
     public ResponseEntity<HabitacionResponseDTO> conserjePonerDisponible(
@@ -43,8 +46,9 @@ public class EmpleadosController {
                 habitacionService.conserjePonerDisponible(id)
         );
     }
+    //endregion
 
-    // Limpieza: poner limpieza / volver a estado anterior
+    //region Limpieza: poner limpieza / volver a estado anterior
     @PreAuthorize("hasRole('LIMPIEZA')")
     @PutMapping("/habitaciones/{id}/estado-limpieza")
     public ResponseEntity<HabitacionResponseDTO> ponerLimpieza(
@@ -53,7 +57,9 @@ public class EmpleadosController {
                 habitacionService.limpiezaPonerLimpieza(id)
         );
     }
+    //endregion
 
+    //region Restaura el estado de limpieza a su anterior estado de una habitacion
     @PutMapping("/habitaciones/{id}/restaurar-estado")
     @PreAuthorize("hasRole('LIMPIEZA')")
     public ResponseEntity<HabitacionResponseDTO> limpiezaRestaurarEstado(
@@ -62,4 +68,5 @@ public class EmpleadosController {
                 habitacionService.limpiezaRestaurarEstado(id)
         );
     }
+    //endregion
 }

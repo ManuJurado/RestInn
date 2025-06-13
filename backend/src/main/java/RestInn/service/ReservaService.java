@@ -413,6 +413,7 @@ public class ReservaService {
     }
     //endregion
 
+    //region Obtiene booleano si habitacion tiene reservas vigentes o futuras
     public boolean habitacionTieneReservasVigentesOFuturas(Long habitacionId) {
         return reservaRepository.existsByHabitacion_IdAndEstadoReservaNotAndFechaSalidaGreaterThanEqual(
                 habitacionId,
@@ -420,4 +421,5 @@ public class ReservaService {
                 LocalDate.now()
         );
     }
+    //endregion
 }

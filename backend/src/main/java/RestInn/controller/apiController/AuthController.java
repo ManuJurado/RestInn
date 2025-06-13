@@ -120,9 +120,7 @@ public class AuthController {
     }
     //endregion
 
-    // dentro de RestInn.controller.apiController.AuthController
-
-    // Inicia el registro: guarda el DTO en JSON dentro de VerificationToken
+    //region Inicia el registro: guarda el DTO en JSON dentro de VerificationToken
     @PostMapping("/register/initiate")
     public ResponseEntity<Map<String,String>> initiateRegistration(@RequestBody UsuarioRequestDTO dto) {
         String code = usuarioService.iniciarRegistro(dto);
@@ -131,8 +129,9 @@ public class AuthController {
                 "code", code
         ));
     }
+    //endregion
 
-    // Completa el registro cuando el usuario mete el código
+    //region Completa el registro cuando el usuario mete el código
     @GetMapping("/register/verify")
     public ResponseEntity<Map<String,String>> completeRegistration(@RequestParam String code) {
         try {
@@ -143,7 +142,7 @@ public class AuthController {
                     .body(Map.of("message", e.getReason()));
         }
     }
-
+    //endregion
 
     public static record AuthRequest(String username, String password) {}
 }

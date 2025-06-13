@@ -24,9 +24,7 @@ public class SecurityConfig {
     @Autowired private JwtFilter jwtFilter;
     @Autowired private CustomUserDetailsService userDetailsService;
 
-    /**
-     *  Ignoramos totalmente los estáticos; ni siquiera pasan por el filtro de Spring Security.
-     */
+    //Ignoramos totalmente los estáticos; ni siquiera pasan por el filtro de Spring Security.
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
         return (web) -> web.ignoring()
@@ -55,7 +53,7 @@ public class SecurityConfig {
         return http.build();
     }
 
-    /** DaoAuthenticationProvider con BCrypt */
+    // DaoAuthenticationProvider con BCrypt
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
@@ -64,7 +62,7 @@ public class SecurityConfig {
         return provider;
     }
 
-    /** AuthenticationManager personalizado */
+    // AuthenticationManager personalizado
     @Bean
     public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
         return http.getSharedObject(AuthenticationManagerBuilder.class)
