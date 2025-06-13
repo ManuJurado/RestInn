@@ -1,35 +1,65 @@
 package RestInn.controller.apiController;
 
-import RestInn.dto.usuariosDTO.UsuarioResponseDTO;
-import RestInn.service.UsuarioService;
+import RestInn.dto.habitacionesDTO.HabitacionResponseDTO;
+import RestInn.service.HabitacionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-//EmpleadosController ahora solo se ocupa de la consulta de empleados,
-// puesto que las operaciones sobre habitaciones se han movido a HabitacionController
-// y las operaciones sobre reservas están en ReservaController.
-
 @RestController
 @RequestMapping("/api/empleados")
-@PreAuthorize("hasAnyRole('ADMINISTRADOR', 'RECEPCIONISTA', 'LIMPIEZA', 'CONSERJE')")// endpoints escalables preparados para la inclusion de mas empleados y metodos exclusivos para los mismos en el futuro
+@PreAuthorize("hasAnyRole('ADMINISTRADOR','RECEPCIONISTA','LIMPIEZA','CONSERJE')")
 public class EmpleadosController {
 
-    private final UsuarioService usuarioService;
+    private final HabitacionService habitacionService;
 
-    public EmpleadosController(UsuarioService usuarioService) {
-        this.usuarioService = usuarioService;
+    public EmpleadosController(HabitacionService habitacionService) {
+        this.habitacionService = habitacionService;
     }
 
-    //region CONSULTA DE EMPLEADOS (ADMIN). Solo el administrador puede listar todos los empleados (solo datos NO sensibles).
-    @GetMapping("/lista")
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
-    public ResponseEntity<List<UsuarioResponseDTO>> listarEmpleados() {
-        List<UsuarioResponseDTO> lista = usuarioService.verEmpleados();
-        return ResponseEntity.ok(lista);
+    // Listar todas activas (cualquier empleado autorizado)
+    @GetMapping("/habitaciones")
+    public ResponseEntity<List<HabitacionResponseDTO>> listarActivas() {
+        return ResponseEntity.ok(habitacionService.listarActivas());
     }
-    //endregion
 
+    // Conserje: poner mantenimiento / volver disponible
+    @PutMapping("/habitaciones/{id}/estado-mantenimiento")
+    @PreAuthorize("hasRole('CONSERJE')")
+    public ResponseEntity<HabitacionResponseDTO> ponerMantenimiento(
+            @PathVariable Long id) {
+        return ResponseEntity.ok(
+                habitacionService.conserjePonerMantenimiento(id)
+        );
+    }
+
+    @PutMapping("/habitaciones/{id}/estado-disponible")
+    @PreAuthorize("hasRole('CONSERJE')")
+    public ResponseEntity<HabitacionResponseDTO> conserjePonerDisponible(
+            @PathVariable Long id) {
+        return ResponseEntity.ok(
+                habitacionService.conserjePonerDisponible(id)
+        );
+    }
+
+    // Limpieza: poner limpieza / volver a estado anterior
+    @PreAuthorize("hasRole('LIMPIEZA')")
+    @PutMapping("/habitaciones/{id}/estado-limpieza")
+    public ResponseEntity<HabitacionResponseDTO> ponerLimpieza(
+            @PathVariable Long id) {
+        return ResponseEntity.ok(
+                habitacionService.limpiezaPonerLimpieza(id)
+        );
+    }
+
+    @PutMapping("/habitaciones/{id}/restaurar-estado")
+    @PreAuthorize("hasRole('LIMPIEZA')")
+    public ResponseEntity<HabitacionResponseDTO> limpiezaRestaurarEstado(
+            @PathVariable Long id) {
+        return ResponseEntity.ok(
+                habitacionService.limpiezaRestaurarEstado(id)
+        );
+    }
 }

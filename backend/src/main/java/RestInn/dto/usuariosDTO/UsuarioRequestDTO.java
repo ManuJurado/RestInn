@@ -1,5 +1,6 @@
 package RestInn.dto.usuariosDTO;
 
+import RestInn.entities.enums.RolEmpleado;
 import RestInn.validation.UsuarioValido;
 import lombok.*;
 
@@ -19,4 +20,6 @@ public class UsuarioRequestDTO {
     private String password;  // Aquí recibimos el password en texto plano para crear/modificar
     private String cuit;
     private Boolean activo;
+
+    private RolEmpleado rolEmpleado;
 }

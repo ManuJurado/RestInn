@@ -22,7 +22,7 @@ import java.util.List;
 public class SecurityConfig {
 
     @Autowired private JwtFilter jwtFilter;
-    @Autowired private UserDetailsService userDetailsService;
+    @Autowired private CustomUserDetailsService userDetailsService;
 
     /**
      *  Ignoramos totalmente los estáticos; ni siquiera pasan por el filtro de Spring Security.
@@ -48,7 +48,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/usuarios/current", "/api/reservas/**").authenticated()
                         // roles
                         .requestMatchers("/api/admin/**", "/api/habitaciones/*/activar").hasRole("ADMINISTRADOR")
-                        .requestMatchers("/api/empleados/**").hasAnyRole("ADMINISTRADOR", "EMPLEADO")
+                        .requestMatchers("/api/empleados/**").hasAnyRole("ADMINISTRADOR", "LIMPIEZA", "CONSERJE", "RECEPCIONISTA")
                         .anyRequest().permitAll())
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
