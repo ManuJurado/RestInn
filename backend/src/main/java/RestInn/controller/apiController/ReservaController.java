@@ -41,6 +41,15 @@ public class ReservaController {
     }
     //endregion
 
+    //region TRAER LISTA DE RESERVAS POR ID DE CLIENTE
+    @GetMapping("/{idCliente}")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR','RECEPCIONISTA')")
+    public ResponseEntity<List<ReservaResponseDTO>> listarReservasCliente(@PathVariable Long idCliente) {
+        List<ReservaResponseDTO> lista = reservaService.obtenerReservasPorUsuarioId(idCliente);
+        return ResponseEntity.ok(lista);
+    }
+    //endregion
+
     //region CANCELAR RESERVA (solo CLIENTE, estado PENDIENTE)
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('CLIENTE')")

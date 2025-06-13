@@ -14,7 +14,7 @@ public class UsuarioResponseDTO {
     private String dni;
     private String phoneNumber;
     private String email;
-    private String CUIT;
+    private String cuit;
     private Boolean activo;
 
     private String role;

@@ -85,6 +85,14 @@ function configurarEventos() {
         });
     }
 
+   // Botón "Visualizar Facturas"
+   const btnVF = document.getElementById("btnVerFacturas");
+   if (btnVF) {
+       btnVF.addEventListener("click", () => {
+           window.location.href = "/admin/lista-facturas.html";
+       });
+   }
+
     // Botón "Cerrar sesión"
     const btnCerrar = document.getElementById("btnCerrarSesion");
     if (btnCerrar) {

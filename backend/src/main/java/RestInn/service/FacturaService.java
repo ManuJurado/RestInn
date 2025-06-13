@@ -184,10 +184,24 @@ public class FacturaService {
     }
     //endregion
 
-    //region Obtener una factura por ID.
+    //region Obtener una factura por ID. (devuelve factura)
     public Factura obtenerFacturaPorId(Long id) {
         return facturaRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Factura no encontrada"));
+    }
+    //endregion
+
+    //region Obtener una factura por ID. (devuelve facturaResponseTO)
+    public FacturaResponseDTO buscarPorId(Long id) {
+        Optional<Factura> facturaOpt = facturaRepository.findById(id);
+        if (facturaOpt.isEmpty()) {
+            return null; // o lanzar excepción, depende cómo manejás
+        }
+        Factura factura = facturaOpt.get();
+
+        // Convertir la entidad Factura a FacturaResponseDTO
+        FacturaResponseDTO dto = mapearAResponseDTO(factura);
+        return dto;
     }
     //endregion
 
@@ -206,6 +220,15 @@ public class FacturaService {
                 .toList();
     }
     //endregion
+
+    //region Listar facturas por cliente.
+    public List<FacturaResponseDTO> listarPorClienteDTO(Long clienteId) {
+        return facturaRepository.findByReserva_Usuario_Id(clienteId).stream()
+                .map(this::mapearAResponseDTO)
+                .toList();
+    }
+    //endregion
+
 
     //region Obtener la factura de los consumos por reserva.
     public Factura obtenerFacturaConsumosPorReserva(Long reservaId) {
@@ -281,6 +304,7 @@ public class FacturaService {
 
             // ← NUEVO: mostrar estado factura
             doc.add(new Paragraph("Estado: " + factura.getEstado().name(), normal));
+            doc.add(new Paragraph("Tipo de factura: " + factura.getTipoFactura().name(), normal));
 
             doc.add(Chunk.NEWLINE);
 

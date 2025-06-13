@@ -96,7 +96,7 @@ public class UsuarioService {
         usuario.setNombre(dto.getNombre());
         usuario.setApellido(dto.getApellido());
         usuario.setPhoneNumber(dto.getPhoneNumber());
-        usuario.setCUIT(dto.getCUIT());
+        usuario.setCuit(dto.getCuit());
 
         usuarioRepository.save(usuario);
         return mapToResponse(usuario);
@@ -124,6 +124,15 @@ public class UsuarioService {
     public List<UsuarioResponseDTO> verEmpleados() {
         return usuarioRepository.findAll().stream()
                 .filter(u -> u instanceof Empleado)
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
+    //endregion
+
+    //region VER SOLO CLIENTES
+    public List<UsuarioResponseDTO> verClientes() {
+        return usuarioRepository.findAll().stream()
+                .filter(u -> u instanceof Cliente)
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
@@ -181,7 +190,7 @@ public class UsuarioService {
         usuario.setDni(dto.getDni());
         usuario.setPhoneNumber(dto.getPhoneNumber());
         usuario.setEmail(dto.getEmail());
-        usuario.setCUIT(dto.getCUIT());
+        usuario.setCuit(dto.getCuit());
         usuario.setActivo(dto.getActivo() != null ? dto.getActivo() : true);
 
         if (esNuevo || (dto.getPassword() != null && !dto.getPassword().isBlank())) {
@@ -212,7 +221,7 @@ public class UsuarioService {
                 .dni(usuario.getDni())
                 .phoneNumber(usuario.getPhoneNumber())
                 .email(usuario.getEmail())
-                .CUIT(usuario.getCUIT())
+                .cuit(usuario.getCuit())
                 .activo(usuario.getActivo())
                 .role(roleValue)
                 .build();

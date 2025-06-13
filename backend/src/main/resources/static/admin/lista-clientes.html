@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <title>Lista de Clientes</title>
+    <link rel="stylesheet" href="../css/base.css" />
+    <link rel="stylesheet" href="../css/layout.css" />
+    <link rel="stylesheet" href="../css/buttons.css" />
+    <link rel="stylesheet" href="../css/wrapper.css" />
+    <link rel="stylesheet" href="../css/components.css" />
+</head>
+<body>
+
+<div class="wrapper">
+    <div class="sidebar">
+        <h3>Filtros</h3>
+        <input type="text" id="filtroNombre" placeholder="Filtrar por nombre" />
+        <input type="text" id="filtroDni" placeholder="Filtrar por DNI" />
+        <button onclick="aplicarFiltros()">Aplicar</button>
+    </div>
+
+    <div class="tabla-habitaciones">
+        <h2>Lista de Clientes</h2>
+        <table class="tabla-clientes">
+            <thead>
+            <tr>
+                <th>Nombre y Apellido</th>
+                <th>DNI</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+            </thead>
+            <tbody id="tablaClientesBody"></tbody>
+        </table>
+    </div>
+</div>
+
+<script src="../js/admin/listaClientes.js"></script>
+</body>
+</html>

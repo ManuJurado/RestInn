@@ -28,8 +28,8 @@ public class UsuarioController {
     }
     //endregion
 
-    //region Listar Usuarios. Solo ADMIN y EMPLEADO pueden ver todos los usuarios(sin su informacion sensible)
-    @PreAuthorize("isAuthenticated()")
+    //region Listar Usuarios. Solo ADMINISTRADOR y RECEPCIONISTA pueden ver todos los usuarios(sin su informacion sensible)
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR','RECEPCIONISTA')")
     @GetMapping
     public ResponseEntity<List<UsuarioResponseDTO>> listarUsuarios() {
         return ResponseEntity.ok(usuarioService.verUsuarios());
@@ -55,7 +55,7 @@ public class UsuarioController {
     }
     //endregion
 
-    //region Cracion de un administrador (muy ocasional)
+    //region Creacion de un administrador (muy ocasional)
     @PostMapping("/admin")
     public ResponseEntity<UsuarioResponseDTO> crearAdmin(@RequestBody UsuarioRequestDTO dto) {
         UsuarioResponseDTO nuevoAdmin = usuarioService.crearAdministrador(dto);

@@ -15,7 +15,7 @@ form.addEventListener('submit', async e => {
   const apellido    = document.getElementById('apellido').value.trim();
   const dni         = document.getElementById('dni').value.trim();
   const phoneNumber = document.getElementById('phoneNumber').value.trim();
-  const CUIT        = document.getElementById('CUIT').value.trim();
+  const cuit        = document.getElementById('cuit').value.trim();
 
   if (password !== confirm) {
     mostrarAlerta('Las contraseñas no coinciden');
@@ -24,7 +24,7 @@ form.addEventListener('submit', async e => {
     return;
   }
 
-  const dto = { nombreLogin, email, password, nombre, apellido, dni, phoneNumber, CUIT };
+  const dto = { nombreLogin, email, password, nombre, apellido, dni, phoneNumber, cuit};
 
   try {
     const res = await fetch('/api/auth/register/initiate', {

@@ -43,7 +43,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         <input class="inputs" value="${u.email}" readonly />
       </label>
       <label class="labels">CUIT
-        <input class="inputs" value="${u.CUIT || '-'}" readonly />
+        <input class="inputs" value="${u.cuit}" readonly />
       </label>
       <label class="labels">Rol
         <input class="inputs" value="${u.role}" readonly />

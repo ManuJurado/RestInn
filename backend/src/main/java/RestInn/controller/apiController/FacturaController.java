@@ -14,7 +14,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/facturas")
-@PreAuthorize("hasRole('ADMINISTRADOR')")
 public class  FacturaController {
     @Autowired
     private FacturaService facturaService;
@@ -74,9 +73,21 @@ public class  FacturaController {
     }
     //endregion
 
+    //region Ver una factura por id
+    @GetMapping("/{facturaId}")
+    @PreAuthorize("hasAnyRole('RECEPCIONISTA', 'CLIENTE', 'ADMINISTRADOR')")
+    public ResponseEntity<FacturaResponseDTO> obtenerFacturaPorId(@PathVariable Long facturaId) {
+        FacturaResponseDTO factura = facturaService.buscarPorId(facturaId);
+        if (factura == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(factura);
+    }
+    //endregion
+
     //region Listar las facturas asociadas a una reserva.
     @GetMapping("/reserva/{reservaId}")
-    @PreAuthorize("hasAnyRole('RECEPCIONISTA', 'CLIENTE')")
+    @PreAuthorize("hasAnyRole('RECEPCIONISTA', 'CLIENTE', 'ADMINISTRADOR')")
     public ResponseEntity<FacturaResponseDTO> obtenerPorReserva(
             @PathVariable Long reservaId) {
         return ResponseEntity.ok(facturaService.buscarPorReservaId(reservaId));
@@ -85,12 +96,22 @@ public class  FacturaController {
 
     //region Trae un listado de facturas por reserva id.
     @GetMapping("/listareservas/{reservaId}")
+    @PreAuthorize("hasAnyRole('RECEPCIONISTA', 'CLIENTE', 'ADMINISTRADOR')")
     public ResponseEntity<List<FacturaResponseDTO>> listarPorReserva(@PathVariable Long reservaId) {
         return ResponseEntity.ok(facturaService.listarPorReservaDTO(reservaId));
     }
     //endregion
 
+    //region Trae un listado de facturas por cliente id.
+    @GetMapping("/cliente/{clienteId}")
+    @PreAuthorize("hasAnyRole('RECEPCIONISTA', 'CLIENTE', 'ADMINISTRADOR')")
+    public ResponseEntity<List<FacturaResponseDTO>> listarPorCliente(@PathVariable Long clienteId) {
+        return ResponseEntity.ok(facturaService.listarPorClienteDTO(clienteId));
+    }
+    //endregion
+
     //region Descarga el pdf de la factura
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR','CLIENTE')")
     @GetMapping("/{facturaId}/pdf")
     public ResponseEntity<InputStreamResource> descargarPdf(@PathVariable Long facturaId) {
         byte[] pdfBytes = facturaService.generarPdf(facturaId);
