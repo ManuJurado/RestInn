@@ -34,30 +34,34 @@ public class AdminUsuarioController {
     }
     //endregion
 
-    // Buscar usuario por ID
+    //region Buscar usuario por ID
     @GetMapping("/{id}")
     public ResponseEntity<UsuarioResponseDTO> buscarPorId(@PathVariable Long id) {
         return ResponseEntity.ok(usuarioService.buscarPorId(id));
     }
+    //endregion
 
-    // Crear empleado
+    //region Crear empleado
     @PostMapping("/empleados")
     public ResponseEntity<UsuarioResponseDTO> crearEmpleado(@RequestBody UsuarioRequestDTO dto) {
         UsuarioResponseDTO nuevoEmpleado = usuarioService.crearEmpleado(dto);
         return new ResponseEntity<>(nuevoEmpleado, HttpStatus.CREATED);
     }
+    //endregion
 
-    // Modificar cualquier usuario
+    //region Modificar cualquier usuario
     @PutMapping("/{id}")
     public ResponseEntity<UsuarioResponseDTO> modificarUsuario(@PathVariable Long id, @RequestBody UsuarioRequestDTO dto) {
         UsuarioResponseDTO actualizado = usuarioService.modificarUsuario(id, dto);
         return ResponseEntity.ok(actualizado);
     }
+    //endregion
 
-    // Eliminar cualquier usuario
+    //region Eliminar cualquier usuario
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> borrarUsuario(@PathVariable Long id) {
         usuarioService.borrarUsuario(id);
         return ResponseEntity.noContent().build();
     }
+    //endregion
 }

@@ -27,7 +27,7 @@ public class ConsumoService {
     @Autowired
     private FacturaService facturaService;
 
-    // ─── Mapear DTO → Entidad ───────────────────────────────────────────────────
+    //region Mapear DTO → Entidad
     private Consumo mapearDesdeRequestDTO(ConsumoRequestDTO dto, Factura factura) {
         BigDecimal subtotal = dto.getPrecioUnitario()
                 .multiply(BigDecimal.valueOf(dto.getCantidad()));
@@ -39,8 +39,9 @@ public class ConsumoService {
                 .factura(factura)
                 .build();
     }
+    //endregion
 
-    // ─── Mapear Entidad → DTO ───────────────────────────────────────────────────
+    //region Mapear Entidad → DTO
     private ConsumoResponseDTO mapearAResponseDTO(Consumo consumo) {
         return ConsumoResponseDTO.builder()
                 .id(consumo.getId())
@@ -50,15 +51,17 @@ public class ConsumoService {
                 .subtotal(consumo.getSubtotal())
                 .build();
     }
+    //endregion
 
-    // ─── Recuperar factura o lanzar excepción ──────────────────────────────────
+    //region Recuperar factura o lanzar excepción
     private Factura cargarFacturaEntidad(Long facturaId) {
         return facturaRepository.findById(facturaId)
                 .orElseThrow(() ->
                         new IllegalArgumentException("Factura no encontrada: " + facturaId));
     }
+    //endregion
 
-    // ─── Crear Consumo ─────────────────────────────────────────────────────────
+    //region Crear Consumo
     @Transactional
     public ConsumoResponseDTO crearConsumo(Long facturaId, ConsumoRequestDTO dto) {
         Factura factura = cargarFacturaEntidad(facturaId);
@@ -76,8 +79,9 @@ public class ConsumoService {
 
         return mapearAResponseDTO(consumo);
     }
+    //endregion
 
-    // ─── Actualizar Consumo ────────────────────────────────────────────────────
+    //region Actualizar Consumo
     @Transactional
     public ConsumoResponseDTO actualizarConsumo(Long consumoId, ConsumoRequestDTO dto) {
         Consumo consumo = consumoRepository.findById(consumoId)
@@ -102,8 +106,9 @@ public class ConsumoService {
 
         return mapearAResponseDTO(consumo);
     }
+    //endregion
 
-    // ─── Eliminar Consumo ───────────────────────────────────────────────────────
+    //region Eliminar Consumo
     @Transactional
     public void eliminarConsumo(Long consumoId) {
         Consumo consumo = consumoRepository.findById(consumoId)
@@ -119,8 +124,9 @@ public class ConsumoService {
         consumoRepository.delete(consumo);
         facturaService.recalcularSubtotal(factura);
     }
+    //endregion
 
-    // ─── Listar por factura ─────────────────────────────────────────────────────
+    //region Listar por factura
     @Transactional(readOnly = true)
     public List<ConsumoResponseDTO> listarPorFacturaDTO(Long facturaId) {
         // Verifica existencia de factura
@@ -130,8 +136,9 @@ public class ConsumoService {
                 .map(this::mapearAResponseDTO)
                 .toList();
     }
+    //endregion
 
-    // ─── Listar por reserva ─────────────────────────────────────────────────────
+    //region Listar por reserva
     @Transactional(readOnly = true)
     public List<ConsumoResponseDTO> listarPorReservaDTO(Long reservaId) {
         // Obtiene la factura de consumos asociada a la reserva
@@ -141,4 +148,5 @@ public class ConsumoService {
                 .map(this::mapearAResponseDTO)
                 .toList();
     }
+    //endregion
 }

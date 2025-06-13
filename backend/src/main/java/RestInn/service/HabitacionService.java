@@ -38,8 +38,9 @@ public class HabitacionService {
     }
     //endregion
 
-    // Guarda el estado anterior para limpieza
+    //region Guarda el estado anterior para limpieza
     private final Map<Long, H_Estado> estadoPrevio = new ConcurrentHashMap<>();
+    //endregion
 
     //region 1) CREAR HABITACIÓN (ADMIN)
     public HabitacionResponseDTO crearHabitacion(HabitacionRequestDTO dto) {
@@ -88,7 +89,6 @@ public class HabitacionService {
         habitacionRepository.save(existente);
     }
     //endregion
-
 
     //region 4) BUSCAR POR ID PARA PÚBLICO (solo activas)
     public HabitacionResponseDTO buscarDTOPorIdPublic(Long id) {
