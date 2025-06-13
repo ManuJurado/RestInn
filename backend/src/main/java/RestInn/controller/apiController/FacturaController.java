@@ -14,14 +14,13 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/facturas")
-@PreAuthorize("hasRole('ADMINISTRADOR')")
 public class  FacturaController {
     @Autowired
     private FacturaService facturaService;
 
     //region Crear una factura al crear reserva.
     @PostMapping("/reserva/{reservaId}")
-    @PreAuthorize("hasRole('RECEPCIONISTA')")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR','RECEPCIONISTA')")
     public ResponseEntity<FacturaResponseDTO> crearFacturaReserva(@PathVariable Long reservaId) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(facturaService.generarFacturaReserva(reservaId));
@@ -30,7 +29,7 @@ public class  FacturaController {
 
     //region Crear factura de consumos al realizar el check-in.
     @PostMapping("/consumos/{reservaId}")
-    @PreAuthorize("hasRole('RECEPCIONISTA')")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR','RECEPCIONISTA')")
     public ResponseEntity<FacturaResponseDTO> crearFacturaConsumos(@PathVariable Long reservaId) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(facturaService.generarFacturaConsumos(reservaId));
@@ -39,7 +38,7 @@ public class  FacturaController {
 
     //region Emitir la factura de consumos al realizar el check-out.
     @PostMapping("/emitir/{reservaId}")
-    @PreAuthorize("hasRole('RECEPCIONISTA')")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR','RECEPCIONISTA')")
     public ResponseEntity<FacturaResponseDTO> emitirFacturaConsumos(
             @PathVariable Long reservaId,
             @RequestBody FacturaRequestDTO dto) {
@@ -50,6 +49,7 @@ public class  FacturaController {
 
     //region Actualizar una factura.
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
     public ResponseEntity<FacturaResponseDTO> actualizarFactura(
             @PathVariable Long id,
             @RequestBody FacturaRequestDTO dto) {
@@ -59,7 +59,7 @@ public class  FacturaController {
 
     //region Anular una factura.
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('RECEPCIONISTA')")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR','RECEPCIONISTA')")
     public ResponseEntity<Void> anularFactura(@PathVariable Long id) {
         facturaService.anularFactura(id);
         return ResponseEntity.noContent().build();
@@ -68,28 +68,24 @@ public class  FacturaController {
 
     //region Listar todas las facturas.
     @GetMapping
-    @PreAuthorize("hasRole('RECEPCIONISTA')")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR','RECEPCIONISTA')")
     public ResponseEntity<List<FacturaResponseDTO>> listarTodas() {
         return ResponseEntity.ok(facturaService.listarTodasDTO());
     }
     //endregion
 
     //region Listar las facturas asociadas a una reserva.
-    @GetMapping("/reserva/{reservaId}")
-    @PreAuthorize("hasAnyRole('RECEPCIONISTA', 'CLIENTE')")
-    public ResponseEntity<FacturaResponseDTO> obtenerPorReserva(
+    @GetMapping("/listareservas/{reservaId}")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'RECEPCIONISTA', 'CLIENTE')")
+    public ResponseEntity<List<FacturaResponseDTO>> listarPorReserva(
             @PathVariable Long reservaId) {
-        return ResponseEntity.ok(facturaService.buscarPorReservaId(reservaId));
+        return ResponseEntity.ok(facturaService.listarPorReservaDTO(reservaId));
     }
     //endregion
 
-    // GET /api/facturas/por-reserva/{reservaId}
-    @GetMapping("/listareservas/{reservaId}")
-    public ResponseEntity<List<FacturaResponseDTO>> listarPorReserva(@PathVariable Long reservaId) {
-        return ResponseEntity.ok(facturaService.listarPorReservaDTO(reservaId));
-    }
-
+    //region Generar el PDF de la factura emitida.
     @GetMapping("/{facturaId}/pdf")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'RECEPCIONISTA', 'CLIENTE')")
     public ResponseEntity<InputStreamResource> descargarPdf(@PathVariable Long facturaId) {
         byte[] pdfBytes = facturaService.generarPdf(facturaId);
 
@@ -106,5 +102,5 @@ public class  FacturaController {
                 .contentLength(pdfBytes.length)
                 .body(new InputStreamResource(new ByteArrayInputStream(pdfBytes)));
     }
-
+    //endregion
 }
