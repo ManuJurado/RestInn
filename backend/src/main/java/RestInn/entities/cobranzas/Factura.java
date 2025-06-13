@@ -61,10 +61,10 @@ public class Factura {
     private Integer cuotas;
 
     @DecimalMin("0.00")
-    private BigDecimal descuento;   // porcentual
+    private BigDecimal descuento; // porcentual
 
     @DecimalMin("0.00")
-    private BigDecimal interes;     // porcentual
+    private BigDecimal interes; // porcentual
 
     @Column(name = "total_final", nullable = false)
     @DecimalMin("0.00")

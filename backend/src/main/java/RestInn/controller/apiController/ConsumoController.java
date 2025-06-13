@@ -24,7 +24,6 @@ public class ConsumoController {
     public ResponseEntity<ConsumoResponseDTO> crearConsumo(
             @PathVariable Long facturaId,
             @RequestBody @Valid ConsumoRequestDTO dto) {
-
         ConsumoResponseDTO response = consumoService.crearConsumo(facturaId, dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -35,7 +34,6 @@ public class ConsumoController {
     public ResponseEntity<ConsumoResponseDTO> actualizarConsumo(
             @PathVariable Long id,
             @RequestBody @Valid ConsumoRequestDTO dto) {
-
         ConsumoResponseDTO response = consumoService.actualizarConsumo(id, dto);
         return ResponseEntity.ok(response);
     }
